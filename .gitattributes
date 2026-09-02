@@ -1,0 +1,11 @@
+# Normalize all text files to LF line endings in the repo and working tree.
+# Keeps line endings consistent whether working on macOS or Windows.
+* text=auto eol=lf
+
+# Explicitly treat common binary files as binary (never touch their bytes).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
