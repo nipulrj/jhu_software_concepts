@@ -1,40 +1,6 @@
-# Byte-compiled / optimized / cache files
+# Byte-compiled / optimized files
 __pycache__/
 *.py[cod]
-*$py.class
 
-# Virtual environments
-venv/
-.venv/
-env/
-.env/
-ENV/
-*env/
-yourappenv/
-
-# Environment variable files
-.env
-.env.*
-
-# Flask
-instance/
-.webassets-cache
-
-# Poetry / packaging
-.local/
-.pythonlibs/
-
-# Testing / coverage
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# IDE / editor
-.vscode/
-.idea/
-*.swp
-
-# OS files
-.DS_Store
-Thumbs.db
+# Claude Code local dev server config
+.claude/
