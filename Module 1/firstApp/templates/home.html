@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Modern Software Concepts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+  </head>
+  <body>
+    <h1>Modern Software Concepts in Python</h1>
+    <h2>JHU Course 605.256</h2>
+    <strong><nav>
+      <ul class="menu">
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+    </nav></strong>
+    <img src="{{ url_for('static', filename='python.png') }}" align="middle" style="width:100px;height:100px;"/>
+    <p>This course will introduce you to a wide range of advanced topics in
+    Python; the skills most developers don't learn until they've been in the
+    workforce. The material has been designed to expose you to common techniques
+    and tools you'll be able to exercise immediately. It is intended for
+    students who have complete 605.206, Intro to Python who are looking to
+    advance their skills by solving problems across a wide variety of topics:
+    web programming, databases, concurrent programming, cloud computing, machine
+    learning, cyber security, and even quantum computing. You'll be introduced
+    to the most current and most popular technologies including: BeautifulSoup,
+    PyCharm/VSCode, Linux CLI, Docker, Git, AWS, Regex, and Flask, as well as a
+    range of Python libraries including: Dask, Dash, Pylint, Pytest, Sphinx,
+    Psychopg3, Sqlalchemy, SciPy, SciKit-Learn, Networkx, numpy, Pytorch,
+    Spacy, Streamlit, Qiskit, and more! Each concept is accompanied by real code
+    samples that will be explained in-detail and the assignments will present
+    you with interesting scientific problems to enable you to practice your
+    Python skills for the purpose of solving real, complex problems. The course
+    is textbook-free and provides several hand-chosen readings to supplement the
+    lecture materials. Upon completion of the course, you should have the
+    knowledge, skills, and tools to take a given problem and comfortably execute
+    a solution using Python and a supporting ecosystem of technologies.
+    Prerequisite: EN.605.206-Introduction to Programming using Python or
+    equivalent course.
+    </p>
+  </body>
+</html>
