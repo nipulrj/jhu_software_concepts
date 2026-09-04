@@ -7,6 +7,39 @@ body {
   margin: 0;
 }
 
+header {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #1f2937;
+}
+
+.navbar ul {
+  list-style-type: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar li {
+  margin: 0;
+}
+
+.navbar a {
+  display: block;
+  padding: 16px 20px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.navbar a:hover {
+  background-color: #374151;
+}
+
+.navbar a.active {
+  background-color: #2563eb;
+}
+
 main {
   width: 80%;
   margin: 0 auto;
