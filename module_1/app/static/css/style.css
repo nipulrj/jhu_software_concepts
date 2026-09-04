@@ -88,3 +88,15 @@ main {
 .contact-list a {
   color: #2563eb;
 }
+
+.project-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px 24px;
+  max-width: 600px;
+}
+
+.project-card a {
+  color: #2563eb;
+  font-weight: 600;
+}
