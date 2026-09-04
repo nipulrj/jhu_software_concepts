@@ -74,3 +74,17 @@ main {
     flex-direction: column;
   }
 }
+
+.contact-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.contact-list li {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.contact-list a {
+  color: #2563eb;
+}
