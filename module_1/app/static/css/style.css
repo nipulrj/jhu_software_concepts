@@ -5,6 +5,8 @@
 body {
   font-family: sans-serif;
   margin: 0;
+  background-color: #ffffff;
+  color: #111827;
 }
 
 header {
@@ -44,4 +46,31 @@ main {
   width: 80%;
   margin: 0 auto;
   padding: 20px 0;
+}
+
+.bio-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.bio-text {
+  flex: 2;
+}
+
+.bio-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.bio-image img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+  .bio-section {
+    flex-direction: column;
+  }
 }

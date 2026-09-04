@@ -3,5 +3,37 @@
 {% block title %}Home | Nipul Jayasekera{% endblock %}
 
 {% block content %}
-  <h1>Home page (placeholder)</h1>
+  <section class="bio-section">
+    <div class="bio-text">
+      <h1>Nipul Jayasekera</h1>
+      <h2>LinkedIn Full-Stack Engineer (Contract), Graduate Student at JHU</h2>
+      <p>
+        I'm a UCLA graduate in Linguistics and Computer Science with experience
+        spanning from larger tech organizations and startups. I worked at Ordr
+        Inc. (a cybersecurity startup) as a Senior Software Engineer, where I
+        focused on frontend development, automation, and integrations. I also
+        previously interned at Niara Inc. and Aruba Networks at Hewlett
+        Packard Enterprise, establishing a solid base in software engineering
+        and programming practices.
+      </p>
+      <p>
+        I design and build web experiences centered on impact. My work
+        encompasses modern front-end engineering and I enjoy collaborating
+        closely with teams to create products that scale and deliver
+        meaningful value.
+      </p>
+      <p>
+        I'm eager to tackle new challenges and continue developing solutions
+        in any area of Computer Science.
+      </p>
+      <p>
+        Recently, I started working at LinkedIn on the Online Jobs team as a
+        Full Stack Engineer (Contract) and on my Master's in Artificial
+        Intelligence at JHU.
+      </p>
+    </div>
+    <div class="bio-image">
+      <img src="{{ url_for('static', filename='img/profile-placeholder.svg') }}" alt="Photo of Nipul Jayasekera">
+    </div>
+  </section>
 {% endblock %}
