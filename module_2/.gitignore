@@ -1,0 +1,4 @@
+# Scraper working files (large intermediate artifacts, not deliverables)
+data/raw_pages/
+data/checkpoint.json
+llm_hosting/models/
