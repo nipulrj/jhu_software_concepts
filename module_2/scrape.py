@@ -266,12 +266,49 @@ class GradCafeScraper:
         if body is None:
             return [], None
 
+        # The visible table omits the year on the decision badge ("Accepted on
+        # Sep 09"), so pull the full notification dates off the same page.
+        decision_dates = self._parse_embedded_decision_dates(soup)
+
         entries = []
         for main_row, detail_rows in self._group_rows(body):
             entry = self._parse_entry(main_row, detail_rows)
-            if entry is not None:
-                entries.append(entry)
+            if entry is None:
+                continue
+            entry["raw_decision_date"] = decision_dates.get(entry["entry_id"], "")
+            entries.append(entry)
         return entries, self._parse_next_cursor(soup)
+
+    @staticmethod
+    def _parse_embedded_decision_dates(soup: BeautifulSoup) -> Dict[Optional[int], str]:
+        """Map entry id to full ``YYYY-MM-DD`` decision date for this page.
+
+        The listing is an Inertia page: the same markup we already downloaded
+        carries the server's data payload in a ``data-page`` attribute, and that
+        payload spells the notification date out in full.  Reading it here keeps
+        the decision year exact without a second request per result, and without
+        having to guess the year from the "Added on" column.
+
+        Returns an empty map if the attribute is missing or malformed, in which
+        case ``clean.py`` falls back to inferring the year.
+        """
+        holder = soup.find(attrs={"data-page": True})
+        if holder is None:
+            return {}
+        try:
+            payload = json.loads(holder["data-page"])
+            rows = payload["props"]["results"]["data"]
+        except (json.JSONDecodeError, KeyError, TypeError):
+            return {}
+
+        dates: Dict[Optional[int], str] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            notified = row.get("date_of_notification")
+            if isinstance(notified, str) and len(notified) >= 10:
+                dates[row.get("id")] = notified[:10]
+        return dates
 
     @staticmethod
     def _group_rows(tbody: Any) -> Iterator[Tuple[Any, List[Any]]]:
@@ -324,6 +361,7 @@ class GradCafeScraper:
             "raw_degree": degree,
             "raw_date_added": self._text(cells[2]),
             "raw_status": self._text(cells[3]),
+            "raw_decision_date": "",
             "raw_term": "",
             "raw_applicant_type": "",
             "raw_gpa": "",
