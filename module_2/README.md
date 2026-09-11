@@ -296,7 +296,14 @@ Names that cannot be matched safely are left alone, on the principle that
 **unstandardized is better than wrong**.
 
 Measured on a 300-row random sample, scoring against the university name the site
-itself renders: **7 corrupted rows before the guard, 0 after.** The legitimate
+itself renders: **7 corrupted rows before the guard, 0 after.** Across the full
+50,000-row output, rows whose standardized university no longer names the same
+school fell from **6.64% to 4.18%** once the typo repair above was added, and
+nearly all of what remains is correct abbreviation expansion that the measure
+over-flags (*UCLA → University of California, Los Angeles*,
+*UNC Chapel Hill → University of North Carolina at Chapel Hill*). Genuine
+remaining errors are about **0.24%** of rows, itemised under "systematic edge
+cases" below. The legitimate
 folds are unaffected — `Speech Language Pathology → Speech-Language Pathology`,
 `MIT (parenthetical) → Massachusetts Institute of Technology`,
 `University of Michigan - Ann Arbor → University of Michigan, Ann Arbor`,
@@ -344,11 +351,32 @@ Result: **979 → 1,330 universities** and **289 → 1,032 programs**.
 Things the standardization still gets wrong, found by comparing its output
 against the university name the site itself renders:
 
-- **The tiny model introduces typos.** TinyLlama produced *"The Whartoon
-  School"* from *"The Wharton School"*. Because the mangled name matches nothing
-  in the canonical list, the post-processor cannot repair it. A larger model, or
-  preferring the scraped university field when the model disagrees with it, would
-  fix this.
+- **The tiny model introduces typos — mostly repaired now.** TinyLlama reliably
+  mangles some well-known names: *Carnegie **Melon***, ***Darmouth** College*,
+  ***Stoony** Brook*, *Loyo**a** University*, *The Whart**oo**n School*. On the
+  full 50,000 rows this affected about 1,230 records. The matcher originally
+  refused to fix them, because its "do not invent specificity" rule could not
+  tell a corrected spelling (*Melon* → *Mellon*) from an added qualifier
+  (*Nebraska* → *Nebraska Omaha*). `_tokens_agree()` now also treats
+  near-identical words as the same word, which repairs these while still
+  rejecting the campus guesses: the typo pairs score 0.91–0.95 on similarity
+  while *Milan*/*Michigan*, *Mary*/*Maryland* and *Omaha*/*Nebraska* score
+  0.29–0.67, so the two classes separate cleanly.
+
+- **The model sometimes hallucinates a confidently wrong campus.** Given
+  *"Economics, University of California (UCSC)"* it answers *"University of
+  California, Berkeley"* — a real school, just not the right one. No amount of
+  post-processing catches this, because the wrong answer **is** a valid canonical
+  entry; the guards only police the fuzzy-matching step, not the model's own
+  output. Affects ~70 rows (0.14%). A cross-check against the acronym in the
+  scraped name would catch it, but produces its own false positives
+  (*UZH → University of Zurich* and *UPenn → University of Pennsylvania* are
+  correct expansions that such a check flags), so it is documented rather than
+  papered over.
+
+- **Acronym-laden names can come back worse.** *"Washington University in St.
+  Louis (WashU/WUSTL)"* sometimes standardizes to *"Washu/Wustl"* — the model
+  latches onto the parenthetical instead of the name (~52 rows).
 - **Qualifiers get dropped.** *"University of Texas at Austin - NWP"* becomes
   *"University of Texas at Austin"*. Usually desirable, occasionally lossy.
 - **Punctuation and accents vary in the source.** The site itself contains

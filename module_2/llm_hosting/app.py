@@ -213,14 +213,31 @@ def _significant_tokens(name: str) -> List[str]:
 
 
 def _tokens_agree(left: str, right: str) -> bool:
-    """True when two words are the same or share a stem (Mathematic/Mathematics)."""
+    """True when two words are the same word.
+
+    Covers three cases seen in the data:
+
+    * identical;
+    * a shared stem - "Mathematic" / "Mathematics";
+    * a misspelling of each other - "Melon" / "Mellon", "Darmouth" / "Dartmouth".
+      The tiny model reliably mangles a few well-known names, and without this
+      the correction is refused as though it named a different school.
+
+    The similarity floor stays high enough that genuinely different words do not
+    pass: "Milan"/"Michigan", "Mary"/"Maryland" and "Omaha"/"Nebraska" all fall
+    well below it.
+    """
     if left == right:
         return True
-    return (
+    if (
         len(left) >= 5
         and len(right) >= 5
         and (left.startswith(right[:5]) or right.startswith(left[:5]))
-    )
+    ):
+        return True
+    if len(left) < 4 or len(right) < 4:
+        return False
+    return difflib.SequenceMatcher(None, left, right).ratio() >= 0.85
 
 
 def _keeps_identity(name: str, candidate: str) -> bool:
