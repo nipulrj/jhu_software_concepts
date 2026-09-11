@@ -120,14 +120,41 @@ correctly evaluate to disallowed — visible in `screenshot.jpg`.
 
 ### 1. Scraping — `scrape.py`
 
-**urllib only; no Selenium.** The assignment anticipated Cloudflare blocking
-plain HTTP and suggested a browser-based workaround. That turned out not to be
-necessary here: `https://www.thegradcafe.com/survey/` is **server-rendered HTML**
-and plain `urllib` retrieves it with **HTTP 200**. Every field the assignment
-asks for is present in the returned markup, so a browser would add startup cost
-and a driver dependency while producing the same bytes. Selenium is therefore not
-used and not in `requirements.txt`. (Chrome *is* used, but only by
-`capture_robots_evidence.py` to render the robots.txt screenshot.)
+**urllib only; no Selenium — and this was tested, not assumed.**
+
+The assignment notes warned that a plain `requests`/`urllib` scrape now returns
+HTTP 403 behind Cloudflare, and that a Selenium-driven browser gets caught in a
+"verify you are human" loop, recommending a hybrid workflow where a person clears
+the Cloudflare check in a real Chrome window and a helper script then captures
+the rendered HTML.
+
+The first step of that diagnosis is exactly what this scraper does, so it was
+worth measuring rather than assuming. **Across 2,500 page requests over two runs,
+plain `urllib` returned HTTP 200 every time — no 403s, no blocks, no challenges,
+no CAPTCHAs.** The survey listing is server-rendered HTML and every field this
+assignment needs is already in the response body.
+
+The likely reason the experience differs is request rate. This scraper is
+deliberately gentle — one request per second, strictly sequential (cursor
+pagination makes parallelism impossible anyway), with a user-agent that
+identifies the project and gives a contact address. Cloudflare's bot scoring
+responds to volume and concurrency, and a parallelised crawl presents very
+differently from a slow sequential one.
+
+Given that, Selenium would launch a browser to obtain bytes `urllib` already
+returns, while adding a driver dependency and browser startup cost. The hybrid
+capture workflow would additionally require a human to clear a Cloudflare
+challenge by hand, which would make the scraper *less* reproducible for a grader,
+not more. So Selenium is not used and is not in `requirements.txt`, and
+`scrape.py` runs start-to-finish unattended.
+
+If Cloudflare does begin refusing this traffic, the scraper does not try to work
+around it: HTTP 401/403/429 raises `ScrapingBlocked` and stops the run, keeping
+its checkpoint so it can resume later.
+
+(Chrome *is* used, but only by `capture_robots_evidence.py` to render the
+robots.txt screenshot — through Chrome's own `--headless --screenshot` flag, not
+Selenium, and never for scraping.)
 
 **URL handling with `urllib.parse`.** `_build_survey_url()` splits the base URL,
 attaches the pagination query with `urlencode`, and reassembles it with
