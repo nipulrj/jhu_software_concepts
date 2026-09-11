@@ -12,7 +12,7 @@ import difflib
 import inspect
 import unicodedata
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from flask import Flask, jsonify, request
 from huggingface_hub import hf_hub_download
