@@ -1,4 +1,8 @@
-# Scraper working files (large intermediate artifacts, not deliverables)
-data/raw_pages/
-data/checkpoint.json
+# Scraper working files: large, regenerable with `python scrape.py`, and not
+# deliverables. The deliverables (applicant_data.json,
+# llm_extend_applicant_data.json) live at the module root and ARE committed.
+data/
+
+# Downloaded GGUF model weights (~670 MB), fetched on first run of the
+# LLM stage from Hugging Face.
 llm_hosting/models/
