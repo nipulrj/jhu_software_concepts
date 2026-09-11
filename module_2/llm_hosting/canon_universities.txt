@@ -1059,3 +1059,261 @@ Fairmont State University
 West Liberty University
 Wheeling University
 Concord University
+
+# --- appended from scraped Grad Cafe data (expand_canon_lists.py) ---
+University of California (UCLA)
+University of Minnesota
+University of Michigan
+Rutgers University
+Penn State University
+University of Maryland
+University of California (UCSB)
+Washington University in St. Louis (WashU/WUSTL)
+UNC Chapel Hill
+Stony Brook University
+Cambridge University
+University of North Carolina (UNC)
+NYU Steinhardt
+Ecole Polytechnique Federale De Lausanne (EPFL)
+Texas A&M University - College Station
+Teachers College at Columbia University
+Ohio State University - Columbus
+Columbia University in the City of New York
+Johns Hopkins Bloomberg School of Public Health
+University of California (UCSC)
+University at Buffalo
+CUNY
+University of Nebraska
+Binghamton University
+University of Western Ontario
+Pratt Institute
+NC State University
+University of California (UCSF)
+University of Wisconsin
+School of the Art Institute of Chicago (SAIC)
+UC RIVERSIDE
+University of Tennessee
+SUNY Buffalo
+Harvard Kennedy School
+Bocconi University
+Indiana University
+CUNY Hunter College
+Hunter College
+NYU Tandon School of Engineering
+SUNY Stony Brook
+Bonn Graduate School of Economics
+London School of Economics
+The Wharton School
+UC Berkeley
+UCSD
+City University of New York
+Institute of Fine Arts, New York University
+Stockholm School of Economics
+UNC Charlotte
+University of California (UCSD)
+Center for Monetary and Financial Studies (CEMFI)
+Central European University
+Northwestern University Feinberg School of Medicine
+Emory Rollins School of Public Health
+SUNY Albany
+UNC Greensboro
+Baylor College of Medicine
+Cornell Tech
+NYU
+Rhode Island School of Design (RISD)
+University of Massachusetts
+Kings College London
+MIT Sloan School of Management
+The Scripps Research Institute
+University at Albany
+University of Colorado Denver/Anschutz Medical Campus
+William James College
+Harvard Divinity School
+Northwestern
+The Wright Institute
+Toulouse School of Economics
+Bard Graduate Center
+Colorado School of Public Health
+MGH Institute of Health Professions
+MIT Media Lab
+State University of New York at Buffalo
+UT Southwestern
+University of California
+London Business School
+Miami University
+Princeton Theological Seminary
+Rush University
+UC Davis
+UC San Diego
+Virginia Polytechnic Institute and State University
+Icahn School of Medicine at Mount Sinai
+MIT-WHOI
+Perimeter Institute for Theoretical Physics
+University of Maryland - University College
+University of Minnesota - Duluth
+University of Texas
+University of Virginia, Charlottesville
+Barcelona School of Economics
+CUNY John Jay College of Criminal Justice
+ETHZ - ETH Zurich
+Ithaca College
+MIT
+Palo Alto University
+Texas Tech University Health Sciences Center
+UT Austin
+University of Arkansas - Fayetteville
+University of Texas MD Anderson Cancer Center
+Yale
+Bryn Mawr College
+Courtauld Institute of Art
+Georgetown University School of Foreign Service (SFS)
+Institute of Science and Technology Austria (ISTA)
+La Salle University
+Northwestern College
+Pacific University
+Rochester University
+Stanford
+UC Irvine
+UCLA
+UCLA Anderson
+Universitat Pompeu Fabra (UPF)
+Weill Cornell Medicine
+Wheaton College
+Zurich Graduate School of Economics (UZH)
+CUNY Graduate School and University Center
+Cornell
+Emory
+Hamad Bin Khalifa University
+International Max Planck Research Schools (IMPRS)
+Michener Center for Writers
+Parsons The New School For Design
+SUNY Binghamton
+State University of New York at Albany
+Toyota Technological Institute at Chicago
+University of Illinois
+Williams College
+Brown
+CSU East Bay
+California Institute of the Arts
+Chicago Booth
+Courant Institute of Mathematical Sciences
+HEC Paris Business School
+Harvard
+Institut d'Etudes Politiques de Paris (Sciences Po)
+PSL Research University
+Princeton
+SFI EPFL
+Tinbergen Institute
+University of Michigan - Dearborn
+University of Texas Southwestern Medical Center
+Wageningen University
+Adler University
+Bard College
+Caltech
+Chinese University of Hong Kong (CUHK)
+Columbia
+Cranbrook Academy of Art
+Drew University
+European University Institute
+Geneva Graduate Institute
+Immaculata University
+Indiana University at South Bend
+Institut Polytechnique De Paris
+Joint CMU-Pitt Ph.D. Program in Computational Biology (CPCB)
+Kellogg School of Management
+Louisiana State University Health Sciences Center
+Marymount University
+Mayo Clinic College of Medicine and Science
+NYU Grossman School of Medicine
+Purdue
+Rice
+SUNY Buffalo State University
+UMass Boston
+UPenn
+University of Hawaii
+University of Massachusetts Chan Medical School
+University of Montreal
+University of Texas Health Science Center
+University of Washington Seattle
+West Chester University of Pennsylvania
+William & Mary
+William Paterson University of New Jersey
+Bennington College
+Brooklyn College
+CUNY Baruch College
+Cornell University School of Industrial and Labor Relations
+Duke
+Georgia Tech
+Hot Piss University
+INSEAD
+Indiana University School of Medicine
+John Hopkins University
+Marywood University
+Medical College of Wisconsin
+NYU Stern
+New School For Social Research
+Ontario Tech University
+Oxford Internet Institute
+SOAS University of London
+School of Visual Arts
+Scripps Research
+Southern California Institute of Architecture (SCI-Arc)
+State University of New York at Stony Brook
+Texas A
+Toronto
+Tulane University of Louisiana
+U Mass Boston
+U Penn
+UT Health San Antonio
+Uniformed Services University of the Health Sciences
+University College London, University of London
+Wisconsin Madison
+Albert Einstein College of Medicine
+Antioch University - Seattle
+Baldwin Wallace University
+Berlin School of Economics
+CREST
+CUNY Bernard M Baruch College
+Cornell Dyson School of Applied Economics and Management
+Dartmouth
+ETH
+Erasmus Mundus Scholarship
+Haas School of Business
+Hogwarts
+Indiana University/Purdue University at Indianapolis
+Johnson & Wales University
+Kent State
+LIU Brooklyn
+LaSalle University
+Mayo Clinic
+Minnesota State University
+Mount Saint Vincent University
+NYU Courant
+Paris School of Economics
+Queens College
+Rheinische Friedrich-Wilhelms Universität Bonn
+Rikers Island Institute of Technology (RIIT)
+Rockefeller University
+Rutgers
+Rutgers School of Health Professions
+Saint Mary's College
+Saint Xavier University
+St. Andrews University
+State University of New York at Binghamton
+Touro University
+UIUC
+UNC
+UNC Wilmington
+Universiteit Leiden
+University of Buffalo
+University of Dublin, Trinity College
+University of Illinois Urbana
+University of Mount Saint Vincent
+University of Nebraska Medical Center
+University of Roma La Sapienza
+University of Tennessee Health Science Center
+University of Toronto, Mississauga
+Universität Zürich
+Wesleyan University
+West Coast University
+Zurich

@@ -68,18 +68,56 @@ def _looks_like_a_name(name: str) -> bool:
         return False
     if not any(ch.isalpha() for ch in name):
         return False
+    # Entries the site stores entirely in lower case ("yale", "english",
+    # "carnegie") are sloppy source data, not canonical spellings. Adding one
+    # would make it the canonical form and hand that lower-case text back as the
+    # standardized answer. The properly-capitalised name is normally already in
+    # the list, and the folded lookup in app.py maps these onto it anyway.
+    if name == name.lower():
+        return False
     # Obvious placeholders applicants type when they do not want to say.
     return _fold(name) not in {"unknown", "n/a", "na", "none", "other", "test"}
+
+
+def _load_matcher():
+    """Borrow ``app._best_match`` so this script and the standardizer agree.
+
+    Importing ``app`` pulls in llama_cpp (an import only - no model is loaded).
+    If that stack is not installed, fall back to adding every missing name, which
+    is the safe direction: a redundant canonical entry is harmless, a missing one
+    is what lets the fuzzy matcher wander onto a different institution.
+    """
+    sys.path.insert(0, str(CANON_DIR))
+    try:
+        from app import _best_match  # type: ignore
+
+        return _best_match
+    except Exception as exc:  # llama_cpp missing, model stack unavailable, ...
+        print(
+            f"note: could not import the standardizer's matcher ({exc.__class__.__name__}); "
+            "adding every missing name",
+            file=sys.stderr,
+        )
+        return lambda name, candidates, cutoff=0.86: None
 
 
 def _candidates(
     values: Iterable[str], existing: List[str], min_count: int
 ) -> List[Tuple[str, int]]:
-    """Pick recurring names that the canonical list does not already cover."""
+    """Pick recurring names the canonical list does not already cover.
+
+    A name is skipped when the standardizer's guarded fuzzy matcher already maps
+    it onto an existing entry - that is the whole point of standardizing, so
+    adding it would freeze the variant in place instead of collapsing it.
+    "University of Michigan - Ann Arbor" already resolves to the canonical
+    "University of Michigan, Ann Arbor" and is therefore not added, while the
+    bare "University of Michigan" has no safe match and is.
+    """
     counts: collections.Counter = collections.Counter(
         value.strip() for value in values if value and _looks_like_a_name(value.strip())
     )
     known = {_fold(entry) for entry in existing}
+    best_match = _load_matcher()
 
     # Where the same name appears in several casings, keep the most common one.
     best_by_key: Dict[str, Tuple[str, int]] = {}
@@ -91,7 +129,21 @@ def _candidates(
         if current is None or count > current[1]:
             best_by_key[key] = (name, count)
 
-    return sorted(best_by_key.values(), key=lambda pair: (-pair[1], pair[0]))
+    # Drop anything the standardizer can already fold into a canonical entry.
+    resolved = 0
+    candidates: List[Tuple[str, int]] = []
+    for name, count in best_by_key.values():
+        if best_match(name, existing, 0.86) is not None:
+            resolved += 1
+            continue
+        candidates.append((name, count))
+
+    if resolved:
+        print(
+            f"    ({resolved:,} variants already fold into an existing entry; not added)",
+            file=sys.stderr,
+        )
+    return sorted(candidates, key=lambda pair: (-pair[1], pair[0]))
 
 
 def _append(path: Path, additions: List[str]) -> None:

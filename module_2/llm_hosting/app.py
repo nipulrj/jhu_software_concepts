@@ -224,12 +224,28 @@ def _tokens_agree(left: str, right: str) -> bool:
 
 
 def _keeps_identity(name: str, candidate: str) -> bool:
-    """True when ``candidate`` still names the same thing as ``name``."""
+    """True when ``candidate`` still names the same thing as ``name``.
+
+    Two ways a match can change the subject, both seen in the scraped data:
+
+    * it drops the identity - "University of Michigan" -> "University of Milan";
+    * it invents specificity the source never gave - "University of Nebraska" ->
+      "University of Nebraska Omaha", or "University of Wisconsin" ->
+      "University of Wisconsin-Stout".  Picking a campus for someone who named
+      only the parent institution is a guess, and it is wrong whenever they
+      meant a different campus.
+    """
     source = _significant_tokens(name)
     if not source:
-        return True  # nothing distinctive to preserve (e.g. an acronym)
+        return True  # nothing distinctive to preserve (e.g. a bare acronym)
     target = _significant_tokens(candidate)
-    return any(_tokens_agree(a, b) for a in source for b in target)
+
+    # Must keep at least one distinctive word of the original.
+    if not any(_tokens_agree(a, b) for a in source for b in target):
+        return False
+
+    # Must not add a distinctive word the original never mentioned.
+    return all(any(_tokens_agree(b, a) for a in source) for b in target)
 
 
 def _best_match(name: str, candidates: List[str], cutoff: float = 0.86) -> str | None:
@@ -243,13 +259,42 @@ def _best_match(name: str, candidates: List[str], cutoff: float = 0.86) -> str |
     return None
 
 
+# MODIFIED: look canonical entries up case- and accent-insensitively.
+#
+# The post-processor title-cases before checking membership, which capitalises
+# connectives: "Earth and Environmental Sciences" becomes "Earth And
+# Environmental Sciences" and no longer equals the canonical entry.  Exact
+# matches were therefore missing for most multi-word names and falling through
+# to fuzzy matching - the very step where a wrong match can change the meaning.
+# Matching on a folded key restores the exact hit and returns the canonical
+# spelling, so fuzzy matching is only reached by names genuinely not in the list.
+def _canon_index(entries: List[str]) -> Dict[str, str]:
+    """Map a folded lookup key to the canonical spelling."""
+    index: Dict[str, str] = {}
+    for entry in entries:
+        index.setdefault(_canon_key(entry), entry)
+    return index
+
+
+def _canon_key(name: str) -> str:
+    """Case-, accent-, and punctuation-insensitive key for canonical lookups."""
+    folded = unicodedata.normalize("NFKD", (name or "").strip().lower())
+    folded = "".join(ch for ch in folded if not unicodedata.combining(ch))
+    return re.sub(r"[^a-z0-9]+", " ", folded).strip()
+
+
+CANON_PROGS_INDEX = _canon_index(CANON_PROGS)
+CANON_UNIS_INDEX = _canon_index(CANON_UNIS)
+
+
 def _post_normalize_program(prog: str) -> str:
     """Apply common fixes, title case, then canonical/fuzzy mapping."""
     p = (prog or "").strip()
     p = COMMON_PROG_FIXES.get(p, p)
     p = p.title()
-    if p in CANON_PROGS:
-        return p
+    canonical = CANON_PROGS_INDEX.get(_canon_key(p))
+    if canonical:
+        return canonical
     match = _best_match(p, CANON_PROGS, cutoff=0.84)
     return match or p
 
@@ -271,9 +316,10 @@ def _post_normalize_university(uni: str) -> str:
     if u:
         u = re.sub(r"\bOf\b", "of", u.title())
 
-    # Canonical or fuzzy map
-    if u in CANON_UNIS:
-        return u
+    # Canonical or fuzzy map (folded lookup first - see _post_normalize_program)
+    canonical = CANON_UNIS_INDEX.get(_canon_key(u))
+    if canonical:
+        return canonical
     match = _best_match(u, CANON_UNIS, cutoff=0.86)
     return match or u or "Unknown"
 

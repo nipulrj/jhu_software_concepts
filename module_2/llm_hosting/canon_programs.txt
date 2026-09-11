@@ -287,3 +287,493 @@ Visual Arts
 Wildlife Biology
 Women’s and Gender Studies
 Writing Studies
+
+# --- appended from scraped Grad Cafe data (expand_canon_lists.py) ---
+School Psychology
+Creative Writing Fiction
+Pure Mathematics
+Audiology
+Creative Writing Poetry
+Physics And Astronomy
+Religion
+Library And Information Science
+Communication Sciences And Disorders
+Astronomy and Astrophysics
+Studio Art
+City Planning
+Electrical Engineering and Computer Science
+Mental Health Counseling
+Sociocultural Anthropology
+Ethnomusicology
+Aeronautics & Astronautics
+Quantum Science and Engineering
+Creative Writing Nonfiction
+Information
+Chemical And Biomolecular Engineering
+Mechanical And Aerospace Engineering
+History of Art
+Communication Studies
+Politics
+Social Welfare
+Biomedical Sciences Graduate Program (BIMS)
+City and Regional Planning
+Industrial And Systems Engineering
+Playwriting
+Artificial Intelligence
+East Asian Languages and Cultures
+East Asian Studies
+Criminology and Criminal Justice
+Machine Learning
+Divinity
+History And Philosophy Of Science
+Marriage And Family Therapy
+Mass Communication
+Organic Chemistry
+Population Health Sciences
+English and American Literature
+English and Literary Arts Creative Writing
+Environmental Health Sciences
+Environmental Studies
+Law
+Literature
+Media and Communication
+Biological and Biomedical Sciences (BBS)
+Agricultural and Resource Economics
+Cognitive Psychology
+Performance Studies
+Theological Studies
+Educational Studies
+History of Art and Architecture
+History, Anthropology, and Science, Technology and Society (HASTS)
+Rhetoric
+Slavic Languages And Literatures
+Spanish and Portuguese
+Art History and Archaeology
+Chemistry and Biochemistry
+Chemistry and Chemical Biology
+Cultural Anthropology
+Earth and Planetary Science
+Public Policy and Administration
+Biochemistry and Molecular Biology
+Counseling
+Engineering Science
+Fine Art
+Applied Mathematics and Statistics
+Communication and Media Studies
+English and Comparative Literature
+Environmental Management
+Government Political Science
+Music Technology
+School Counseling
+Social Anthropology
+Theatre Arts and Performance Studies
+AeroAstro
+Community and Regional Planning
+Development Studies
+Geosciences
+German
+Applied Statistics
+Brain And Cognitive Sciences
+Chemical And Biological Engineering
+EECS
+Feminist Studies
+Gender Studies
+Immunology
+Industrial and Operations Engineering
+Management Science and Engineering
+Rhetoric and Composition
+Theoretical Physics
+Urban Planning and Policy
+Applied Linguistics & TESOL
+Atmospheric and Oceanic Sciences
+Biomedical Data Science
+Cinema Studies
+Community Health Sciences
+Film Studies
+Financial Economics
+Geological Sciences
+History of Science
+Mass Communications
+Operations Research and Financial Engineering
+French
+Global Studies
+Jurisprudence and Social Policy
+Kinesiology
+Media Culture Communications (MCC)
+Medical Biophysics
+Microbiology and Immunology
+Nuclear Engineering and Radiological Sciences
+Psychological and Brain Sciences
+Romance Languages and Literature
+Science and Technology Studies (STS)
+Speech Pathology
+Urban Planning and Development
+Applied Behavior Analysis
+Asian and Middle Eastern Studies
+Astrophysical Sciences
+Biosciences
+Computer and Information Science
+Economics and Public Policy
+Energy Science and Engineering
+Health Psychology
+Learning Design Technology
+Mathematics and Statistics
+Media Arts And Sciences
+Molecular Biology
+Optics
+Organizational Behavior
+Painting
+Social and Behavioural sciences
+Statistical Science
+Applied And Computational Mathematics
+Applied And Interdisciplinary Mathematics (AIM)
+Applied Data Science
+Business
+Cell and Molecular Biology
+Chemical Biology
+Classical Studies
+Clinical-Community Psychology
+Communication Arts
+Computational Data Science
+Computational and Mathematical Engineering
+Design Engineering
+Directing
+Earth System Science
+Environment
+History of Science, Technology, and Medicine
+Human Development and Social Policy
+Intelligent Systems
+Materials Engineering
+Modern Culture and Media Studies
+Near Eastern Studies
+Sport and Exercise Psychology
+Analytical Chemistry
+Anthropology and History
+Art History and Museum Studies
+Art and Archaeology
+Asian Languages and Cultures
+Black, Race, and Ethnic Studies
+Computational Social Science
+Counselor Education
+Couples and Family Therapy
+Criminology, Law and Society
+ECE
+Entomology
+Environmental Science and Engineering
+Financial Mathematics
+Government and Politics
+Health Services and Policy Research
+Human Factors
+Information and Media
+Integrated Life Sciences (ILS)
+Interdisciplinary PhD in Theatre and Drama (IPTD)
+Joint CMU-Pitt Ph.D. Program in Computational Biology (CPCB)
+Media Lab
+Middle Eastern, South Asian, and African Studies
+Planning
+Poetry
+Program in Biomedical Sciences (PiBS)
+Psychological Sciences
+Public Health Sciences
+Robotics, Systems, and Control
+School for Environment and Sustainability (SEAS)
+Social Data Science
+Speech, Language, and Hearing Sciences
+Aeronautics
+Applied Mathematics, Applied and Computational
+Biochemistry, Cellular, and Molecular Biology (BCMB)
+Bioinformatics and Computational Biology
+Cancer Biology
+Computational and Applied Mathematics
+Decorative Arts, Design History and Material Culture
+Education, Culture, and Society
+Environment and Sustainability
+Environmental Social Science
+Environmental Social Sciences
+Epidemiology and Biostatistics
+Geophysical Sciences
+Global Social and Political Thought
+Higher Education and Student Affairs
+History and Sociology of Science
+History of Consciousness
+Human Development and Family Science
+IDSS
+Integrative Biology
+International Education
+Medieval History
+Molecular Cell Biology, Genetics, and Development (MCGD)
+Nutritional Sciences
+Painting and Drawing
+Romance Languages and Literatures
+Romance Studies
+School-Clinical Child Psychology
+Screen Cultures
+StatML CDT
+Sustainable Development
+Urban Education
+Urban Studies and Planning
+Visual Studies
+Applied & Computational Mathematics
+Behavioral and Social Health Sciences
+Biochemistry and Molecular Biophysics
+Biomedical and Health Informatics
+Ceramics
+Chicana and Central American Studies
+Clinical and School Psychology
+Combined School and Clinical Psychology
+Comparative Literature and Literary Theory
+Data Science and Engineering
+East Asian Languages and Civilizations
+Ecology, Evolution, Environment and Society (EEES)
+Electrical and Systems Engineering
+Energy and Resource Group (ERG)
+Geography and Environment
+Human Centered Design and Engineering
+Immunology and Microbiology
+Industrial and Labor Relations
+Italian
+Materials
+Mathematics Education
+Media, Culture, and Communication (MCC)
+Medical Anthropology Joint PhD
+Mental Health
+Mental Health Counseling and Behavioral Medicine
+Music Performance and Composition
+Plant Pathology
+Politics and International Relations
+Politics and International Studies
+Polymer Science and Engineering
+Public Policy (Economics Track)
+Public Policy and Management
+Sculpture
+Social Science of the Internet
+Social Sciences
+Social Work and Social Welfare
+Societal Computing
+Space Systems
+Sustainability
+Translational Medicine
+Writing for the Screen and Stage
+American History
+Applied Developmental Psychology
+Applied Mathematics, Applied Statistics and Scientific Computation
+Black Studies
+CSEM
+Cellular and Molecular Biology
+Civil and Coastal Engineering
+Cognitive and Brain Sciences
+Communication and Information Sciences
+Communication, Information, and Media
+Comparative Literary Studies
+Computational and Systems Biology
+Data Science and Artificial Intelligence
+Earth, Environmental and Planetary Sciences
+Economic Analysis & Policy
+Education Policy Studies
+Education Policy and Analysis
+Education Policy and Leadership
+Educational Leadership and Policy
+English Literature
+English and Education
+Environmental Economics
+Environmental Science and Management
+Epidemiology and Clinical Research
+FVNMA
+Film, Television, and Media
+Foreign Service
+Forestry and Natural Resources
+French and Francophone Studies
+Game Design and Development
+Genetics and Genomics
+Geoscience
+HCI
+Higher Education Administration
+Higher and Postsecondary Education
+History of Science and Medicine
+Human Development
+Humanities
+ICME
+IWER
+Information Management and Systems (MIMS)
+Interaction Design
+Interdisciplinary Neuroscience
+International Health
+Library Science
+Literary Translation
+Literary and Cultural Studies
+Machine Learning and Data Science
+Materials Science and NanoEngineering
+Mechanical Engineering and Materials Science
+Microbiology and Molecular Genetics (MMG)
+Modern and Contemporary Art History
+Political Economy
+Population, Family, and Reproductive Health
+Professional Counseling
+Psychiatry
+Psychological Research
+Public Administration and Policy
+Public and International Affairs
+Quantitative Economics
+Regional Planning
+Rehabilitation Science
+Russian, East European, and Eurasian Studies
+Screenwriting
+Second Language Acquisition
+Second Language Acquisition and Teaching (SLAT)
+Social, Behavioral, and Population Sciences
+South Asian Studies
+Symbolic Systems
+Teaching and Learning
+Technology and Social Behavior
+Transportation Systems
+Urban and Environmental Planning and Policy
+Advanced Computer Science
+African and African Diaspora Studies
+Agricultural, Food, and Resource Economics
+Algorithms, Combinatorics and Optimization
+American Culture
+Analytics
+Applied Anthropology
+Applied Biostatistics
+Art
+Art Therapy
+Artificial Intelligence Engineering
+Arts Management
+Astronautical Engineering
+Astronomy and Planetary Science
+Atmospheric and Climate Science
+Behavioral, Social, and Health Education Sciences
+Biological Chemistry
+Biological Engineering
+Biomedical Data Science and Informatics
+Biomedical Physics
+Biomedical Research
+Business Administration - Strategic Management - DBA
+Business and Management
+Chemical and Biological Sciences
+Climate and Society
+Clinical Research
+Combined Program in Education and Psychology
+Communication Arts and Sciences
+Communication and Culture
+Comparative Studies In Discourse and Society
+Comparative Thought and Literature
+Computational Biology and Bioinformatics
+Computational Science
+Computer
+Computer and Information Technology
+Computing
+Condensed Matter Theory
+Constructed Environment
+Costume Studies
+Counseling and School Psychology
+Creative Writing - Fiction
+Culture and Theory
+Documentary Film
+Drama And Theatre
+Dramaturgy and Dramatic Criticism
+EDIC
+Earth and Atmospheric Sciences
+East Asian Languages and Literatures
+Ecology and Evolution
+Ecology, Behavior and Evolution (EBE)
+Econometrics and Mathematical Economics (EME)
+Economics and Management
+Education Policy And Evaluation
+Energy Technologies
+Energy and Sustainability
+Engineering
+Engineering Sciences and Applied Mathematics
+English Language and Literature
+English and Cultural Studies
+English and WGSS
+Environment and Natural Resources
+Environment and Sustainability In Ecosystem Science and Management
+Environmental Policy and Management
+Environmental Science, Policy, and Management (ESPM)
+European History
+Evolutionary Anthropology
+Fiber and Material Studies
+Film and Digital Media
+Film and Television Studies
+Folklore
+Forestry
+Gallatin
+Geography and Geographic Information Science
+Health Sciences Integrated (HSIP)
+Health Services
+Health Services Research and Policy
+Hispanic Languages and Literature
+History and Library Science
+Hospitality and Tourism Management
+Human Centered Computing
+Human Evolutionary Biology
+Imaging Science
+Immunology and Molecular Pathogenesis (IMP)
+Information Networking
+Information Science and Technology
+Institute for the Study of the Ancient World (ISAW)
+Interdisciplinary Design and Media
+Journalism and Media
+Ling
+Linguistics and Applied Linguistics
+Logic and Philosophy of Science
+MPH
+MSCS
+Machine Learning and Machine Intelligence
+Managerial Economics and Strategy
+Master of Arts in Law and Diplomacy (MALD)
+Master of social work
+Masters of Social Work
+Material Science and Mechanical Engineering
+Maternal and Child Health
+Math
+Mathematical Modelling And Scientific Computing
+Mechanical and Industrial Engineering
+Medical Engineering and Medical Physics (MEMP)
+Microbial Biology
+Modern South Asian Studies
+Molecular Microbiology and Immunology
+Movement Science
+Multidisciplinary Gender Studies
+Near Eastern languages and Civilizations
+Network Science
+Nuclear Science and Engineering
+OID
+Oceans
+Operations Research and Information Engineering
+Optical Sciences
+Organismic and Evolutionary Biology (OEB)
+Organizational Science
+PIBBS
+Particle Physics
+Pathobiology
+Personalized Medicine And Applied Engineering
+Petroleum Engineering
+Pharmaceutical Health Services Research
+Plasma Physics
+Policy Analysis
+Psychological Science
+Public Humanities
+Public Policy and Political Science
+Quantitative Biomedical Science (QBS)
+Quantum Fields and Fundamental Forces
+Quantum Technologies
+Rhetoric and Writing
+SLAT
+School and Child Clinical Psychology
+Science Communication
+Second Language Education
+Second Language Studies
+Slavic
+Social and Behavioral Sciences
+Sociomedical Sciences
+Speech-Language Hearing Sciences
+Strategic Management
+Structural Engineering
+Teaching
+Theatre
+Theory and Criticism
+Translational Research and Applied Medicine
+Transportation Technology and Policy
+Writing

@@ -1,7 +1,7 @@
 # Module 2 — Grad Cafe Admissions Data
 
 **Name:** Nipul Jayasekera
-**JHED ID:** _TODO — fill in before submitting_
+**JHED ID:** njayase1
 
 **Module:** Module 2 — Web Scraping (EN.605.256, Modern Software Concepts in Python)
 **Assignment:** Scrape, clean, and LLM-standardize Grad Cafe applicant data
@@ -238,14 +238,40 @@ Michigan, Ann Arbor"* but not the bare *"University of Michigan"* — which appe
 in 135 rows of a 14k sample.
 
 `_best_match()` now considers several near matches and accepts one only if it
-preserves a distinctive word of the original (accent-folded, with generic words
-like *university* and *state* ignored, and stems compared so
-`Mathematic → Mathematics` still matches). Names that cannot be matched safely
-are left alone, on the principle that **unstandardized is better than wrong**.
+preserves the original's identity, which means two things:
+
+1. **It must keep a distinctive word of the original** (accent-folded, generic
+   words like *university* and *state* ignored, stems compared so
+   `Mathematic → Mathematics` still matches). This is what stops
+   Michigan → Milan.
+2. **It must not add a distinctive word the original never mentioned.** A second
+   round of checking found the matcher inventing campuses:
+   `University of Nebraska → University of Nebraska Omaha` (46 rows) and
+   `University of Wisconsin → University of Wisconsin–Stout` (28 rows). Choosing
+   a campus for someone who named only the parent institution is a guess, and
+   it is wrong whenever they meant a different one.
+
+Names that cannot be matched safely are left alone, on the principle that
+**unstandardized is better than wrong**.
 
 Measured on a 300-row random sample, scoring against the university name the site
 itself renders: **7 corrupted rows before the guard, 0 after.** The legitimate
-abbreviation expansions are unaffected.
+folds are unaffected — `Speech Language Pathology → Speech-Language Pathology`,
+`MIT (parenthetical) → Massachusetts Institute of Technology`,
+`University of Michigan - Ann Arbor → University of Michigan, Ann Arbor`,
+`San Jose → San José`, `University of Hawaii at Manoa → University of Hawaiʻi at Mānoa`
+all still apply.
+
+**Exact canonical matches were silently failing.** `_post_normalize_*` title-cases
+before testing membership, which capitalises connectives: *"Earth and
+Environmental Sciences"* became *"Earth And Environmental Sciences"* and no
+longer equalled its own canonical entry. Almost every multi-word name was
+therefore skipping the exact match and falling through to fuzzy matching — the
+one step where a wrong answer can change the meaning. Canonical lookup now goes
+through a case-, accent- and punctuation-folded index that returns the canonical
+spelling, so fuzzy matching is only reached by names genuinely absent from the
+list. This also repairs the site's own inconsistent casing
+(`university of british columbia → University of British Columbia`).
 
 **Canonical lists — `expand_canon_lists.py`:**
 
@@ -256,7 +282,19 @@ source of extra canonical entries. The script counts distinct names, keeps only
 those recurring at least `--min-count` (default 3) times so a stray one-off
 cannot become canonical, drops placeholders like `N/A` and `Unknown`, and appends
 what is missing under a marked header. Existing entries are never reordered or
-removed.
+removed. Two filters keep the additions clean:
+
+- **Variants that already fold into a canonical entry are skipped**, since
+  collapsing them is the entire point of standardizing — adding
+  `University of Michigan - Ann Arbor` would freeze the variant in place instead
+  of letting it resolve to `University of Michigan, Ann Arbor`. 57 universities
+  and 23 programs were excluded this way.
+- **Entries the site stores entirely in lower case are skipped** (`yale`,
+  `carnegie`, `english`, `chemistry`). These are sloppy source data, and adding
+  one would make the lower-case text *the* canonical answer. The folded lookup
+  maps them onto the properly capitalised entry instead.
+
+Result: **979 → 1,236 universities** and **289 → 778 programs**.
 
 ---
 
@@ -287,6 +325,19 @@ against the university name the site itself renders:
 - **Applicants edit their entries.** One record changed decision from *Rejected*
   to *Wait listed* between two fetches minutes apart, so any snapshot is
   point-in-time rather than permanently reproducible.
+- **Near-miss program names the stem rule cannot separate.**
+  *"Computer Science and Engineering"* still matches
+  *"Computational Science and Engineering"* (35 rows), because *computer* and
+  *computational* share a stem while naming different fields. Separating them
+  needs a real subject ontology rather than string distance.
+- **Single-word fragments are not expanded.** The site stores some schools as
+  just *"Zurich"* or *"Yale"*. These stay as they are; folding a fragment into a
+  full name would be the same guesswork the campus rule above rejects.
+- **The model is not bit-reproducible.** llama.cpp reduces floats across threads
+  in a non-deterministic order, so even at `temperature=0` a rerun can differ on
+  borderline rows. On the provided `sample_data.json`, row 2 (*"Information,
+  McG"*) came back as *"Information"* on one run and *"Information Studies"* on
+  another; the latter is what the file's own few-shot examples teach.
 
 The pipeline is intentionally re-runnable: update the canonical lists, rerun
 `app.py`, and the results converge without re-scraping.
@@ -318,8 +369,6 @@ Required entry points: `scrape_data()`, `clean_data()`, `save_data()`,
 
 ## Known bugs and limitations
 
-- **JHED ID is a placeholder** in this README and needs filling in before
-  submission.
 - **The decision-year fallback is ambiguous by construction.** When the site
   supplies no notification date, `clean.py` infers the year from the "Added on"
   date and picks the most recent year not in the future. For an entry posted long
