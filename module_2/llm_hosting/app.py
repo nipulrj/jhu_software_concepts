@@ -7,14 +7,23 @@ import json
 import os
 import re
 import sys
+import time
 import difflib
-from typing import Any, Dict, List, Tuple
+import inspect
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from flask import Flask, jsonify, request
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama  # CPU-only by default if N_GPU_LAYERS=0
 
 app = Flask(__name__)
+
+# MODIFIED: resolve bundled files relative to this file rather than the caller's
+# working directory, so the canonical lists and the model cache are found no
+# matter where the script is launched from.
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_DIR = BASE_DIR / "models"
 
 # ---------------- Model config ----------------
 MODEL_REPO = os.getenv(
@@ -30,8 +39,8 @@ N_THREADS = int(os.getenv("N_THREADS", str(os.cpu_count() or 2)))
 N_CTX = int(os.getenv("N_CTX", "2048"))
 N_GPU_LAYERS = int(os.getenv("N_GPU_LAYERS", "0"))  # 0 → CPU-only
 
-CANON_UNIS_PATH = os.getenv("CANON_UNIS_PATH", "canon_universities.txt")
-CANON_PROGS_PATH = os.getenv("CANON_PROGS_PATH", "canon_programs.txt")
+CANON_UNIS_PATH = os.getenv("CANON_UNIS_PATH", str(BASE_DIR / "canon_universities.txt"))
+CANON_PROGS_PATH = os.getenv("CANON_PROGS_PATH", str(BASE_DIR / "canon_programs.txt"))
 
 # Precompiled, non-greedy JSON object matcher to tolerate chatter around JSON
 JSON_OBJ_RE = re.compile(r"\{.*?\}", re.DOTALL)
@@ -119,13 +128,22 @@ def _load_llm() -> Llama:
     if _LLM is not None:
         return _LLM
 
-    model_path = hf_hub_download(
-        repo_id=MODEL_REPO,
-        filename=MODEL_FILE,
-        local_dir="models",
-        local_dir_use_symlinks=False,
-        force_filename=MODEL_FILE,
-    )
+    # MODIFIED (compat): huggingface_hub 1.x removed `force_filename` and
+    # deprecated `local_dir_use_symlinks`; passing them raises a TypeError on a
+    # current install.  Only send the kwargs this version actually accepts, so
+    # the same file works on both old and new hub releases.
+    download_kwargs = {
+        "repo_id": MODEL_REPO,
+        "filename": MODEL_FILE,
+        "local_dir": str(MODELS_DIR),
+    }
+    supported = inspect.signature(hf_hub_download).parameters
+    if "local_dir_use_symlinks" in supported:
+        download_kwargs["local_dir_use_symlinks"] = False
+    if "force_filename" in supported:
+        download_kwargs["force_filename"] = MODEL_FILE
+
+    model_path = hf_hub_download(**download_kwargs)
 
     _LLM = Llama(
         model_path=model_path,
@@ -283,34 +301,115 @@ def standardize() -> Any:
     return jsonify({"rows": out})
 
 
+# ---------------- MODIFIED: dedupe + parallel CLI ----------------
+# The original CLI called the model once per row.  Over 30k rows that is hours of
+# CPU time spent re-answering the same question, because the dataset contains far
+# fewer distinct "program" strings than rows.  The CLI below standardizes each
+# DISTINCT string once and fans that work across worker processes, then maps the
+# answers back onto every row.  Output is unchanged per row.
+
+
+def _standardize_unique(program_text: str) -> Tuple[str, Dict[str, str]]:
+    """Worker entry point: standardize one distinct program string."""
+    return program_text, _call_llm(program_text)
+
+
+def _init_worker() -> None:
+    """Load this process's own copy of the model once, before any task runs."""
+    # Each worker holds its own llama.cpp context, so keep per-instance threads
+    # low; the parallelism comes from running many workers, not many threads.
+    os.environ.setdefault("N_THREADS", "1")
+    global N_THREADS
+    N_THREADS = 1
+    _load_llm()
+
+
+def _standardize_texts(
+    texts: List[str], workers: int, progress_every: int = 250
+) -> Dict[str, Dict[str, str]]:
+    """Standardize distinct program strings, in parallel when asked."""
+    results: Dict[str, Dict[str, str]] = {}
+    total = len(texts)
+    started = time.time()
+
+    def _note_progress() -> None:
+        done = len(results)
+        if done % progress_every and done != total:
+            return
+        elapsed = time.time() - started
+        rate = done / elapsed if elapsed else 0.0
+        remaining = (total - done) / rate / 60 if rate else 0.0
+        print(
+            f"[llm] {done:,}/{total:,} unique strings | "
+            f"{elapsed / 60:.1f} min elapsed | ~{remaining:.1f} min left",
+            file=sys.stderr,
+        )
+
+    if workers <= 1:
+        _load_llm()
+        for text in texts:
+            results[text] = _call_llm(text)
+            _note_progress()
+        return results
+
+    import multiprocessing as mp
+
+    ctx = mp.get_context("spawn")
+    with ctx.Pool(processes=workers, initializer=_init_worker) as pool:
+        for text, result in pool.imap_unordered(_standardize_unique, texts, chunksize=8):
+            results[text] = result
+            _note_progress()
+    return results
+
+
 def _cli_process_file(
     in_path: str,
     out_path: str | None,
     append: bool,
     to_stdout: bool,
+    workers: int = 1,
+    json_array: bool = False,
 ) -> None:
-    """Process a JSON file and write JSONL incrementally."""
+    """Standardize every row of a JSON file.
+
+    Writes JSON Lines by default (the original behaviour).  With ``--json-array``
+    the whole result is written as a single JSON array instead, which is the
+    shape the assignment's deliverable expects.
+    """
     with open(in_path, "r", encoding="utf-8") as f:
         rows = _normalize_input(json.load(f))
 
+    # One model call per distinct program string instead of one per row.
+    unique_texts = sorted({(row or {}).get("program") or "" for row in rows})
+    print(
+        f"[llm] {len(rows):,} rows -> {len(unique_texts):,} distinct program strings "
+        f"({len(unique_texts) / max(len(rows), 1):.1%}) on {workers} worker(s)",
+        file=sys.stderr,
+    )
+
+    standardized = _standardize_texts(unique_texts, workers)
+
+    for row in rows:
+        program_text = (row or {}).get("program") or ""
+        result = standardized.get(program_text) or _call_llm(program_text)
+        row["llm-generated-program"] = result["standardized_program"]
+        row["llm-generated-university"] = result["standardized_university"]
+
     sink = sys.stdout if to_stdout else None
     if not to_stdout:
-        out_path = out_path or (in_path + ".jsonl")
-        mode = "a" if append else "w"
-        sink = open(out_path, mode, encoding="utf-8")
+        out_path = out_path or (in_path + (".json" if json_array else ".jsonl"))
+        sink = open(out_path, "a" if append and not json_array else "w", encoding="utf-8")
 
     assert sink is not None  # for type-checkers
-
     try:
-        for row in rows:
-            program_text = (row or {}).get("program") or ""
-            result = _call_llm(program_text)
-            row["llm-generated-program"] = result["standardized_program"]
-            row["llm-generated-university"] = result["standardized_university"]
-
-            json.dump(row, sink, ensure_ascii=False)
+        if json_array:
+            json.dump(rows, sink, ensure_ascii=False, indent=2)
             sink.write("\n")
-            sink.flush()
+        else:
+            for row in rows:
+                json.dump(row, sink, ensure_ascii=False)
+                sink.write("\n")
+        sink.flush()
     finally:
         if sink is not sys.stdout:
             sink.close()
@@ -348,6 +447,20 @@ if __name__ == "__main__":
         action="store_true",
         help="Write JSON Lines to stdout instead of a file.",
     )
+    # MODIFIED: added --workers and --json-array.
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Worker processes to standardize distinct program strings with. "
+        "Each worker loads its own ~670 MB model copy, so size this to your RAM "
+        "and core count (default: 1).",
+    )
+    parser.add_argument(
+        "--json-array",
+        action="store_true",
+        help="Write one JSON array instead of JSON Lines.",
+    )
     args = parser.parse_args()
 
     if args.serve or args.file is None:
@@ -359,4 +472,6 @@ if __name__ == "__main__":
             out_path=args.out,
             append=bool(args.append),
             to_stdout=bool(args.stdout),
+            workers=max(1, int(args.workers)),
+            json_array=bool(args.json_array),
         )
