@@ -12,7 +12,7 @@ import difflib
 import inspect
 import unicodedata
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from flask import Flask, jsonify, request
 from huggingface_hub import hf_hub_download
@@ -324,8 +324,24 @@ def _post_normalize_university(uni: str) -> str:
     return match or u or "Unknown"
 
 
-def _call_llm(program_text: str) -> Dict[str, str]:
-    """Query the tiny LLM and return standardized fields."""
+def _normalize_pair(std_prog: str, std_uni: str) -> Dict[str, str]:
+    """Post-process a raw model answer. Cheap, deterministic, always re-run.
+
+    Kept separate from the model call so that the expensive half can be cached
+    while this half still picks up changes to the canonical lists.
+    """
+    return {
+        "standardized_program": _post_normalize_program(std_prog),
+        "standardized_university": _post_normalize_university(std_uni),
+    }
+
+
+def _llm_raw(program_text: str) -> Tuple[str, str]:
+    """Ask the model to split one string, returning its answer un-normalized.
+
+    This is the expensive half of the pipeline and the only part worth caching:
+    the same program string always produces the same request.
+    """
     llm = _load_llm()
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -362,12 +378,12 @@ def _call_llm(program_text: str) -> Dict[str, str]:
     except Exception:
         std_prog, std_uni = _split_fallback(program_text)
 
-    std_prog = _post_normalize_program(std_prog)
-    std_uni = _post_normalize_university(std_uni)
-    return {
-        "standardized_program": std_prog,
-        "standardized_university": std_uni,
-    }
+    return std_prog, std_uni
+
+
+def _call_llm(program_text: str) -> Dict[str, str]:
+    """Query the tiny LLM and return standardized fields."""
+    return _normalize_pair(*_llm_raw(program_text))
 
 
 def _normalize_input(payload: Any) -> List[Dict[str, Any]]:
@@ -410,9 +426,36 @@ def standardize() -> Any:
 # answers back onto every row.  Output is unchanged per row.
 
 
-def _standardize_unique(program_text: str) -> Tuple[str, Dict[str, str]]:
-    """Worker entry point: standardize one distinct program string."""
-    return program_text, _call_llm(program_text)
+CACHE_PATH = BASE_DIR / "standardization_cache.json"
+
+
+def _standardize_unique(program_text: str) -> Tuple[str, Tuple[str, str]]:
+    """Worker entry point: run the model on one distinct program string."""
+    return program_text, _llm_raw(program_text)
+
+
+def _load_cache(path: Path) -> Dict[str, Tuple[str, str]]:
+    """Load previously computed raw model answers, keyed by program string."""
+    if not path.exists():
+        return {}
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            stored = json.load(handle)
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return {
+        key: (value[0], value[1])
+        for key, value in stored.items()
+        if isinstance(value, list) and len(value) == 2
+    }
+
+
+def _save_cache(path: Path, cache: Dict[str, Tuple[str, str]]) -> None:
+    """Write the cache out atomically so an interrupted run cannot corrupt it."""
+    temp_path = path.with_suffix(path.suffix + ".tmp")
+    with temp_path.open("w", encoding="utf-8") as handle:
+        json.dump({k: list(v) for k, v in cache.items()}, handle, ensure_ascii=False)
+    temp_path.replace(path)
 
 
 def _init_worker() -> None:
@@ -426,41 +469,62 @@ def _init_worker() -> None:
 
 
 def _standardize_texts(
-    texts: List[str], workers: int, progress_every: int = 250
-) -> Dict[str, Dict[str, str]]:
-    """Standardize distinct program strings, in parallel when asked."""
-    results: Dict[str, Dict[str, str]] = {}
-    total = len(texts)
+    texts: List[str],
+    workers: int,
+    cache: Dict[str, Tuple[str, str]],
+    cache_path: Optional[Path] = None,
+    progress_every: int = 250,
+) -> Dict[str, Tuple[str, str]]:
+    """Run the model over the strings not already answered in ``cache``."""
+    pending = [text for text in texts if text not in cache]
+    total = len(pending)
+    print(
+        f"[llm] {len(texts) - total:,} of {len(texts):,} distinct strings already "
+        f"cached; {total:,} to compute",
+        file=sys.stderr,
+    )
+    if not pending:
+        return cache
+
     started = time.time()
+    done = 0
 
     def _note_progress() -> None:
-        done = len(results)
         if done % progress_every and done != total:
             return
         elapsed = time.time() - started
         rate = done / elapsed if elapsed else 0.0
         remaining = (total - done) / rate / 60 if rate else 0.0
         print(
-            f"[llm] {done:,}/{total:,} unique strings | "
+            f"[llm] {done:,}/{total:,} new strings | "
             f"{elapsed / 60:.1f} min elapsed | ~{remaining:.1f} min left",
             file=sys.stderr,
         )
+        # Checkpoint so an interrupted run keeps the work it has already paid for.
+        if cache_path is not None:
+            _save_cache(cache_path, cache)
 
     if workers <= 1:
         _load_llm()
-        for text in texts:
-            results[text] = _call_llm(text)
+        for text in pending:
+            cache[text] = _llm_raw(text)
+            done += 1
             _note_progress()
-        return results
+    else:
+        import multiprocessing as mp
 
-    import multiprocessing as mp
+        ctx = mp.get_context("spawn")
+        with ctx.Pool(processes=workers, initializer=_init_worker) as pool:
+            for text, raw in pool.imap_unordered(
+                _standardize_unique, pending, chunksize=8
+            ):
+                cache[text] = raw
+                done += 1
+                _note_progress()
 
-    ctx = mp.get_context("spawn")
-    with ctx.Pool(processes=workers, initializer=_init_worker) as pool:
-        for text, result in pool.imap_unordered(_standardize_unique, texts, chunksize=8):
-            results[text] = result
-            _note_progress()
-    return results
+    if cache_path is not None:
+        _save_cache(cache_path, cache)
+    return cache
 
 
 def _cli_process_file(
@@ -470,6 +534,7 @@ def _cli_process_file(
     to_stdout: bool,
     workers: int = 1,
     json_array: bool = False,
+    cache_path: Optional[Path] = CACHE_PATH,
 ) -> None:
     """Standardize every row of a JSON file.
 
@@ -488,11 +553,15 @@ def _cli_process_file(
         file=sys.stderr,
     )
 
-    standardized = _standardize_texts(unique_texts, workers)
+    cache = _load_cache(cache_path) if cache_path else {}
+    cache = _standardize_texts(unique_texts, workers, cache, cache_path)
 
+    # Post-processing is re-applied on every run, so edits to the canonical
+    # lists take effect without paying for the model again.
     for row in rows:
         program_text = (row or {}).get("program") or ""
-        result = standardized.get(program_text) or _call_llm(program_text)
+        raw = cache.get(program_text)
+        result = _normalize_pair(*raw) if raw else _call_llm(program_text)
         row["llm-generated-program"] = result["standardized_program"]
         row["llm-generated-university"] = result["standardized_university"]
 
@@ -562,6 +631,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Write one JSON array instead of JSON Lines.",
     )
+    parser.add_argument(
+        "--cache",
+        default=str(CACHE_PATH),
+        help="JSON file of raw model answers reused across runs "
+        "(default: %(default)s). Pass an empty string to disable.",
+    )
     args = parser.parse_args()
 
     if args.serve or args.file is None:
@@ -575,4 +650,5 @@ if __name__ == "__main__":
             to_stdout=bool(args.stdout),
             workers=max(1, int(args.workers)),
             json_array=bool(args.json_array),
+            cache_path=Path(args.cache) if args.cache else None,
         )

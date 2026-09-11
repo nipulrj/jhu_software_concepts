@@ -6,3 +6,7 @@ data/
 # Downloaded GGUF model weights (~670 MB), fetched on first run of the
 # LLM stage from Hugging Face.
 llm_hosting/models/
+
+# Cached raw model answers. Regenerable, and only an optimisation: it lets a
+# rerun skip the model for strings already standardized.
+llm_hosting/standardization_cache.json
