@@ -32,6 +32,7 @@ from scrape import BASE_URL, ROBOTS_URL, SURVEY_PATH, USER_AGENT, GradCafeScrape
 
 MODULE_DIR = Path(__file__).resolve().parent
 SCREENSHOT_PATH = MODULE_DIR / "screenshot.jpg"
+SNAPSHOT_PATH = MODULE_DIR / "robots_txt_snapshot.txt"
 
 # Paths whose permission status is worth recording in the evidence header:
 # the two the scraper actually uses, and two it must stay away from.
@@ -99,6 +100,26 @@ def _http_status(url: str) -> str:
             return f"HTTP {response.status} {response.reason}"
     except urllib.error.HTTPError as exc:
         return f"HTTP {exc.code} {exc.reason}"
+
+
+def _write_snapshot(path: Path, robots_text: str, status: str) -> None:
+    """Save the exact robots.txt bytes we fetched, with provenance on top.
+
+    The screenshot proves the file was read, but an image cannot be grepped or
+    diffed, and the live file changes over time. Keeping the text alongside it
+    means the rules the scraper was actually written against stay inspectable.
+    """
+    checked_at = dt.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z")
+    header = (
+        f"# Snapshot of {ROBOTS_URL}\n"
+        f"# Retrieved: {checked_at}\n"
+        f"# Response:  {status}\n"
+        f"# Retrieved by: {USER_AGENT}\n"
+        "#\n"
+        "# Saved verbatim below. Regenerate with: python capture_robots_evidence.py\n"
+        "# " + "-" * 74 + "\n\n"
+    )
+    path.write_text(header + robots_text, encoding="utf-8")
 
 
 def _load_font(size: int, bold: bool = False) -> ImageFont.ImageFont:
@@ -184,10 +205,20 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--out", type=Path, default=SCREENSHOT_PATH,
         help="output image path (default: %(default)s)",
     )
+    parser.add_argument(
+        "--snapshot", type=Path, default=SNAPSHOT_PATH,
+        help="where to save the robots.txt text (default: %(default)s)",
+    )
     args = parser.parse_args(argv)
 
     chrome = _find_chrome(args.chrome)
     print(f"Rendering {ROBOTS_URL} with {chrome}", file=sys.stderr)
+
+    # Keep the raw text next to the image: greppable, diffable, and the record
+    # of which rules the scraper was written against.
+    status = _http_status(ROBOTS_URL)
+    _write_snapshot(args.snapshot, GradCafeScraper()._read_url(ROBOTS_URL), status)
+    print(f"Wrote {args.snapshot}", file=sys.stderr)
 
     with tempfile.TemporaryDirectory() as workdir:
         raw_capture = Path(workdir) / "robots.png"
