@@ -13,7 +13,7 @@
 
 | File | Contents |
 |---|---|
-| `applicant_data.json` | 30,000 cleaned applicant records (the Part 1 deliverable) |
+| `applicant_data.json` | 50,000 cleaned applicant records (the Part 1 deliverable; the assignment's minimum is 30,000) |
 | `llm_extend_applicant_data.json` | The same records plus `llm-generated-program` and `llm-generated-university` |
 | `screenshot.jpg` | Evidence that `robots.txt` was checked before scraping |
 | `robots_txt_snapshot.txt` | The robots.txt text itself, as fetched, with retrieval timestamp |
@@ -38,7 +38,7 @@ run fine without it.
 ## Reproducing the submitted files
 
 ```bash
-python scrape.py --target 30000      # ~25 min, writes data/raw_applicant_data.json
+python scrape.py --target 50000      # ~42 min, writes data/raw_applicant_data.json
 python clean.py                      # writes applicant_data.json
 python expand_canon_lists.py         # grows llm_hosting's canonical lists from the data
 python llm_hosting/app.py --file applicant_data.json \
@@ -137,13 +137,21 @@ attaches the pagination query with `urlencode`, and reassembles it with
 `?page=N` is silently ignored — pages 1, 2, 50, 500 and 4000 all return the
 identical 20 rows. The listing instead pages through an opaque `cursor` token
 that appears on the rendered "Next" link, which the scraper reads with
-BeautifulSoup and follows. 30,000 records is 1,500 such requests.
+BeautifulSoup and follows. 50,000 records is 2,500 such requests.
 
 Because each cursor is only discoverable from the previous page, the walk is
 inherently sequential and cannot be parallelized — which suits the politeness
 requirement anyway. The cursor is checkpointed to `data/checkpoint.json` after
 every 25 pages along with the partial results, so an interrupted run resumes
 instead of re-fetching.
+
+That resume path is not theoretical — it is how the submitted data was built.
+The first 30,000 rows were collected in 25 minutes over 1,500 pages; extending
+the target to 50,000 later re-ran the same command, which picked up from the
+saved cursor (`[resume] continuing from 30,000 saved entries`) and fetched only
+the 1,000 pages of new results rather than starting over. It was also verified
+directly: two runs against scratch paths, where the second kept the first's
+entries, fetched only the delta, and produced no duplicate IDs.
 
 **Parsing.** Each applicant occupies up to three sibling `<tr>` elements: a main
 row (school, program + degree, date added, decision, permalink), an optional
@@ -300,7 +308,7 @@ removed. Two filters keep the additions clean:
   one would make the lower-case text *the* canonical answer. The folded lookup
   maps them onto the properly capitalised entry instead.
 
-Result: **979 → 1,236 universities** and **289 → 778 programs**.
+Result: **979 → 1,330 universities** and **289 → 1,032 programs**.
 
 ---
 
@@ -402,4 +410,4 @@ Required entry points: `scrape_data()`, `clean_data()`, `save_data()`,
   above. The guard prevents wrong answers but cannot manufacture right ones.
 - **The scrape is a point-in-time snapshot.** Grad Cafe receives new results
   continuously and applicants edit existing ones, so re-running produces a
-  different 30,000 rows.
+  different 50,000 rows.

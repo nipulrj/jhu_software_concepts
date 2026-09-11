@@ -1317,3 +1317,97 @@ Universität Zürich
 Wesleyan University
 West Coast University
 Zurich
+California State University
+CUNY Queens College
+Sarah Lawrence College
+CUNY New York City College of Technology
+Long Island University
+Spalding University
+Carnegie Mellon
+Pardee RAND Graduate School
+Southern Illinois University
+Panera Bread University
+University of Lethbridge
+CUNY Lehman College
+Cold Spring Harbor Laboratory
+Francis Crick Institute
+Maryville University of Saint Louis
+Philadelphia College of Osteopathic Medicine
+University of Hong Kong (HKU)
+Vilcek Institute of Graduate Biomedical Sciences
+42 US
+CUNY City College
+California College of the Arts
+California Polytechnic State University
+Chestnut Hill College
+Elmhurst University
+Faulkner University
+Indiana University of Pennsylvania-Main Campus
+MIT-Harvard
+Rosalind Franklin University of Medicine & Science
+The Juilliard School
+University of St. Augustine for Health Sciences
+Van Andel Institute
+A.T. Still University
+Baruch College
+Chatham University
+Cornell College
+Hertie School
+Ladoke Akintola University of Technology
+MILA University
+Mount Saint Mary's University
+Otis College of Art and Design
+Ryerson University
+State University of New York at Oswego
+University Of Oklahoma Health Sciences Center
+University of Colorado
+University of St Thomas
+Van Andel Institute Graduate School
+Vermont College of Fine Arts
+Weill Medical College of Cornell University
+Yale Divinity School
+1 December University of Alba Iulia
+3rd Military Medical University
+Acadia University
+Art Center College of Design
+Berlin Mathematical School
+California State Polytechnic University
+Dakota State University
+Georgia College & State University
+Gerstner Sloan Kettering
+Hollins University
+Hong Kong Baptist University
+Hunter College Silberman School of Social Work
+Illinois School of Professional Psychology at National Louis University
+Indiana University Indianapolis
+Johns Hopkins
+Kaiser Permanente School of Allied Health Sciences
+King Fahad University of Petroleum and Minerals
+Linköping University
+Louisiana State University and Agricultural & Mechanical College
+Mohamed bin Zayed University of Artificial Intelligence (MBZUAI)
+Molloy College
+New York Institute of Technology
+New York University, Abu Dhabi
+Northern Michigan University
+Okinawa Institute of Science and Technology
+PAU-Stanford
+Regis College
+Sacramento State University
+Sarah Lawrence
+Smith College
+Sonoma State University
+Stowers Institute for Medical Research
+Teachers College
+The Chicago School at Chicago
+The Chicago School at Washington DC
+Tribhuvan University
+UC San Diego (UCSD)
+University of Chicago Harris School of Public Policy
+University of Macau
+University of Mannheim
+University of Nevada
+University of New Hampshire-Main Campus
+University of Pitt
+University of Texas Medical Branch at Galveston
+Vienna University of Economics and Business
