@@ -10,6 +10,7 @@ import sys
 import time
 import difflib
 import inspect
+import unicodedata
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -180,12 +181,66 @@ def _split_fallback(text: str) -> Tuple[str, str]:
     return prog, uni
 
 
+# MODIFIED: guard the fuzzy matcher against cross-institution corruption.
+#
+# difflib scores on raw character overlap, so a name missing from the canonical
+# list gets rewritten to whatever looks closest.  Observed on real scraped data:
+# "University of Michigan" was not in canon_universities.txt (only "University
+# of Michigan, Ann Arbor" was), and difflib rewrote it to "University of Milan"
+# - a different school on a different continent.  Silently relabelling one real
+# institution as another is far worse than leaving a name unstandardized.
+#
+# The guard below requires the match to keep at least one of the name's
+# distinctive words, so "Michigan" can no longer become "Milan" while genuine
+# fixes ("Mathematic" -> "Mathematics", "University of California (UCLA)" ->
+# "University of California, Los Angeles") still pass.
+_NAME_STOPWORDS = {
+    "university", "universities", "college", "school", "institute", "institution",
+    "polytechnic", "academy", "campus", "state", "graduate", "program", "programs",
+    "the", "and", "for", "with",
+}
+
+
+def _significant_tokens(name: str) -> List[str]:
+    """Accent-folded words of four or more characters, minus generic filler."""
+    folded = unicodedata.normalize("NFKD", (name or "").lower())
+    folded = "".join(ch for ch in folded if not unicodedata.combining(ch))
+    return [
+        token
+        for token in re.findall(r"[a-z0-9]+", folded)
+        if len(token) >= 4 and token not in _NAME_STOPWORDS
+    ]
+
+
+def _tokens_agree(left: str, right: str) -> bool:
+    """True when two words are the same or share a stem (Mathematic/Mathematics)."""
+    if left == right:
+        return True
+    return (
+        len(left) >= 5
+        and len(right) >= 5
+        and (left.startswith(right[:5]) or right.startswith(left[:5]))
+    )
+
+
+def _keeps_identity(name: str, candidate: str) -> bool:
+    """True when ``candidate`` still names the same thing as ``name``."""
+    source = _significant_tokens(name)
+    if not source:
+        return True  # nothing distinctive to preserve (e.g. an acronym)
+    target = _significant_tokens(candidate)
+    return any(_tokens_agree(a, b) for a in source for b in target)
+
+
 def _best_match(name: str, candidates: List[str], cutoff: float = 0.86) -> str | None:
-    """Fuzzy match via difflib (lightweight, Replit-friendly)."""
+    """Fuzzy match via difflib, rejecting matches that change the name's identity."""
     if not name or not candidates:
         return None
-    matches = difflib.get_close_matches(name, candidates, n=1, cutoff=cutoff)
-    return matches[0] if matches else None
+    # Consider several near matches so a safe one further down can still win.
+    for match in difflib.get_close_matches(name, candidates, n=5, cutoff=cutoff):
+        if _keeps_identity(name, match):
+            return match
+    return None
 
 
 def _post_normalize_program(prog: str) -> str:
