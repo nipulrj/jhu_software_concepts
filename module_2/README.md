@@ -327,9 +327,21 @@ Required entry points: `scrape_data()`, `clean_data()`, `save_data()`,
   payload is used whenever it is available, which on the submitted data is every
   record — the fallback is dormant but retained. The un-inferred label is always
   preserved in `raw.raw_status`.
-- **GRE Quant vs a bare "GRE" badge.** The listing labels the quantitative score
-  just `GRE`; it is stored as `gre_quant`. If the site ever emits a combined
-  total under the same label, it would land in the same field.
+- **Applicant-entered scores are out of range, and are preserved anyway.** These
+  are self-reported fields with no validation on the site, and the data contains
+  values no scale allows. Verified against the raw badge text rather than assumed:
+
+  | Observed | What it is |
+  |---|---|
+  | `gre_quant` 323–340 alongside a separate `gre_verbal` | the applicant entered their **combined** GRE total in the quant field |
+  | `gre_aw` = `99.99` | a placeholder; the AW scale only runs 0–6 |
+  | `gpa` = 8.25, 8.69, 9.10 | a 10-point CGPA scale, common outside the US |
+
+  The listing labels the quantitative score just `GRE`, so a combined total
+  entered there is indistinguishable from a section score at parse time. Nothing
+  is clamped, corrected, or dropped — the requirement is to preserve what the
+  applicant reported, and `raw` keeps the badge text for every one of these. Any
+  downstream analysis should filter on plausible ranges itself.
 - **Standardization quality is capped by the 1.1B model** — see the edge cases
   above. The guard prevents wrong answers but cannot manufacture right ones.
 - **The scrape is a point-in-time snapshot.** Grad Cafe receives new results
