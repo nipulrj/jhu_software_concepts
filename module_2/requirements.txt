@@ -3,7 +3,7 @@
 #
 #     python -m pip install -r requirements.txt
 #
-# The scraper itself needs only the standard library (urllib, json, re,
+# The scraper needs only the standard library (urllib, json, re,
 # urllib.robotparser) plus BeautifulSoup. Selenium is deliberately NOT used:
 # the survey listing is server-rendered HTML that plain urllib retrieves with
 # HTTP 200, so a browser adds nothing. See README.md for details.
@@ -11,11 +11,6 @@
 # --- scraping and cleaning (scrape.py, clean.py) ---
 beautifulsoup4==4.14.3
 soupsieve==2.8.3
-
-# --- robots.txt evidence capture (capture_robots_evidence.py) ---
-# Composes the header onto the headless-Chrome screenshot. Chrome itself is an
-# external dependency and is only needed to regenerate screenshot.jpg.
-pillow==12.3.0
 
 # --- local LLM standardizer (llm_hosting/app.py) ---
 # llama-cpp-python has no prebuilt wheel for CPython 3.13 on Windows and is

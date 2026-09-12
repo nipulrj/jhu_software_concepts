@@ -3,7 +3,7 @@
 # Response:  HTTP 200 OK
 # Retrieved by: JHU-EN605256-CourseProject/1.0 (graduate coursework scraper; contact: nipulrj@gmail.com)
 #
-# Saved verbatim below. Regenerate with: python capture_robots_evidence.py
+# Saved verbatim below, exactly as returned by the server.
 # --------------------------------------------------------------------------
 
 # As a condition of accessing this website, you agree to abide by the following
