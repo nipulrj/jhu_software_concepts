@@ -16,8 +16,8 @@ Existing entries are never reordered or removed - additions go in a clearly
 marked block at the end of each file, so the diff against the provided lists
 stays easy to review.
 
-    python expand_canon_lists.py --min-count 3
-    python expand_canon_lists.py --dry-run
+    python llm_hosting/expand_canon_lists.py --min-count 3
+    python llm_hosting/expand_canon_lists.py --dry-run
 """
 
 from __future__ import annotations
@@ -29,11 +29,17 @@ import unicodedata
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from clean import CLEANED_DATA_PATH
-from scrape import load_data
+CANON_DIR = Path(__file__).resolve().parent          # llm_hosting/
+MODULE_DIR = CANON_DIR.parent                        # module_2/
 
-MODULE_DIR = Path(__file__).resolve().parent
-CANON_DIR = MODULE_DIR / "llm_hosting"
+# clean.py and scrape.py live one directory up, so make them importable
+# regardless of where this script is launched from.
+if str(MODULE_DIR) not in sys.path:
+    sys.path.insert(0, str(MODULE_DIR))
+
+from clean import CLEANED_DATA_PATH  # noqa: E402  (needs the path set above)
+from scrape import load_data  # noqa: E402
+
 CANON_UNIVERSITIES = CANON_DIR / "canon_universities.txt"
 CANON_PROGRAMS = CANON_DIR / "canon_programs.txt"
 
@@ -87,7 +93,8 @@ def _load_matcher():
     is the safe direction: a redundant canonical entry is harmless, a missing one
     is what lets the fuzzy matcher wander onto a different institution.
     """
-    sys.path.insert(0, str(CANON_DIR))
+    if str(CANON_DIR) not in sys.path:
+        sys.path.insert(0, str(CANON_DIR))
     try:
         from app import _best_match  # type: ignore
 

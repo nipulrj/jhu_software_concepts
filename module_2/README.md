@@ -40,7 +40,7 @@ run fine without it.
 ```bash
 python scrape.py --target 50000      # ~42 min, writes data/raw_applicant_data.json
 python clean.py                      # writes applicant_data.json
-python expand_canon_lists.py         # grows llm_hosting's canonical lists from the data
+python llm_hosting/expand_canon_lists.py   # grows the canonical lists from the data
 python llm_hosting/app.py --file applicant_data.json \
     --out llm_extend_applicant_data.json --json-array --workers 8
 ```
@@ -313,7 +313,7 @@ spelling, so fuzzy matching is only reached by names genuinely absent from the
 list. This also repairs the site's own inconsistent casing
 (`university of british columbia → University of British Columbia`).
 
-**Canonical lists — `expand_canon_lists.py`:**
+**Canonical lists — `llm_hosting/expand_canon_lists.py`:**
 
 Grad Cafe stores each result's school and programme as foreign keys (`school_id`,
 `program_id`), so the names it renders come from the site's own controlled
@@ -411,7 +411,6 @@ The pipeline is intentionally re-runnable: update the canonical lists, rerun
 module_2/
   scrape.py                    scraping logic (GradCafeScraper, save_data, load_data)
   clean.py                     cleaning logic (clean_data, and the parsers it uses)
-  expand_canon_lists.py        grows the canonical lists from scraped data
   applicant_data.json          cleaned records (deliverable)
   llm_extend_applicant_data.json   cleaned records + LLM fields (deliverable)
   screenshot.jpg               robots.txt evidence (rendered, with verdicts)
@@ -419,6 +418,7 @@ module_2/
   requirements.txt
   README.md
   llm_hosting/                 provided standardizer, plus the changes listed above
+    expand_canon_lists.py      grows the canonical lists from scraped data
   data/                        raw scrape + checkpoint (regenerable, not committed)
 ```
 
