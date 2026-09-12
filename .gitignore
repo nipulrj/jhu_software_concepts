@@ -4,6 +4,3 @@ __pycache__/
 
 # Claude Code local dev server config
 .claude/
-
-# Canvas submission bundle, rebuilt from the tracked files
-module_2.zip
