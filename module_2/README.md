@@ -5,7 +5,7 @@
 
 **Module:** Module 2 — Web Scraping (EN.605.256, Modern Software Concepts in Python)
 **Assignment:** Scrape, clean, and LLM-standardize Grad Cafe applicant data
-**Due:** See Canvas
+**Due:** September 13, 2026
 
 ---
 
