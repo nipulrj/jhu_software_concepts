@@ -22,7 +22,6 @@ with the SQLAlchemy ORM, and serve the results from a dynamic Flask page.
 | `query_results.pdf` | Every question with its result, its SQL and an explanation |
 | `limitations.pdf` | Two paragraphs on what self-reported data can and cannot support |
 | `screenshots/` | Raw SQL output, ORM output, and the running web page |
-| `tools/` | Scripts that build `query_results.pdf`/`.docx` and capture the screenshots |
 
 ---
 
@@ -106,9 +105,6 @@ python orm_queries.py --compare  # check the two agree (they do, on all eleven)
 python app.py                    # http://127.0.0.1:5000
 python models.py                 # quick connectivity check
 python pull_data.py --target 300 # pull new results without the web page
-
-python tools/build_pdfs.py       # regenerate query_results.pdf from a live run
-powershell -ExecutionPolicy Bypass -File tools/capture_screenshots.ps1
 ```
 
 `--questions` takes `1-6`, `1,4,5` or a mix, which is useful for re-running one
@@ -161,9 +157,8 @@ to *Wait listed* between two fetches minutes apart.
 ## Results
 
 Run against the database as it stands: the committed 50,000-record dataset plus
-4 records a live Pull Data test added, so 50,004 rows. (`query_results.pdf` is
-generated from the same state; re-run `tools/build_pdfs.py` after a further pull
-and both it and these numbers move together.)
+the records a live Pull Data test added. `query_results.pdf` was produced from the
+same state, so the two agree; a further pull would move both.
 
 | # | Question | Answer |
 |---|---|---|
@@ -416,11 +411,6 @@ module_3/
   scrape.py                    Module 2 scraper
   clean.py                     Module 2 cleaner
   llm_hosting/                 Module 2 LLM standardizer
-  tools/
-    build_pdfs.py              generates query_results.pdf directly
-    export_results_json.py     dumps a live run, for the Word route
-    build_query_results_docx.js  turns that dump into query_results.docx
-    capture_screenshots.ps1    captures the six screenshots
   applicant_data.json          Module 2 cleaned records
   llm_extend_applicant_data.json   the file load_data.py reads
   screenshots/
@@ -437,56 +427,26 @@ module_3/
 
 ---
 
-## How the PDFs and screenshots are produced
+## How the PDFs and screenshots were produced
 
-`query_results.pdf` is generated from a live run of `query_data.py` rather than
-typed up by hand, so the result printed beside each query is necessarily the one
-that query produced. Re-run `python tools/build_pdfs.py` after a Pull Data and it
-follows the new data.
+Both PDFs were written in Word and exported. Their figures come from a run of
+`query_data.py` against the database as committed, so nothing in them was typed
+from memory. If a Pull Data ever moves those numbers, the documents want
+re-reading rather than re-rendering.
 
-`limitations.pdf` is deliberately *not* generated. It is written prose, drafted in
-Word and exported, so a generator would overwrite the authored version rather
-than help. Its figures are quoted from a run of `query_data.py`; if the data ever
-moves them, the essay wants re-reading rather than re-rendering.
+The screenshots are real screen captures of real windows, not text styled to look
+like a terminal. Two details were worth solving to get them legible. The eleven
+answers run longer than one console window, and Windows Terminal ignores both the
+legacy console-resize API and a scroll key sent with `SendKeys` -- so the window
+was sized in pixels through `MoveWindow`, and the shell made to wait before
+printing, since output written into a short viewport stays where it was written.
+The `--questions` selector then splits the run into batches that each fit. The
+browser window was opened InPrivate: on a first run Edge signs itself in with the
+Windows account and shows a sync dialog that covers the page *and* prints the
+account's email address onto the screenshot.
 
-Both PDFs can also be produced through Word, which is how the submitted copies
-were made. `tools/` has a two-step route for the analysis document:
-
-```bash
-python tools/export_results_json.py --out results.json
-npm install docx
-node tools/build_query_results_docx.js results.json query_results.docx
-```
-
-The first step runs the real queries and dumps what they returned; the second
-turns that into a Word file. Open it, adjust anything, then export to PDF. The
-querying stays in Python where the queries live, and the document building goes
-to the library that writes `.docx` properly. `--` is promoted to an em dash on the
-way into Word, except inside SQL, where two hyphens start a comment and have to
-stay two hyphens.
-
-`node_modules/` is gitignored; the Word route is optional tooling and is not
-needed to run anything else in this module.
-
-The screenshots are real screen captures of real windows, not text rendered to
-look like a terminal. `tools/capture_screenshots.ps1` launches each window
-itself, sizes it, brings it to the front and captures only that window's
-rectangle -- never the whole desktop, so nothing else that happens to be on
-screen is caught. Two details were worth solving properly:
-
-* The eleven answers are longer than one console window, and Windows Terminal
-  ignores both the legacy console-resize API and a scroll key sent with
-  `SendKeys`. The script sizes the window in pixels through `MoveWindow` instead,
-  and has the launched shell wait before printing -- output written into a short
-  viewport stays where it was written, so the resize has to land first. The
-  `--questions` selector then splits the run into two batches that each fit.
-* The browser window opens InPrivate. On a first run Edge signs itself in with
-  the Windows account and shows a "we are now syncing your browsing data"
-  dialog, which covered the page *and* printed the account's email address onto
-  the screenshot -- and these files are committed and submitted. An InPrivate
-  window never signs in, so the dialog cannot appear.
-
----
+The scripts that did this work are not in the submission. They were one-off
+tooling, their output is committed, and nothing here needs them to run.
 
 ## Known limitations
 

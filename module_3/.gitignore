@@ -2,23 +2,17 @@
 .env
 
 # Scraper working files: large, regenerable with `python scrape.py`, and not
-# deliverables. The data the loader reads (llm_extend_applicant_data.json)
-# lives at the module root and IS committed.
+# deliverables. The data the loader reads (module_2/llm_extend_applicant_data.json)
+# IS committed.
 data/
 
 # Downloaded GGUF model weights (~670 MB), fetched on first run of the
 # LLM stage from Hugging Face.
-llm_hosting/models/
+module_2/llm_hosting/models/
 
 # Cached raw model answers. Regenerable, and only an optimisation: it lets a
 # rerun skip the model for strings already standardized.
-llm_hosting/standardization_cache.json
+module_2/llm_hosting/standardization_cache.json
 
 # Marker file written while a Pull Data scrape is in flight.
 .pull_data.lock
-
-# Node modules, if the Word builder is ever run from inside this folder.
-# tools/build_query_results_docx.js needs `npm install docx`; keep it out of
-# the repo and the submission ZIP.
-node_modules/
-package-lock.json

@@ -18,11 +18,11 @@ SQLAlchemy==2.0.48
 # --- web application (app.py) ---
 Flask==3.1.3
 
-# --- scraping and cleaning, carried over from Module 2 (scrape.py, clean.py) ---
+# --- scraping and cleaning, carried over (module_2/scrape.py, module_2/clean.py) ---
 beautifulsoup4==4.14.3
 soupsieve==2.8.3
 
-# --- local LLM standardizer, carried over from Module 2 (llm_hosting/app.py) ---
+# --- local LLM standardizer, carried over (module_2/llm_hosting/app.py) ---
 # Only needed by the Pull Data button, and only to fill the two LLM columns.
 # Without it the pull still runs and still loads the new rows; it just leaves
 # llm_generated_program and llm_generated_university empty for them.
@@ -33,11 +33,6 @@ soupsieve==2.8.3
 # version instead, or run this stage on Python 3.11/3.12.
 llama-cpp-python==0.2.90
 huggingface_hub==1.31.0
-
-# --- report generation (tools/build_pdfs.py) ---
-# Builds query_results.pdf and limitations.pdf. Not needed to run the analysis
-# or the web page; the PDFs themselves are committed.
-reportlab==4.4.4
 
 # --- transitive pins, recorded so the environment reconstructs exactly ---
 blinker==1.9.0

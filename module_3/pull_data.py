@@ -3,7 +3,9 @@
 This is what the "Pull Data" button runs.  It drives the Module 2 pipeline
 end to end, reusing that code rather than reimplementing it:
 
-    scrape.GradCafeScraper  ->  clean.clean_data  ->  llm_hosting/app.py  ->  load_data
+    scrape.GradCafeScraper -> clean.clean_data -> llm_hosting/app.py -> load_data
+
+all of which live in ``module_2/``, carried over unchanged.
 
 Only the newest page of results is walked, not the whole site: the scraper starts
 at the most recent entry and collects ``--target`` records.  Anything already in
@@ -32,6 +34,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+
+# The Module 2 pipeline lives in its own folder. Putting it on sys.path rather
+# than importing it as a package keeps those files exactly as Module 2 left them
+# -- clean.py does `from scrape import ...`, which only resolves if the two sit
+# together on the path.
+MODULE_2_DIR = PROJECT_ROOT / "module_2"
+if str(MODULE_2_DIR) not in sys.path:
+    sys.path.insert(0, str(MODULE_2_DIR))
+
 DATA_DIR = PROJECT_ROOT / "data"
 PULL_DIR = DATA_DIR / "pull"
 
@@ -201,7 +212,7 @@ def _standardize(clean_path: Path, out_path: Path, workers: int) -> bool:
     """
     command = [
         sys.executable,
-        str(PROJECT_ROOT / "llm_hosting" / "app.py"),
+        str(MODULE_2_DIR / "llm_hosting" / "app.py"),
         "--file",
         str(clean_path),
         "--out",

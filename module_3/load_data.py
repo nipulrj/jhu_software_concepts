@@ -29,7 +29,11 @@ import psycopg
 import db_config
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DEFAULT_DATA_PATH = PROJECT_ROOT / "llm_extend_applicant_data.json"
+
+# The Module 2 pipeline and its outputs live in module_2/, kept together so this
+# module's own files are not mixed in with the ones carried over from the last.
+MODULE_2_DIR = PROJECT_ROOT / "module_2"
+DEFAULT_DATA_PATH = MODULE_2_DIR / "llm_extend_applicant_data.json"
 
 TABLE_NAME = "applicants"
 
@@ -194,7 +198,8 @@ def load_records(path: Path = DEFAULT_DATA_PATH) -> List[Dict[str, Any]]:
     path = Path(path)
     if not path.exists():
         raise LoaderError(
-            "{path} does not exist. Run the Module 2 pipeline first:\n"
+            "{path} does not exist. Run the Module 2 pipeline first, from "
+            "module_2/:\n"
             "    python scrape.py --target 50000\n"
             "    python clean.py\n"
             "    python llm_hosting/app.py --file applicant_data.json "
