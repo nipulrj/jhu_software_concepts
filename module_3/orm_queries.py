@@ -30,6 +30,8 @@ from models import Applicant, SessionLocal
 from query_data import (
     QUESTION_3_CAVEAT,
     QUESTION_9_CAVEAT,
+    QUESTION_10_CAVEAT,
+    QUESTION_11_CAVEAT,
     QuestionResult,
     parse_selection,
     fmt_avg,
@@ -176,6 +178,106 @@ def question_3(session: Session) -> QuestionResult:
         _avg2(Applicant.gre_aw),
     ).select_from(Applicant)
     gpa, gre, gre_v, gre_aw = session.execute(statement).one()
+
+    # Supporting analysis rather than part of the answer: how much of each
+    # average is an artefact of values that are impossible on their own scale.
+    metrics = (
+        ("GPA (0-4.0)", Applicant.gpa, Applicant.gpa <= 4.0, Applicant.gpa > 4.0),
+        (
+            "GRE Quantitative (130-170)",
+            Applicant.gre,
+            Applicant.gre.between(130, 170),
+            or_(Applicant.gre < 130, Applicant.gre > 170),
+        ),
+        (
+            "GRE Verbal (130-170)",
+            Applicant.gre_v,
+            Applicant.gre_v.between(130, 170),
+            or_(Applicant.gre_v < 130, Applicant.gre_v > 170),
+        ),
+        (
+            "GRE Analytical Writing (0-6)",
+            Applicant.gre_aw,
+            Applicant.gre_aw.between(0, 6),
+            or_(Applicant.gre_aw < 0, Applicant.gre_aw > 6),
+        ),
+    )
+
+    validity = session.execute(
+        select(
+            *[
+                expression
+                for _, column, in_range, out_of_range in metrics
+                for expression in (
+                    func.count(column),
+                    _count_where(out_of_range),
+                    _avg2(column),
+                    _avg2(case((in_range, column), else_=None)),
+                )
+            ]
+        ).select_from(Applicant)
+    ).one()
+
+    # The impossible GRE Quantitative values are not random noise, and saying so
+    # needs evidence.  Verbal and Quantitative are each reported on 130-170 and
+    # the combined total on 260-340, so a total typed into the Quantitative box
+    # should land in that second band -- and subtracting the verbal score the
+    # same row reports should leave a believable section score.
+    in_total_range = Applicant.gre.between(260, 340)
+    impossible_gre = and_(
+        Applicant.gre.is_not(None),
+        or_(Applicant.gre < 130, Applicant.gre > 170),
+    )
+    has_verbal = and_(in_total_range, Applicant.gre_v.is_not(None))
+
+    impossible, in_range_total, with_verbal, implied_quant = session.execute(
+        select(
+            _count_where(impossible_gre),
+            _count_where(in_total_range),
+            _count_where(has_verbal),
+            _avg2(case((has_verbal, Applicant.gre - Applicant.gre_v), else_=None)),
+        ).select_from(Applicant)
+    ).one()
+
+    table_rows: List[List[str]] = []
+    for index, (label, _column, _in_range, _out_of_range) in enumerate(metrics):
+        reported, out_of_range, average_all, average_in_range = validity[
+            index * 4 : index * 4 + 4
+        ]
+        shift = None
+        if average_all is not None and average_in_range is not None:
+            shift = float(average_all) - float(average_in_range)
+        table_rows.append(
+            [
+                label,
+                fmt_count(reported),
+                fmt_count(out_of_range),
+                fmt_avg(average_all),
+                fmt_avg(average_in_range),
+                "n/a" if shift is None else "{0:+.2f}".format(shift),
+            ]
+        )
+
+    supporting = [
+        "How much of each average is an artefact of impossible values:",
+    ]
+    if impossible and in_range_total:
+        supporting.append(
+            "{0} of the {1} impossible GRE Quantitative values ({2}) fall in 260-340, "
+            "the official combined Verbal+Quantitative range".format(
+                fmt_count(in_range_total),
+                fmt_count(impossible),
+                fmt_pct(100.0 * in_range_total / impossible),
+            )
+        )
+    if with_verbal and implied_quant is not None:
+        supporting.append(
+            "Subtracting the verbal score from the {0} of those that report one "
+            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
+                fmt_count(with_verbal), fmt_avg(implied_quant)
+            )
+        )
+
     return QuestionResult(
         number=3,
         question=(
@@ -192,8 +294,26 @@ def question_3(session: Session) -> QuestionResult:
         explanation=(
             "func.avg maps to SQL's AVG, which ignores NULLs, so each metric is "
             "averaged over exactly the applicants who reported it and no "
-            "applicant needs all four values to contribute to one of them."
+            "applicant needs all four values to contribute to one of them. Two "
+            "supporting statements follow, built from the same expressions: one "
+            "re-computes each average with the impossible values removed, the "
+            "other tests what those values are. Where the handwritten version "
+            "repeats a near-identical SELECT four times in a UNION ALL, here the "
+            "repetition is a comprehension over a list of (column, valid-range) "
+            "pairs -- a fifth metric would be one more tuple."
         ),
+        table={
+            "columns": [
+                "Metric",
+                "Reported",
+                "Out of range",
+                "Average (all)",
+                "Average (in range)",
+                "Distortion",
+            ],
+            "rows": table_rows,
+        },
+        supporting=supporting,
         caveat=QUESTION_3_CAVEAT,
     )
 
@@ -370,218 +490,208 @@ def question_9(session: Session) -> QuestionResult:
 
 def question_10(session: Session) -> QuestionResult:
     """Original question 1 of 2 -- the one repeated here for Part 6."""
-    busiest = (
+    most_applied_to = (
         select(
             Applicant.llm_generated_university.label("university"),
             func.count().label("entries"),
             _count_where(IS_ACCEPTED).label("acceptances"),
+            _count_where(
+                and_(IS_ACCEPTED, Applicant.gpa.is_not(None))
+            ).label("accepted_with_gpa"),
+            func.avg(
+                case((IS_ACCEPTED, Applicant.gpa), else_=None)
+            ).label("avg_gpa_accepted"),
         )
-        .where(
-            and_(IS_FALL_2026, Applicant.llm_generated_university.is_not(None))
-        )
+        .where(Applicant.llm_generated_university.is_not(None))
         .group_by(Applicant.llm_generated_university)
         .order_by(desc("entries"))
-        .limit(10)
+        .limit(20)
         .subquery()
     )
 
+    acceptance_percent = _percent(
+        most_applied_to.c.acceptances, most_applied_to.c.entries
+    ).label("acceptance_percent")
+
     statement = select(
-        busiest.c.university,
-        busiest.c.entries,
-        busiest.c.acceptances,
-        _percent(busiest.c.acceptances, busiest.c.entries).label("acceptance_percent"),
-    ).order_by(desc("acceptance_percent"))
+        most_applied_to.c.university,
+        most_applied_to.c.entries,
+        most_applied_to.c.acceptances,
+        acceptance_percent,
+        most_applied_to.c.accepted_with_gpa,
+        func.round(cast(most_applied_to.c.avg_gpa_accepted, Numeric), 2).label(
+            "avg_gpa_accepted"
+        ),
+    ).order_by("acceptance_percent")
 
     rows = session.execute(statement).all()
 
     answer_lines = []
     if rows:
-        best, lowest = rows[0], rows[-1]
+        hardest, easiest = rows[0], rows[-1]
         answer_lines.append(
-            "Highest acceptance rate among the ten busiest Fall 2026 universities: "
-            "{0} at {1} ({2} of {3} entries)".format(
-                best[0], fmt_pct(best[3]), fmt_count(best[2]), fmt_count(best[1])
+            "Hardest of the twenty most-applied-to universities: {0} at {1} "
+            "({2} of {3} entries), average GPA of those accepted {4}".format(
+                hardest[0], fmt_pct(hardest[3]), fmt_count(hardest[2]),
+                fmt_count(hardest[1]), fmt_avg(hardest[5]),
             )
         )
         answer_lines.append(
-            "Lowest: {0} at {1} ({2} of {3} entries)".format(
-                lowest[0], fmt_pct(lowest[3]), fmt_count(lowest[2]), fmt_count(lowest[1])
+            "Easiest: {0} at {1} ({2} of {3} entries), average GPA of those "
+            "accepted {4}".format(
+                easiest[0], fmt_pct(easiest[3]), fmt_count(easiest[2]),
+                fmt_count(easiest[1]), fmt_avg(easiest[5]),
             )
         )
+        gpas = [float(row[5]) for row in rows if row[5] is not None]
+        rates = [float(row[3]) for row in rows if row[3] is not None]
+        if gpas and rates:
+            answer_lines.append(
+                "Acceptance rate across the twenty spans {0} to {1}, but the "
+                "average GPA of those accepted spans only {2} to {3} -- "
+                "selectivity barely shows up in the GPA of who gets in".format(
+                    fmt_pct(min(rates)), fmt_pct(max(rates)),
+                    fmt_avg(min(gpas)), fmt_avg(max(gpas)),
+                )
+            )
     else:
-        answer_lines.append("No Fall 2026 entries with a standardized university.")
+        answer_lines.append("No entries with a standardized university.")
 
     return QuestionResult(
         number=10,
         question=(
-            "Of the ten universities with the most Fall 2026 entries, which "
-            "reports the highest acceptance rate, and how wide is the spread?"
+            "Of the twenty universities that applicants apply to most, which is "
+            "hardest to get into, and does a lower acceptance rate come with a "
+            "stronger GPA among those who are accepted?"
         ),
         answer_lines=answer_lines,
         sql=_sql(statement),
         explanation=(
             "The grouped query is built as a .subquery() and selected from, which "
             "is how the ORM expresses the derived table the handwritten version "
-            "writes as a bracketed FROM clause. Grouping on the standardized "
+            "writes as a bracketed FROM clause. Two conditional aggregates run "
+            "over the same scan -- one counting acceptances, one averaging GPA "
+            "across only the accepted -- built from the same IS_ACCEPTED "
+            "predicate the other questions use. Grouping on the standardized "
             "university keeps one school in one group rather than splitting it "
             "across its several raw spellings."
         ),
         table={
-            "columns": ["University", "Entries", "Acceptances", "Acceptance rate"],
+            "columns": [
+                "University",
+                "Entries",
+                "Acceptances",
+                "Acceptance rate",
+                "Accepted w/ GPA",
+                "Avg GPA (accepted)",
+            ],
             "rows": [
-                [row[0], fmt_count(row[1]), fmt_count(row[2]), fmt_pct(row[3])]
+                [
+                    row[0],
+                    fmt_count(row[1]),
+                    fmt_count(row[2]),
+                    fmt_pct(row[3]),
+                    fmt_count(row[4]),
+                    fmt_avg(row[5]),
+                ]
                 for row in rows
             ],
         },
+        caveat=QUESTION_10_CAVEAT,
         original=True,
     )
 
 
 def question_11(session: Session) -> QuestionResult:
     """Original question 2 of 2."""
-    metrics = (
-        ("GPA (0-4.0)", Applicant.gpa, Applicant.gpa <= 4.0, Applicant.gpa > 4.0),
-        (
-            "GRE Quantitative (130-170)",
-            Applicant.gre,
-            Applicant.gre.between(130, 170),
-            or_(Applicant.gre < 130, Applicant.gre > 170),
-        ),
-        (
-            "GRE Verbal (130-170)",
-            Applicant.gre_v,
-            Applicant.gre_v.between(130, 170),
-            or_(Applicant.gre_v < 130, Applicant.gre_v > 170),
-        ),
-        (
-            "GRE Analytical Writing (0-6)",
-            Applicant.gre_aw,
-            Applicant.gre_aw.between(0, 6),
-            or_(Applicant.gre_aw < 0, Applicant.gre_aw > 6),
-        ),
+    cohort = func.initcap(func.trim(Applicant.us_or_international)).label("cohort")
+    acceptance_percent = _percent(_count_where(IS_ACCEPTED), func.count()).label(
+        "acceptance_percent"
     )
 
-    statement = select(
-        *[
-            expression
-            for _, column, in_range, out_of_range in metrics
-            for expression in (
-                func.count(column),
-                _count_where(out_of_range),
-                _avg2(column),
-                _avg2(case((in_range, column), else_=None)),
-            )
-        ]
-    ).select_from(Applicant)
-
-    values = session.execute(statement).one()
-
-    # A second statement, mirroring the raw-SQL file: the impossible GRE
-    # Quantitative values are not random noise, and saying so needs evidence.
-    # Verbal and Quantitative are each reported on 130-170 and the combined total
-    # on 260-340, so a total typed into the Quantitative box should land in that
-    # second band -- and subtracting the verbal score the same row reports should
-    # leave a believable section score.
-    in_total_range = Applicant.gre.between(260, 340)
-    impossible_gre = and_(
-        Applicant.gre.is_not(None),
-        or_(Applicant.gre < 130, Applicant.gre > 170),
-    )
-    has_verbal = and_(in_total_range, Applicant.gre_v.is_not(None))
-
-    impossible, in_range_total, with_verbal, implied_quant = session.execute(
+    statement = (
         select(
-            _count_where(impossible_gre),
-            _count_where(in_total_range),
-            _count_where(has_verbal),
-            _avg2(case((has_verbal, Applicant.gre - Applicant.gre_v), else_=None)),
-        ).select_from(Applicant)
-    ).one()
-
-    table_rows: List[List[str]] = []
-    total_out_of_range = 0
-    worst_metric: Optional[str] = None
-    worst_shift = 0.0
-
-    for index, (label, _column, _in_range, _out_of_range) in enumerate(metrics):
-        reported, out_of_range, average_all, average_in_range = values[
-            index * 4 : index * 4 + 4
-        ]
-        total_out_of_range += int(out_of_range or 0)
-
-        shift = None
-        if average_all is not None and average_in_range is not None:
-            shift = float(average_all) - float(average_in_range)
-            if abs(shift) > abs(worst_shift):
-                worst_shift, worst_metric = shift, label
-
-        table_rows.append(
-            [
-                label,
-                fmt_count(reported),
-                fmt_count(out_of_range),
-                fmt_avg(average_all),
-                fmt_avg(average_in_range),
-                "n/a" if shift is None else "{0:+.2f}".format(shift),
-            ]
+            cohort,
+            func.count().label("entries"),
+            _count_where(IS_ACCEPTED).label("acceptances"),
+            acceptance_percent,
+            _percent(func.count(Applicant.gpa), func.count()).label("gpa_disclosure"),
+            _avg2(Applicant.gpa).label("avg_gpa"),
         )
+        .select_from(Applicant)
+        .where(HAS_NATIONALITY)
+        .group_by(cohort)
+        .order_by(desc("acceptance_percent"))
+    )
 
-    answer_lines = [
-        "Impossible values reported across the four metrics: {0}".format(
-            fmt_count(total_out_of_range)
-        )
-    ]
-    if worst_metric is not None:
+    rows = session.execute(statement).all()
+    by_cohort = {row[0]: row for row in rows}
+    american = by_cohort.get("American")
+    international = by_cohort.get("International")
+
+    answer_lines = []
+    if american and international:
         answer_lines.append(
-            "Largest distortion: {0}, whose headline average is {1} too high".format(
-                worst_metric, fmt_avg(abs(worst_shift))
+            "Acceptance rate: {0} American vs {1} international -- a gap of "
+            "{2:.2f} points".format(
+                fmt_pct(american[3]),
+                fmt_pct(international[3]),
+                float(american[3]) - float(international[3]),
             )
         )
-    if impossible and in_range_total:
         answer_lines.append(
-            "Of those, {0} of the {1} impossible GRE Quantitative values ({2}) fall in "
-            "260-340, the official combined Verbal+Quantitative range".format(
-                fmt_count(in_range_total),
-                fmt_count(impossible),
-                fmt_pct(100.0 * in_range_total / impossible),
+            "But the sharper gap is in what they disclose: {0} of American "
+            "entries report a GPA against {1} of international ones".format(
+                fmt_pct(american[4]), fmt_pct(international[4])
             )
         )
-    if with_verbal and implied_quant is not None:
         answer_lines.append(
-            "Subtracting the verbal score from the {0} of those that report one "
-            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
-                fmt_count(with_verbal), fmt_avg(implied_quant)
+            "Yet the GPAs they do report are near identical -- {0} American, "
+            "{1} international".format(
+                fmt_avg(american[5]), fmt_avg(international[5])
             )
         )
+    else:
+        answer_lines.append("Not enough nationality data to compare cohorts.")
 
     return QuestionResult(
         number=11,
         question=(
-            "How many self-reported metrics are impossible for their own scale, "
-            "and how far do they move the averages reported in Question 3?"
+            "Do international applicants fare differently from American ones -- "
+            "and are they equally willing to say what their GPA was?"
         ),
         answer_lines=answer_lines,
         sql=_sql(statement),
         explanation=(
-            "Four aggregates per metric, built by a Python comprehension over a "
-            "list of (column, valid-range) pairs and selected in one pass. Where "
-            "the handwritten version repeats a near-identical SELECT four times "
-            "in a UNION ALL, here the repetition is a loop -- adding a fifth "
-            "metric would be one more tuple. A second statement then tests what "
-            "the impossible values are rather than merely counting them, using "
-            "the same between() and case() expressions."
+            "One grouped pass over the mapped column, reusing the HAS_NATIONALITY "
+            "predicate Question 2 defines so 'did not say' is excluded the same "
+            "way in both. Three measures per cohort: the acceptance rate, the "
+            "share of entries that disclose a GPA at all -- func.count() over the "
+            "column counts only non-NULLs, which is exactly the disclosure rate "
+            "-- and the average of the GPAs disclosed."
         ),
         table={
             "columns": [
-                "Metric",
-                "Reported",
-                "Out of range",
-                "Average (all)",
-                "Average (in range)",
-                "Distortion",
+                "Cohort",
+                "Entries",
+                "Acceptances",
+                "Acceptance rate",
+                "Report a GPA",
+                "Avg GPA",
             ],
-            "rows": table_rows,
+            "rows": [
+                [
+                    row[0],
+                    fmt_count(row[1]),
+                    fmt_count(row[2]),
+                    fmt_pct(row[3]),
+                    fmt_pct(row[4]),
+                    fmt_avg(row[5]),
+                ]
+                for row in rows
+            ],
         },
+        caveat=QUESTION_11_CAVEAT,
         original=True,
     )
 

@@ -249,6 +249,18 @@ h1 {
 }
 .answer-line + .answer-line { margin-top: 3px; }
 
+/* Findings that support an answer without being part of it — Question 3 uses
+   these to show what its own averages are worth. */
+.supporting {
+  margin: 14px 0 0;
+  padding-left: 20px;
+  font-size: 0.91rem;
+  color: var(--ink-soft);
+}
+
+.supporting li { margin-bottom: 4px; }
+.supporting li::marker { color: var(--accent); }
+
 .caveat {
   margin: 12px 0 0;
   padding: 11px 15px;

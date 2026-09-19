@@ -171,13 +171,13 @@ $Script
 # that each fit on screen, which between them show every answer in full.
 Write-Output "Capturing raw SQL output..."
 Capture-Console -Script "python -X utf8 query_data.py --questions 1-6" `
-                -Path (Join-Path $shots "01_raw_sql_output_q1-6.png") -Height 790
+                -Path (Join-Path $shots "01_raw_sql_output_q1-6.png") -Height 1200
 Capture-Console -Script "python -X utf8 query_data.py --questions 7-11" `
                 -Path (Join-Path $shots "02_raw_sql_output_q7-11.png") -Height 1270
 
 Write-Output "Capturing SQLAlchemy ORM output..."
 Capture-Console -Script "python -X utf8 orm_queries.py --questions 1-6" `
-                -Path (Join-Path $shots "03_orm_output_q1-6.png") -Height 790
+                -Path (Join-Path $shots "03_orm_output_q1-6.png") -Height 1200
 Capture-Console -Script "python -X utf8 orm_queries.py --questions 7-11" `
                 -Path (Join-Path $shots "04_orm_output_q7-11.png") -Height 1270
 

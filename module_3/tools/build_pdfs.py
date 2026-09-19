@@ -280,6 +280,17 @@ def build_query_results(results: Sequence[query_data.QuestionResult], path: Path
             story.append(Spacer(1, 8))
             story.append(_result_table(result.table))
 
+        if result.supporting:
+            story.append(
+                KeepTogether(
+                    [Paragraph("SUPPORTING ANALYSIS", styles["label"])]
+                    + [
+                        Paragraph("&bull;&nbsp; " + _escape(entry), styles["body"])
+                        for entry in result.supporting
+                    ]
+                )
+            )
+
         story.append(
             KeepTogether(
                 [
@@ -326,9 +337,9 @@ def build_limitations(results: Sequence[query_data.QuestionResult], path: Path) 
     styles = _styles()
     by_number = {result.number: result for result in results}
 
-    # Pull the figures out of Question 11's table so the essay cannot cite stale
-    # numbers: row order is GPA, GRE Q, GRE V, GRE AW.
-    metrics = {row[0].split(" (")[0]: row for row in by_number[11].table["rows"]}
+    # Pull the figures out of Question 3's scale-validity table so the essay
+    # cannot cite stale numbers: row order is GPA, GRE Q, GRE V, GRE AW.
+    metrics = {row[0].split(" (")[0]: row for row in by_number[3].table["rows"]}
     gre_q = metrics["GRE Quantitative"]
     gre_aw = metrics["GRE Analytical Writing"]
 
@@ -369,8 +380,9 @@ def build_limitations(results: Sequence[query_data.QuestionResult], path: Path) 
         (
             "The second limitation is that the data is not merely incomplete but "
             "partly wrong, in ways arithmetic will happily propagate. Grad Cafe "
-            "validates nothing an applicant types, and Question 11 counts the "
-            "consequences: {out_of_range} of the {reported} reported GRE "
+            "validates nothing an applicant types, and the supporting analysis "
+            "under Question 3 counts the consequences: "
+            "{out_of_range} of the {reported} reported GRE "
             "Quantitative values &mdash; {share} of them &mdash; are impossible on "
             "a scale that runs 130 to 170. They are not random noise. The GRE "
             "reports Verbal and Quantitative on 130-170 each and a <i>combined</i> "

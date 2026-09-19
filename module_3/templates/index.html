@@ -99,6 +99,12 @@
       </div>
     {% endif %}
 
+    {% if result.supporting %}
+      <ul class="supporting">
+        {% for entry in result.supporting %}<li>{{ entry }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+
     {% if result.caveat %}
       <p class="caveat"><strong>Read this before quoting the number:</strong>
         {{ result.caveat }}</p>

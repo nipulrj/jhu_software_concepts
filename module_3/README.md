@@ -176,8 +176,8 @@ and both it and these numbers move together.)
 | 7 | JHU master's in Computer Science | 18 |
 | 8 | CS PhD acceptances at the four universities (original fields) | 30 |
 | 9 | Same, using the LLM fields | 30 (difference: +0) |
-| 10 | *(my own)* Highest acceptance rate among the ten busiest Fall 2026 universities | University of Toronto, 39.70% |
-| 11 | *(my own)* Impossible self-reported values | 2,715 (97.75% of the GRE ones are mis-entered totals) |
+| 10 | *(my own)* Hardest of the 20 most-applied-to universities, and the GPA of its admits | Yale, 18.47%, avg GPA 3.82 |
+| 11 | *(my own)* International vs American acceptance, and willingness to report a GPA | 35.39% vs 39.23%; 52.98% vs 64.78% disclose |
 
 Two of these need a word of explanation, and both are in `query_results.pdf` and
 on the web page as well.
@@ -193,8 +193,8 @@ Analytical Writing 0–6, with a **combined Verbal+Quantitative total reported o
 260–340**. That last range is the whole explanation.
 
 The Quantitative column here is **bimodal**, and the second mode falls in exactly
-the combined-total band. Question 11 tests this rather than asserting it, and
-both predictions hold:
+the combined-total band. The supporting analysis under Question 3 tests this
+rather than asserting it, and both predictions hold:
 
 | Check | Result |
 |---|---|
@@ -213,9 +213,32 @@ differently-worded question than the field label implies. Only **52 values
 Analytical Writing is distorted the same way by placeholder values of `99.99` on
 a scale that stops at 6.
 
+### My two questions
+
+**Question 10 — of the twenty universities applicants apply to most, which is
+hardest to get into, and does a lower acceptance rate come with a stronger GPA
+among those accepted?**
+
+Yale is hardest at **18.47%**; Oxford easiest at **52.12%**. The interesting part
+is the answer to the second half: **no**. Acceptance rate across the twenty spans
+18.47%–52.12%, while the average GPA of those admitted spans only **3.71–4.00** —
+and the *easiest* school in the set has the *highest* admitted GPA. Selectivity,
+as this dataset measures it, barely shows up in the GPA of who gets in.
+
+**Question 11 — do international applicants fare differently from American ones,
+and are they equally willing to say what their GPA was?**
+
+International applicants are accepted at **35.39%** against **39.23%** for
+American ones, a 3.84-point gap. But the larger gap is in disclosure: **52.98%**
+of international entries report a GPA against **64.78%** of American ones. The
+GPAs they do report are near identical (3.76 vs 3.77) — so the averages agree
+while the populations behind them do not, which is the whole problem with
+self-reported data in one table.
+
 Restricted to values each scale actually permits, the averages are **165.74** and
-**4.33** — both entirely ordinary. Question 11 computes exactly this comparison,
-and `limitations.pdf` takes up what it means.
+**4.33** — both entirely ordinary. Question 3 carries that comparison as
+supporting analysis beneath its own answer, and `limitations.pdf` takes up what
+it means.
 
 ### Question 9: the LLM fields change nothing *here*
 
@@ -448,7 +471,8 @@ screen is caught. Two details were worth solving properly:
   the answers. That is the intended behaviour, not a defect, but it means the
   figures quoted above belong to the committed 50,000-row dataset.
 * **Nothing validates the self-reported metrics, and this module does not add
-  validation.** Question 11 measures the damage rather than repairing it, on the
+  validation.** Question 3's supporting analysis measures the damage rather than
+  repairing it, on the
   same principle Module 2 followed: preserve what the applicant reported and be
   explicit about what it is worth. Any downstream use should filter to plausible
   ranges itself.

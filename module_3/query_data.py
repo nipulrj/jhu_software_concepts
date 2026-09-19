@@ -101,13 +101,13 @@ QUESTION_3_CAVEAT = (
     "combined Verbal+Quantitative total on 260-340, and Analytical Writing "
     "on 0-6. The Quantitative column here is bimodal, and the second mode "
     "falls in exactly the 260-340 band: those applicants entered their "
-    "combined total into the box the site labels only 'GRE'. Two further "
-    "checks in Question 11 confirm that rather than assume it -- almost all "
+    "combined total into the box the site labels only 'GRE'. The two "
+    "supporting checks above confirm that rather than assume it -- almost all "
     "of the impossible values land inside the official total range, and "
     "subtracting the verbal score the same rows report leaves a mean back "
     "inside 130-170. Analytical Writing is inflated the same way by "
-    "placeholder values of 99.99 on a scale that stops at 6. Question 11 "
-    "also gives the averages restricted to values each scale permits; "
+    "placeholder values of 99.99 on a scale that stops at 6. The table above "
+    "gives each average restricted to the values its scale permits; "
     "limitations.pdf discusses what follows from it."
 )
 
@@ -128,6 +128,28 @@ QUESTION_9_CAVEAT = (
     "department name like 'CS' that only the LLM column spells out."
 )
 
+QUESTION_10_CAVEAT = (
+    "An acceptance rate computed from Grad Cafe is not an admissions rate. It "
+    "is the share of people who chose to post about one school and reported "
+    "being admitted, and both halves of that are selected: someone holding an "
+    "offer has more reason to come back and post than someone rejected "
+    "everywhere. The ordering here is still informative because every school in "
+    "the table is subject to the same posting behaviour, but the levels are not "
+    "comparable to a published admissions rate."
+)
+
+QUESTION_11_CAVEAT = (
+    "The disclosure gap has an innocent explanation that the acceptance gap "
+    "does not. Grad Cafe offers a single GPA box with no scale, and much of the "
+    "world does not grade on a 4.0 -- Module 2 found GPAs of 8.25 and 9.10 in "
+    "this data, which are 10-point CGPAs. An applicant whose GPA does not fit "
+    "the box has a good reason to leave it empty, so the lower international "
+    "disclosure rate is at least partly a measurement artefact rather than "
+    "reticence. That cuts both ways: it also means the international GPA "
+    "average is drawn from a self-selected subset of international applicants, "
+    "which is exactly the kind of hidden filtering limitations.pdf is about."
+)
+
 
 @dataclass
 class QuestionResult:
@@ -141,6 +163,10 @@ class QuestionResult:
     table: Optional[Dict[str, Any]] = None
     original: bool = False  # True for the two questions of my own
     caveat: Optional[str] = None  # shown beside the answer where it would mislead
+    # Extra findings that support the answer without being part of it. Question 3
+    # uses this to show what its own averages are worth without burying the four
+    # numbers the question actually asked for.
+    supporting: Optional[List[str]] = None
 
     @property
     def answer(self) -> str:
@@ -236,7 +262,98 @@ SELECT ROUND(AVG(gpa)::numeric, 2)    AS avg_gpa,
        ROUND(AVG(gre_aw)::numeric, 2) AS avg_gre_aw
 FROM applicants;
 """
+
+    # Supporting analysis rather than part of the answer: how much of each
+    # average above is an artefact of values that are impossible on their own
+    # scale.  It lives with Question 3 because it is what tells you what
+    # Question 3's four numbers are actually worth.
+    validity_sql = """
+SELECT 'GPA (0-4.0)'                          AS metric,
+       COUNT(gpa)                             AS reported,
+       COUNT(*) FILTER (WHERE gpa > 4.0)      AS out_of_range,
+       ROUND(AVG(gpa)::numeric, 2)            AS average_all,
+       ROUND(AVG(gpa) FILTER (WHERE gpa <= 4.0)::numeric, 2) AS average_in_range
+FROM applicants
+UNION ALL
+SELECT 'GRE Quantitative (130-170)',
+       COUNT(gre),
+       COUNT(*) FILTER (WHERE gre < 130 OR gre > 170),
+       ROUND(AVG(gre)::numeric, 2),
+       ROUND(AVG(gre) FILTER (WHERE gre BETWEEN 130 AND 170)::numeric, 2)
+FROM applicants
+UNION ALL
+SELECT 'GRE Verbal (130-170)',
+       COUNT(gre_v),
+       COUNT(*) FILTER (WHERE gre_v < 130 OR gre_v > 170),
+       ROUND(AVG(gre_v)::numeric, 2),
+       ROUND(AVG(gre_v) FILTER (WHERE gre_v BETWEEN 130 AND 170)::numeric, 2)
+FROM applicants
+UNION ALL
+SELECT 'GRE Analytical Writing (0-6)',
+       COUNT(gre_aw),
+       COUNT(*) FILTER (WHERE gre_aw < 0 OR gre_aw > 6),
+       ROUND(AVG(gre_aw)::numeric, 2),
+       ROUND(AVG(gre_aw) FILTER (WHERE gre_aw BETWEEN 0 AND 6)::numeric, 2)
+FROM applicants;
+"""
+
+    # The impossible GRE Quantitative values are not random noise, and saying so
+    # needs evidence.  The GRE reports Verbal and Quantitative on 130-170 each
+    # and a combined total on 260-340, so a total typed into the Quantitative box
+    # should land in that second band -- and subtracting the verbal score the
+    # same row reports should leave a believable section score.
+    diagnosis_sql = """
+SELECT COUNT(*) FILTER (WHERE gre IS NOT NULL AND (gre < 130 OR gre > 170)) AS impossible,
+       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340)                      AS in_total_range,
+       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL) AS with_verbal,
+       ROUND(AVG(gre - gre_v) FILTER (
+                 WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL)::numeric, 2)
+                                                                            AS implied_quant
+FROM applicants;
+"""
+
     gpa, gre, gre_v, gre_aw = _row(connection, sql)
+    validity_rows = _rows(connection, validity_sql)
+    impossible, in_total_range, with_verbal, implied_quant = _row(
+        connection, diagnosis_sql
+    )
+
+    table_rows = []
+    for metric, reported, out_of_range, average_all, average_in_range in validity_rows:
+        shift = None
+        if average_all is not None and average_in_range is not None:
+            shift = float(average_all) - float(average_in_range)
+        table_rows.append(
+            [
+                metric,
+                fmt_count(reported),
+                fmt_count(out_of_range),
+                fmt_avg(average_all),
+                fmt_avg(average_in_range),
+                "n/a" if shift is None else "{0:+.2f}".format(shift),
+            ]
+        )
+
+    supporting = [
+        "How much of each average is an artefact of impossible values:",
+    ]
+    if impossible and in_total_range:
+        supporting.append(
+            "{0} of the {1} impossible GRE Quantitative values ({2}) fall in 260-340, "
+            "the official combined Verbal+Quantitative range".format(
+                fmt_count(in_total_range),
+                fmt_count(impossible),
+                fmt_pct(100.0 * in_total_range / impossible),
+            )
+        )
+    if with_verbal and implied_quant is not None:
+        supporting.append(
+            "Subtracting the verbal score from the {0} of those that report one "
+            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
+                fmt_count(with_verbal), fmt_avg(implied_quant)
+            )
+        )
+
     return QuestionResult(
         number=3,
         question=(
@@ -249,15 +366,37 @@ FROM applicants;
             "Average GRE Verbal: {0}".format(fmt_avg(gre_v)),
             "Average GRE Analytical Writing: {0}".format(fmt_avg(gre_aw)),
         ],
-        sql=sql.strip(),
+        sql=(
+            sql.strip()
+            + "\n\n-- supporting: what those averages are worth\n"
+            + validity_sql.strip()
+            + "\n\n-- supporting: what the impossible values actually are\n"
+            + diagnosis_sql.strip()
+        ),
         explanation=(
             "SQL's AVG skips NULLs, so each average is taken over exactly the "
             "applicants who reported that one metric. Computing all four in a "
             "single statement keeps them independent -- an applicant with a GPA "
             "but no GRE still contributes to the GPA average, which is what the "
-            "question requires. Question 11 examines how much these four figures "
-            "are moved by values that are out of range for their own scale."
+            "question requires. The two supporting statements are not part of the "
+            "answer: the first re-computes each average with the impossible "
+            "values removed so the distortion is visible, and the second tests "
+            "what those values are rather than merely counting them. Both of the "
+            "second one's predictions hold, which is why the caveat below states "
+            "a diagnosis rather than a guess."
         ),
+        table={
+            "columns": [
+                "Metric",
+                "Reported",
+                "Out of range",
+                "Average (all)",
+                "Average (in range)",
+                "Distortion",
+            ],
+            "rows": table_rows,
+        },
+        supporting=supporting,
         caveat=QUESTION_3_CAVEAT,
     )
 
@@ -456,65 +595,100 @@ def question_10(connection: psycopg.Connection) -> QuestionResult:
 SELECT university,
        entries,
        acceptances,
-       ROUND(100.0 * acceptances / NULLIF(entries, 0), 2) AS acceptance_percent
+       ROUND(100.0 * acceptances / NULLIF(entries, 0), 2) AS acceptance_percent,
+       accepted_with_gpa,
+       ROUND(avg_gpa_accepted::numeric, 2)                AS avg_gpa_accepted
 FROM (
-    SELECT llm_generated_university                          AS university,
-           COUNT(*)                                          AS entries,
-           COUNT(*) FILTER (WHERE status ILIKE 'accept%')     AS acceptances
+    SELECT llm_generated_university                        AS university,
+           COUNT(*)                                        AS entries,
+           COUNT(*) FILTER (WHERE status ILIKE 'accept%')   AS acceptances,
+           COUNT(gpa) FILTER (WHERE status ILIKE 'accept%') AS accepted_with_gpa,
+           AVG(gpa) FILTER (WHERE status ILIKE 'accept%')   AS avg_gpa_accepted
     FROM applicants
-    WHERE lower(trim(term)) = 'fall 2026'
-      AND llm_generated_university IS NOT NULL
+    WHERE llm_generated_university IS NOT NULL
     GROUP BY llm_generated_university
     ORDER BY entries DESC
-    LIMIT 10
-) AS busiest
-ORDER BY acceptance_percent DESC;
+    LIMIT 20
+) AS most_applied_to
+ORDER BY acceptance_percent ASC;
 """
     rows = _rows(connection, sql)
 
-    best = rows[0] if rows else None
     answer_lines = []
-    if best is not None:
+    if rows:
+        hardest, easiest = rows[0], rows[-1]
         answer_lines.append(
-            "Highest acceptance rate among the ten busiest Fall 2026 universities: "
-            "{0} at {1} ({2} of {3} entries)".format(
-                best[0], fmt_pct(best[3]), fmt_count(best[2]), fmt_count(best[1])
+            "Hardest of the twenty most-applied-to universities: {0} at {1} "
+            "({2} of {3} entries), average GPA of those accepted {4}".format(
+                hardest[0], fmt_pct(hardest[3]), fmt_count(hardest[2]),
+                fmt_count(hardest[1]), fmt_avg(hardest[5]),
             )
         )
-        lowest = rows[-1]
         answer_lines.append(
-            "Lowest: {0} at {1} ({2} of {3} entries)".format(
-                lowest[0], fmt_pct(lowest[3]), fmt_count(lowest[2]), fmt_count(lowest[1])
+            "Easiest: {0} at {1} ({2} of {3} entries), average GPA of those "
+            "accepted {4}".format(
+                easiest[0], fmt_pct(easiest[3]), fmt_count(easiest[2]),
+                fmt_count(easiest[1]), fmt_avg(easiest[5]),
             )
         )
+
+        gpas = [float(row[5]) for row in rows if row[5] is not None]
+        rates = [float(row[3]) for row in rows if row[3] is not None]
+        if gpas and rates:
+            answer_lines.append(
+                "Acceptance rate across the twenty spans {0} to {1}, but the "
+                "average GPA of those accepted spans only {2} to {3} -- "
+                "selectivity barely shows up in the GPA of who gets in".format(
+                    fmt_pct(min(rates)), fmt_pct(max(rates)),
+                    fmt_avg(min(gpas)), fmt_avg(max(gpas)),
+                )
+            )
     else:
-        answer_lines.append("No Fall 2026 entries with a standardized university.")
+        answer_lines.append("No entries with a standardized university.")
 
     return QuestionResult(
         number=10,
         question=(
-            "Of the ten universities with the most Fall 2026 entries, which "
-            "reports the highest acceptance rate, and how wide is the spread?"
+            "Of the twenty universities that applicants apply to most, which is "
+            "hardest to get into, and does a lower acceptance rate come with a "
+            "stronger GPA among those who are accepted?"
         ),
         answer_lines=answer_lines,
         sql=sql.strip(),
         explanation=(
-            "The inner query groups Fall 2026 entries by standardized university "
-            "and keeps the ten with the most submissions, so every rate is drawn "
-            "from a reasonable sample rather than from a school with three "
-            "entries. The outer query turns each pair of counts into a "
-            "percentage and ranks by it. Grouping on the standardized column "
+            "The inner query groups every entry by standardized university and "
+            "keeps the twenty with the most submissions, so each rate rests on a "
+            "real sample rather than on a school with three entries. For each it "
+            "computes the acceptance rate and, separately, the average GPA of "
+            "just the accepted applicants -- two FILTER clauses over the same "
+            "scan. The outer query ranks by acceptance rate ascending, so the "
+            "hardest school comes first. Grouping on the standardized column "
             "rather than the raw one matters here: the raw field spells the same "
-            "school several ways, which would split one university across "
-            "several groups and push all of them out of the top ten."
+            "school several ways, which would split one university across several "
+            "groups and push all of them out of the top twenty."
         ),
         table={
-            "columns": ["University", "Entries", "Acceptances", "Acceptance rate"],
+            "columns": [
+                "University",
+                "Entries",
+                "Acceptances",
+                "Acceptance rate",
+                "Accepted w/ GPA",
+                "Avg GPA (accepted)",
+            ],
             "rows": [
-                [row[0], fmt_count(row[1]), fmt_count(row[2]), fmt_pct(row[3])]
+                [
+                    row[0],
+                    fmt_count(row[1]),
+                    fmt_count(row[2]),
+                    fmt_pct(row[3]),
+                    fmt_count(row[4]),
+                    fmt_avg(row[5]),
+                ]
                 for row in rows
             ],
         },
+        caveat=QUESTION_10_CAVEAT,
         original=True,
     )
 
@@ -522,148 +696,89 @@ ORDER BY acceptance_percent DESC;
 def question_11(connection: psycopg.Connection) -> QuestionResult:
     """Original question 2 of 2."""
     sql = """
-SELECT 'GPA (0-4.0)'                          AS metric,
-       COUNT(gpa)                             AS reported,
-       COUNT(*) FILTER (WHERE gpa > 4.0)      AS out_of_range,
-       ROUND(AVG(gpa)::numeric, 2)            AS average_all,
-       ROUND(AVG(gpa) FILTER (WHERE gpa <= 4.0)::numeric, 2) AS average_in_range
+SELECT initcap(trim(us_or_international))                      AS cohort,
+       COUNT(*)                                                AS entries,
+       COUNT(*) FILTER (WHERE status ILIKE 'accept%')            AS acceptances,
+       ROUND(100.0 * COUNT(*) FILTER (WHERE status ILIKE 'accept%')
+             / NULLIF(COUNT(*), 0), 2)                          AS acceptance_percent,
+       ROUND(100.0 * COUNT(gpa) / NULLIF(COUNT(*), 0), 2)       AS gpa_disclosure_percent,
+       ROUND(AVG(gpa)::numeric, 2)                              AS avg_gpa
 FROM applicants
-UNION ALL
-SELECT 'GRE Quantitative (130-170)',
-       COUNT(gre),
-       COUNT(*) FILTER (WHERE gre < 130 OR gre > 170),
-       ROUND(AVG(gre)::numeric, 2),
-       ROUND(AVG(gre) FILTER (WHERE gre BETWEEN 130 AND 170)::numeric, 2)
-FROM applicants
-UNION ALL
-SELECT 'GRE Verbal (130-170)',
-       COUNT(gre_v),
-       COUNT(*) FILTER (WHERE gre_v < 130 OR gre_v > 170),
-       ROUND(AVG(gre_v)::numeric, 2),
-       ROUND(AVG(gre_v) FILTER (WHERE gre_v BETWEEN 130 AND 170)::numeric, 2)
-FROM applicants
-UNION ALL
-SELECT 'GRE Analytical Writing (0-6)',
-       COUNT(gre_aw),
-       COUNT(*) FILTER (WHERE gre_aw < 0 OR gre_aw > 6),
-       ROUND(AVG(gre_aw)::numeric, 2),
-       ROUND(AVG(gre_aw) FILTER (WHERE gre_aw BETWEEN 0 AND 6)::numeric, 2)
-FROM applicants;
+WHERE us_or_international IS NOT NULL
+  AND trim(us_or_international) <> ''
+GROUP BY 1
+ORDER BY acceptance_percent DESC;
 """
-
-    # A second statement, because the impossible GRE Quantitative values are not
-    # random noise and saying so needs evidence rather than assertion. The GRE
-    # reports Verbal and Quantitative on 130-170 each and a *combined* total on
-    # 260-340; if these values are combined totals entered in the wrong box, they
-    # should sit in that second band, and subtracting the verbal score the same
-    # row reports should leave a plausible section score.
-    diagnosis_sql = """
-SELECT COUNT(*) FILTER (WHERE gre IS NOT NULL AND (gre < 130 OR gre > 170)) AS impossible,
-       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340)                      AS in_total_range,
-       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL) AS with_verbal,
-       ROUND(AVG(gre - gre_v) FILTER (
-                 WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL)::numeric, 2)
-                                                                            AS implied_quant
-FROM applicants;
-"""
-
     rows = _rows(connection, sql)
-    impossible, in_total_range, with_verbal, implied_quant = _row(
-        connection, diagnosis_sql
-    )
+    by_cohort = {row[0]: row for row in rows}
+    american = by_cohort.get("American")
+    international = by_cohort.get("International")
 
-    table_rows = []
-    worst_metric = None
-    worst_shift = 0.0
-    for metric, reported, out_of_range, average_all, average_in_range in rows:
-        shift = None
-        if average_all is not None and average_in_range is not None:
-            shift = float(average_all) - float(average_in_range)
-            if abs(shift) > abs(worst_shift):
-                worst_shift = shift
-                worst_metric = metric
-        table_rows.append(
-            [
-                metric,
-                fmt_count(reported),
-                fmt_count(out_of_range),
-                fmt_avg(average_all),
-                fmt_avg(average_in_range),
-                "n/a" if shift is None else "{0:+.2f}".format(shift),
-            ]
-        )
-
-    total_out_of_range = sum(int(row[2] or 0) for row in rows)
-    answer_lines = [
-        "Impossible values reported across the four metrics: {0}".format(
-            fmt_count(total_out_of_range)
-        )
-    ]
-    if worst_metric is not None:
+    answer_lines = []
+    if american and international:
         answer_lines.append(
-            "Largest distortion: {0}, whose headline average is {1} too high".format(
-                worst_metric, fmt_avg(abs(worst_shift))
+            "Acceptance rate: {0} American vs {1} international -- a gap of "
+            "{2:.2f} points".format(
+                fmt_pct(american[3]),
+                fmt_pct(international[3]),
+                float(american[3]) - float(international[3]),
             )
         )
-    if impossible and in_total_range:
         answer_lines.append(
-            "Of those, {0} of the {1} impossible GRE Quantitative values ({2}) fall in "
-            "260-340, the official combined Verbal+Quantitative range".format(
-                fmt_count(in_total_range),
-                fmt_count(impossible),
-                fmt_pct(100.0 * in_total_range / impossible),
+            "But the sharper gap is in what they disclose: {0} of American "
+            "entries report a GPA against {1} of international ones".format(
+                fmt_pct(american[4]), fmt_pct(international[4])
             )
         )
-    if with_verbal and implied_quant is not None:
         answer_lines.append(
-            "Subtracting the verbal score from the {0} of those that report one "
-            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
-                fmt_count(with_verbal), fmt_avg(implied_quant)
+            "Yet the GPAs they do report are near identical -- {0} American, "
+            "{1} international".format(
+                fmt_avg(american[5]), fmt_avg(international[5])
             )
         )
+    else:
+        answer_lines.append("Not enough nationality data to compare cohorts.")
 
     return QuestionResult(
         number=11,
         question=(
-            "How many self-reported metrics are impossible for their own scale, "
-            "and how far do they move the averages reported in Question 3?"
+            "Do international applicants fare differently from American ones -- "
+            "and are they equally willing to say what their GPA was?"
         ),
         answer_lines=answer_lines,
-        sql=(
-            sql.strip()
-            + "\n\n-- and, to test what those impossible values actually are:\n"
-            + diagnosis_sql.strip()
-        ),
+        sql=sql.strip(),
         explanation=(
-            "Grad Cafe validates nothing an applicant types, so the table holds "
-            "GRE Analytical Writing scores of 99.99 and GPAs on a 10-point scale. "
-            "Each branch of the UNION counts how many values a metric has, how "
-            "many of those are outside the range the scale allows, and the "
-            "average with and without them. The final column is the gap between "
-            "those two averages -- that is, the amount of Question 3's answer "
-            "that is an artefact of unvalidated input rather than a fact about "
-            "applicants. UNION ALL rather than UNION so that two metrics with "
-            "identical counts are not silently collapsed into one row. The "
-            "second statement then tests what the impossible values are rather "
-            "than merely counting them: the GRE reports Verbal and Quantitative "
-            "on 130-170 each and a combined total on 260-340, so if these are "
-            "totals typed into the wrong box they should land in that second "
-            "band -- and subtracting the verbal score the same row reports "
-            "should leave a believable section score. Both predictions hold, "
-            "which is why the caveat on Question 3 states this as a diagnosis "
-            "rather than a guess."
+            "One pass grouped by nationality, computing three things per cohort: "
+            "the acceptance rate, the share of entries that disclose a GPA at "
+            "all, and the average of the GPAs that are disclosed. Entries with no "
+            "nationality are excluded, as in Question 2, so 'did not say' is not "
+            "silently counted as domestic. The disclosure percentage is the "
+            "reason the question is worth asking: an average can only describe "
+            "the people who answered, so knowing how many declined to answer is "
+            "part of knowing what the average means."
         ),
         table={
             "columns": [
-                "Metric",
-                "Reported",
-                "Out of range",
-                "Average (all)",
-                "Average (in range)",
-                "Distortion",
+                "Cohort",
+                "Entries",
+                "Acceptances",
+                "Acceptance rate",
+                "Report a GPA",
+                "Avg GPA",
             ],
-            "rows": table_rows,
+            "rows": [
+                [
+                    row[0],
+                    fmt_count(row[1]),
+                    fmt_count(row[2]),
+                    fmt_pct(row[3]),
+                    fmt_pct(row[4]),
+                    fmt_avg(row[5]),
+                ]
+                for row in rows
+            ],
         },
+        caveat=QUESTION_11_CAVEAT,
         original=True,
     )
 
@@ -764,6 +879,12 @@ def print_results(results: Sequence[QuestionResult], show_sql: bool = False) -> 
             print()
             for line in _render_table(result.table):
                 print(line)
+        if result.supporting:
+            print()
+            for entry in result.supporting:
+                wrapped = textwrap.wrap(entry, width=74)
+                for index, line in enumerate(wrapped):
+                    print("    {0} {1}".format("+" if index == 0 else " ", line))
         if result.caveat:
             print()
             for line in textwrap.wrap(result.caveat, width=76):
