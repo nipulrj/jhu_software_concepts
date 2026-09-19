@@ -22,7 +22,7 @@ with the SQLAlchemy ORM, and serve the results from a dynamic Flask page.
 | `query_results.pdf` | Every question with its result, its SQL and an explanation |
 | `limitations.pdf` | Two paragraphs on what self-reported data can and cannot support |
 | `screenshots/` | Raw SQL output, ORM output, and the running web page |
-| `tools/` | Scripts that generate the two PDFs and capture the screenshots |
+| `tools/` | Scripts that generate `query_results.pdf` and capture the screenshots |
 
 ---
 
@@ -107,7 +107,7 @@ python app.py                    # http://127.0.0.1:5000
 python models.py                 # quick connectivity check
 python pull_data.py --target 300 # pull new results without the web page
 
-python tools/build_pdfs.py       # regenerate both PDFs from a live run
+python tools/build_pdfs.py       # regenerate query_results.pdf from a live run
 powershell -ExecutionPolicy Bypass -File tools/capture_screenshots.ps1
 ```
 
@@ -417,7 +417,7 @@ module_3/
   clean.py                     Module 2 cleaner
   llm_hosting/                 Module 2 LLM standardizer
   tools/
-    build_pdfs.py              generates query_results.pdf and limitations.pdf
+    build_pdfs.py              generates query_results.pdf
     capture_screenshots.ps1    captures the six screenshots
   applicant_data.json          Module 2 cleaned records
   llm_extend_applicant_data.json   the file load_data.py reads
@@ -439,10 +439,13 @@ module_3/
 
 `query_results.pdf` is generated from a live run of `query_data.py` rather than
 typed up by hand, so the result printed beside each query is necessarily the one
-that query produced. `limitations.pdf` is written prose, but every figure quoted
-in it is pulled from the same run, so the essay cannot end up citing a stale
-number either. Re-run `python tools/build_pdfs.py` after a Pull Data and both
-documents follow the new data.
+that query produced. Re-run `python tools/build_pdfs.py` after a Pull Data and it
+follows the new data.
+
+`limitations.pdf` is deliberately *not* generated. It is written prose, drafted in
+Word and exported, so a generator would overwrite the authored version rather
+than help. Its figures are quoted from a run of `query_data.py`; if the data ever
+moves them, the essay wants re-reading rather than re-rendering.
 
 The screenshots are real screen captures of real windows, not text rendered to
 look like a terminal. `tools/capture_screenshots.ps1` launches each window
