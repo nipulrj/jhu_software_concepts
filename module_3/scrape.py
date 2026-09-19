@@ -543,6 +543,29 @@ class GradCafeScraper:
 # ----------------------------------------------------------------------
 # Persistence helpers
 # ----------------------------------------------------------------------
+# os.replace is atomic, but on Windows it raises PermissionError (WinError 5)
+# whenever anything else holds the destination open even momentarily -- OneDrive's
+# sync engine and on-access virus scanners both grab a file the instant it is
+# written, and this repository lives inside a OneDrive folder. The rename
+# succeeds a fraction of a second later, so retrying briefly turns a spurious
+# crash back into the atomic replace it was always meant to be. Added in Module 3
+# after a Pull Data run died here with the scraped data already safely on disk.
+_REPLACE_ATTEMPTS = 6
+_REPLACE_BACKOFF_SECONDS = 0.25
+
+
+def _replace_atomically(temp_path: Path, path: Path) -> None:
+    """Rename ``temp_path`` over ``path``, retrying a transient Windows lock."""
+    for attempt in range(_REPLACE_ATTEMPTS):
+        try:
+            temp_path.replace(path)
+            return
+        except PermissionError:
+            if attempt == _REPLACE_ATTEMPTS - 1:
+                raise
+            time.sleep(_REPLACE_BACKOFF_SECONDS * (attempt + 1))
+
+
 def save_data(rows: List[Dict[str, Any]], path: Path = RAW_DATA_PATH) -> None:
     """Write rows to a JSON file, replacing the target atomically."""
     path = Path(path)
@@ -550,7 +573,7 @@ def save_data(rows: List[Dict[str, Any]], path: Path = RAW_DATA_PATH) -> None:
     temp_path = path.with_suffix(path.suffix + ".tmp")
     with temp_path.open("w", encoding="utf-8") as handle:
         json.dump(rows, handle, ensure_ascii=False, indent=2)
-    temp_path.replace(path)
+    _replace_atomically(temp_path, path)
 
 
 def load_data(path: Path = RAW_DATA_PATH) -> List[Dict[str, Any]]:
