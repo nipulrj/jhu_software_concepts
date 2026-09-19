@@ -22,6 +22,7 @@ with the SQLAlchemy ORM, and serve the results from a dynamic Flask page.
 | `query_results.pdf` | Every question with its result, its SQL and an explanation |
 | `limitations.pdf` | Two paragraphs on what self-reported data can and cannot support |
 | `screenshots/` | Raw SQL output, ORM output, and the running web page |
+| `tools/` | Scripts that generate the two PDFs and capture the screenshots |
 
 ---
 
@@ -98,13 +99,20 @@ seconds.
 python load_data.py              # load (or refresh) the applicants table
 python query_data.py             # the eleven answers, via raw SQL
 python query_data.py --sql       # ... each with the SQL that produced it
+python query_data.py --questions 1-6   # ... or just some of them
 python orm_queries.py            # the same answers, via SQLAlchemy
 python orm_queries.py --sql      # ... each with the SQL SQLAlchemy generated
 python orm_queries.py --compare  # check the two agree (they do, on all eleven)
 python app.py                    # http://127.0.0.1:5000
 python models.py                 # quick connectivity check
 python pull_data.py --target 300 # pull new results without the web page
+
+python tools/build_pdfs.py       # regenerate both PDFs from a live run
+powershell -ExecutionPolicy Bypass -File tools/capture_screenshots.ps1
 ```
+
+`--questions` takes `1-6`, `1,4,5` or a mix, which is useful for re-running one
+question while working on it.
 
 `orm_queries.py --compare` is worth running first if anything looks wrong: it
 answers every question both ways and reports any disagreement, which catches a
@@ -152,11 +160,14 @@ to *Wait listed* between two fetches minutes apart.
 
 ## Results
 
-Run against the committed 50,000-record dataset.
+Run against the database as it stands: the committed 50,000-record dataset plus
+4 records a live Pull Data test added, so 50,004 rows. (`query_results.pdf` is
+generated from the same state; re-run `tools/build_pdfs.py` after a further pull
+and both it and these numbers move together.)
 
 | # | Question | Answer |
 |---|---|---|
-| 1 | Fall 2026 applicant count | 33,207 |
+| 1 | Fall 2026 applicant count | 33,208 |
 | 2 | Percent international | 47.89% |
 | 3 | Average GPA / GRE Q / GRE V / GRE AW | 3.77 / 261.45 / 161.14 / 9.17 |
 | 4 | Average GPA, American, Fall 2026 | 3.79 |
@@ -365,15 +376,51 @@ module_3/
   scrape.py                    Module 2 scraper
   clean.py                     Module 2 cleaner
   llm_hosting/                 Module 2 LLM standardizer
+  tools/
+    build_pdfs.py              generates query_results.pdf and limitations.pdf
+    capture_screenshots.ps1    captures the six screenshots
   applicant_data.json          Module 2 cleaned records
   llm_extend_applicant_data.json   the file load_data.py reads
   screenshots/
+    01_raw_sql_output_q1-6.png       04_orm_output_q7-11.png
+    02_raw_sql_output_q7-11.png      05_orm_vs_sql_compare.png
+    03_orm_output_q1-6.png           06_flask_page.png
+  github.txt
   query_results.pdf
   limitations.pdf
   requirements.txt
   .env.example                 committed; the real .env is not
   README.md
 ```
+
+---
+
+## How the PDFs and screenshots are produced
+
+`query_results.pdf` is generated from a live run of `query_data.py` rather than
+typed up by hand, so the result printed beside each query is necessarily the one
+that query produced. `limitations.pdf` is written prose, but every figure quoted
+in it is pulled from the same run, so the essay cannot end up citing a stale
+number either. Re-run `python tools/build_pdfs.py` after a Pull Data and both
+documents follow the new data.
+
+The screenshots are real screen captures of real windows, not text rendered to
+look like a terminal. `tools/capture_screenshots.ps1` launches each window
+itself, sizes it, brings it to the front and captures only that window's
+rectangle -- never the whole desktop, so nothing else that happens to be on
+screen is caught. Two details were worth solving properly:
+
+* The eleven answers are longer than one console window, and Windows Terminal
+  ignores both the legacy console-resize API and a scroll key sent with
+  `SendKeys`. The script sizes the window in pixels through `MoveWindow` instead,
+  and has the launched shell wait before printing -- output written into a short
+  viewport stays where it was written, so the resize has to land first. The
+  `--questions` selector then splits the run into two batches that each fit.
+* The browser window opens InPrivate. On a first run Edge signs itself in with
+  the Windows account and shows a "we are now syncing your browsing data"
+  dialog, which covered the page *and* printed the account's email address onto
+  the screenshot -- and these files are committed and submitted. An InPrivate
+  window never signs in, so the dialog cannot appear.
 
 ---
 
