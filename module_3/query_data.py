@@ -86,6 +86,45 @@ def use_utf8_console() -> None:
             pass
 
 
+# ----------------------------------------------------------------------
+# Caveats
+#
+# These describe the data, not the query, so the ORM file reuses them verbatim
+# rather than keeping a second copy that could drift.  They are shown beside the
+# answer on the console, in the PDF and on the webpage, because in both cases the
+# number is literally correct and still easy to misread.
+# ----------------------------------------------------------------------
+QUESTION_3_CAVEAT = (
+    "These are the averages of exactly what applicants reported, which is "
+    "what the question asks for -- but two of them are not usable as test "
+    "scores. The GRE Quantitative field is bimodal: most values sit in the "
+    "valid 130-170 band, while a large minority fall between 260 and 340, "
+    "because those applicants typed their combined GRE total into the box "
+    "the site labels only 'GRE'. The Analytical Writing average is inflated "
+    "the same way by placeholder values of 99.99 on a scale that stops at 6. "
+    "Question 11 counts these and gives the averages restricted to values "
+    "each scale actually permits; limitations.pdf discusses what follows "
+    "from it."
+)
+
+QUESTION_9_CAVEAT = (
+    "The two counts are equal here, and not by coincidence: they select "
+    "the identical set of rows, not merely the same number of them. Grad "
+    "Cafe stores each result's school as a foreign key into its own "
+    "controlled vocabulary rather than as applicant free text, so these "
+    "four well-known universities already arrive with one full, correctly "
+    "spelled name ('Massachusetts Institute of Technology (MIT)', "
+    "'Stanford University'). Standardizing a name that is already "
+    "canonical cannot change which rows match. The standardizer is not "
+    "idle overall -- it rewrites the university on 4,768 of the 50,000 "
+    "rows, folding 'University of Wisconsin - Madison' and 'University of "
+    "California (UCLA)' onto single canonical spellings -- but none of "
+    "that work falls inside this particular filter. A difference would "
+    "appear for schools the site stores inconsistently, or for a "
+    "department name like 'CS' that only the LLM column spells out."
+)
+
+
 @dataclass
 class QuestionResult:
     """One answered question, ready for the console, the PDF or the webpage."""
@@ -215,18 +254,7 @@ FROM applicants;
             "question requires. Question 11 examines how much these four figures "
             "are moved by values that are out of range for their own scale."
         ),
-        caveat=(
-            "These are the averages of exactly what applicants reported, which is "
-            "what the question asks for -- but two of them are not usable as test "
-            "scores. The GRE Quantitative field is bimodal: most values sit in the "
-            "valid 130-170 band, while a large minority fall between 260 and 340, "
-            "because those applicants typed their combined GRE total into the box "
-            "the site labels only 'GRE'. The Analytical Writing average is inflated "
-            "the same way by placeholder values of 99.99 on a scale that stops at 6. "
-            "Question 11 counts these and gives the averages restricted to values "
-            "each scale actually permits; limitations.pdf discusses what follows "
-            "from it."
-        ),
+        caveat=QUESTION_3_CAVEAT,
     )
 
 
@@ -414,22 +442,7 @@ WHERE lower(trim(term)) = 'fall 2026'
             "come from the standardized columns, while term, degree and status "
             "still come from the original downloaded fields as instructed."
         ),
-        caveat=(
-            "The two counts are equal here, and not by coincidence: they select "
-            "the identical set of rows, not merely the same number of them. Grad "
-            "Cafe stores each result's school as a foreign key into its own "
-            "controlled vocabulary rather than as applicant free text, so these "
-            "four well-known universities already arrive with one full, correctly "
-            "spelled name ('Massachusetts Institute of Technology (MIT)', "
-            "'Stanford University'). Standardizing a name that is already "
-            "canonical cannot change which rows match. The standardizer is not "
-            "idle overall -- it rewrites the university on 4,768 of the 50,000 "
-            "rows, folding 'University of Wisconsin - Madison' and 'University of "
-            "California (UCLA)' onto single canonical spellings -- but none of "
-            "that work falls inside this particular filter. A difference would "
-            "appear for schools the site stores inconsistently, or for a "
-            "department name like 'CS' that only the LLM column spells out."
-        ),
+        caveat=QUESTION_9_CAVEAT,
     )
 
 

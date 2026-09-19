@@ -28,6 +28,8 @@ from sqlalchemy.orm import Session
 import db_config
 from models import Applicant, SessionLocal
 from query_data import (
+    QUESTION_3_CAVEAT,
+    QUESTION_9_CAVEAT,
     QuestionResult,
     fmt_avg,
     fmt_count,
@@ -190,6 +192,7 @@ def question_3(session: Session) -> QuestionResult:
             "averaged over exactly the applicants who reported it and no "
             "applicant needs all four values to contribute to one of them."
         ),
+        caveat=QUESTION_3_CAVEAT,
     )
 
 
@@ -359,6 +362,7 @@ def question_9(session: Session) -> QuestionResult:
             "question specifies. Swapping two names in the and_() is the whole "
             "edit, which makes the comparison a genuinely controlled one."
         ),
+        caveat=QUESTION_9_CAVEAT,
     )
 
 
