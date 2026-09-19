@@ -39,7 +39,7 @@ TABLE_NAME = "applicants"
 
 # The schema the assignment specifies, in order.  ``p_id`` is the Grad Cafe
 # result id rather than a generated sequence, which is what lets a re-run
-# recognise a record it has already stored.
+# recognize a record it has already stored.
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS applicants (
     p_id                     integer PRIMARY KEY,
@@ -121,7 +121,7 @@ class LoaderError(RuntimeError):
 # Reading and shaping the JSON
 # ----------------------------------------------------------------------
 def _text(value: Any) -> Optional[str]:
-    """Normalise a text field to a non-empty string or ``None``.
+    """Normalize a text field to a non-empty string or ``None``.
 
     The Module 2 cleaner already writes ``null`` rather than an empty string, but
     this loader also has to survive a hand-edited file, so blank and
@@ -136,7 +136,7 @@ def _text(value: Any) -> Optional[str]:
 
 
 def _number(value: Any) -> Optional[float]:
-    """Normalise a numeric field to a float or ``None``.
+    """Normalize a numeric field to a float or ``None``.
 
     Values the applicant typed are kept exactly as reported -- nothing is clamped
     or corrected here.  Some of them are out of range for their scale (a GRE AW

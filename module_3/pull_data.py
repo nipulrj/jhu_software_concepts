@@ -9,7 +9,7 @@ all of which live in ``module_2/``, carried over unchanged.
 
 Only the newest page of results is walked, not the whole site: the scraper starts
 at the most recent entry and collects ``--target`` records.  Anything already in
-the database is recognised by its ``p_id`` and refreshed rather than duplicated,
+the database is recognized by its ``p_id`` and refreshed rather than duplicated,
 so overlapping with the previous pull is harmless and expected.
 
 The Flask app runs this file as a subprocess so a slow scrape never blocks a web

@@ -134,7 +134,7 @@ QUESTION_10_CAVEAT = (
     "being admitted, and both halves of that are selected: someone holding an "
     "offer has more reason to come back and post than someone rejected "
     "everywhere. The ordering here is still informative because every school in "
-    "the table is subject to the same posting behaviour, but the levels are not "
+    "the table is subject to the same posting behavior, but the levels are not "
     "comparable to a published admissions rate."
 )
 
@@ -144,7 +144,7 @@ QUESTION_11_CAVEAT = (
     "world does not grade on a 4.0 -- Module 2 found GPAs of 8.25 and 9.10 in "
     "this data, which are 10-point CGPAs. An applicant whose GPA does not fit "
     "the box has a good reason to leave it empty, so the lower international "
-    "disclosure rate is at least partly a measurement artefact rather than "
+    "disclosure rate is at least partly a measurement artifact rather than "
     "reticence. That cuts both ways: it also means the international GPA "
     "average is drawn from a self-selected subset of international applicants, "
     "which is exactly the kind of hidden filtering limitations.pdf is about."
@@ -218,7 +218,7 @@ WHERE lower(trim(term)) = 'fall 2026';
             "Counts every row whose term is Fall 2026. COUNT(*) is used rather "
             "than COUNT(term) because the filter has already guaranteed the "
             "column is non-NULL, and lower(trim(...)) makes the match "
-            "insensitive to capitalisation and stray whitespace."
+            "insensitive to capitalization and stray whitespace."
         ),
     )
 
@@ -264,7 +264,7 @@ FROM applicants;
 """
 
     # Supporting analysis rather than part of the answer: how much of each
-    # average above is an artefact of values that are impossible on their own
+    # average above is an artifact of values that are impossible on their own
     # scale.  It lives with Question 3 because it is what tells you what
     # Question 3's four numbers are actually worth.
     validity_sql = """
@@ -335,7 +335,7 @@ FROM applicants;
         )
 
     supporting = [
-        "How much of each average is an artefact of impossible values:",
+        "How much of each average is an artifact of impossible values:",
     ]
     if impossible and in_total_range:
         supporting.append(

@@ -39,7 +39,7 @@
       refresh once it finishes.
     </p>
     <p class="muted">
-      Only new entries are added. Anything already stored is recognised by its
+      Only new entries are added. Anything already stored is recognized by its
       Grad Cafe result id and refreshed rather than duplicated, and a second pull
       cannot start while one is already running.
     </p>
@@ -123,9 +123,11 @@
   <section class="panel">
     <h2 class="section-heading">My own questions</h2>
     <p class="section-intro">
-      Two questions of my own. The first asks which of the busiest programmes
-      actually admits people; the second asks how far the numbers above can be
-      trusted at all.
+      Two questions of my own. The first asks which of the most-applied-to
+      universities is hardest to get into, and whether that shows up in the GPA
+      of the people it accepts. The second asks whether international applicants
+      fare differently from American ones, and whether the two are equally
+      willing to say what their GPA was.
     </p>
     {% for result in groups.original %}{{ render_question(result) }}{% endfor %}
   </section>

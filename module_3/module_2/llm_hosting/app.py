@@ -278,7 +278,7 @@ def _best_match(name: str, candidates: List[str], cutoff: float = 0.86) -> str |
 
 # MODIFIED: look canonical entries up case- and accent-insensitively.
 #
-# The post-processor title-cases before checking membership, which capitalises
+# The post-processor title-cases before checking membership, which capitalizes
 # connectives: "Earth and Environmental Sciences" becomes "Earth And
 # Environmental Sciences" and no longer equals the canonical entry.  Exact
 # matches were therefore missing for most multi-word names and falling through
@@ -555,7 +555,7 @@ def _cli_process_file(
 ) -> None:
     """Standardize every row of a JSON file.
 
-    Writes JSON Lines by default (the original behaviour).  With ``--json-array``
+    Writes JSON Lines by default (the original behavior).  With ``--json-array``
     the whole result is written as a single JSON array instead, which is the
     shape the assignment's deliverable expects.
     """

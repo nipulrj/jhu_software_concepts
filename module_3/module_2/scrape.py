@@ -10,7 +10,7 @@ opaque ``cursor`` token on the rendered "Next" link.  The scraper therefore walk
 the listing one page at a time, following that link, and checkpoints the cursor
 so an interrupted run can resume instead of starting over.
 
-Output of this module is *raw* text as rendered by the site.  Normalising it is
+Output of this module is *raw* text as rendered by the site.  Normalizing it is
 the job of ``clean.py``.
 """
 
@@ -253,7 +253,7 @@ class GradCafeScraper:
     # ------------------------------------------------------------------
     @staticmethod
     def _text(node: Any) -> str:
-        """Collapse an element's visible text to a single normalised line."""
+        """Collapse an element's visible text to a single normalized line."""
         if node is None:
             return ""
         return re.sub(r"\s+", " ", node.get_text(" ", strip=True)).strip()

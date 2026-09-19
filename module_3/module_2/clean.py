@@ -1,4 +1,4 @@
-"""Normalise scraped Grad Cafe rows into the structured ``applicant_data.json``.
+"""Normalize scraped Grad Cafe rows into the structured ``applicant_data.json``.
 
 ``scrape.py`` deliberately stores text exactly as the site rendered it.  This
 module turns that raw text into consistent, typed fields:
@@ -39,7 +39,7 @@ _STATUS_RE = re.compile(r"^(?P<status>.+?)(?:\s+on\s+(?P<month>[A-Za-z]{3,9})\s+
 _TERM_RE = re.compile(r"^(?P<season>Fall|Spring|Summer|Winter)\s+(?P<year>\d{4})$", re.IGNORECASE)
 _TAG_RE = re.compile(r"<[^>]+>")
 
-# Decision labels the site uses, normalised to canonical spellings.
+# Decision labels the site uses, normalized to canonical spellings.
 _STATUS_CANON = {
     "accepted": "Accepted",
     "rejected": "Rejected",
@@ -190,7 +190,7 @@ def _combine_program_field(program: Optional[str], university: Optional[str]) ->
 
 
 def _clean_entry(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """Normalise one scraped row into the output schema."""
+    """Normalize one scraped row into the output schema."""
     program = _clean_text(row.get("raw_program"))
     university = _clean_text(row.get("raw_university"))
     if not program and not university:

@@ -5,7 +5,7 @@ hundred well-known names.  Anything outside them either survives unstandardized
 or - worse, before the guard added to ``_best_match`` - got fuzzy-matched onto a
 different institution entirely.
 
-Grad Cafe stores the school and programme on each result as foreign keys
+Grad Cafe stores the school and program on each result as foreign keys
 (``school_id`` / ``program_id``), so the names rendered in the listing come from
 the site's own controlled vocabulary rather than free text.  That makes the
 scraped data a sound source of additional canonical entries: this script counts
@@ -77,7 +77,7 @@ def _looks_like_a_name(name: str) -> bool:
     # Entries the site stores entirely in lower case ("yale", "english",
     # "carnegie") are sloppy source data, not canonical spellings. Adding one
     # would make it the canonical form and hand that lower-case text back as the
-    # standardized answer. The properly-capitalised name is normally already in
+    # standardized answer. The properly-capitalized name is normally already in
     # the list, and the folded lookup in app.py maps these onto it anyway.
     if name == name.lower():
         return False

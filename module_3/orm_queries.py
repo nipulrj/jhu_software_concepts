@@ -180,7 +180,7 @@ def question_3(session: Session) -> QuestionResult:
     gpa, gre, gre_v, gre_aw = session.execute(statement).one()
 
     # Supporting analysis rather than part of the answer: how much of each
-    # average is an artefact of values that are impossible on their own scale.
+    # average is an artifact of values that are impossible on their own scale.
     metrics = (
         ("GPA (0-4.0)", Applicant.gpa, Applicant.gpa <= 4.0, Applicant.gpa > 4.0),
         (
@@ -259,7 +259,7 @@ def question_3(session: Session) -> QuestionResult:
         )
 
     supporting = [
-        "How much of each average is an artefact of impossible values:",
+        "How much of each average is an artifact of impossible values:",
     ]
     if impossible and in_range_total:
         supporting.append(

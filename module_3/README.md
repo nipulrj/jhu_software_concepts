@@ -4,7 +4,7 @@
 **JHED ID:** njayase1
 
 **Module:** Module 3 — Databases (EN.605.256, Modern Software Concepts in Python)
-**Assignment:** Load the Module 2 data into PostgreSQL, analyse it with SQL and
+**Assignment:** Load the Module 2 data into PostgreSQL, analyze it with SQL and
 with the SQLAlchemy ORM, and serve the results from a dynamic Flask page.
 
 ---
@@ -452,7 +452,7 @@ tooling, their output is committed, and nothing here needs them to run.
 
 * **The analysis is a point-in-time snapshot.** Grad Cafe receives new results
   continuously and applicants edit existing ones, so re-running Pull Data changes
-  the answers. That is the intended behaviour, not a defect, but it means the
+  the answers. That is the intended behavior, not a defect, but it means the
   figures quoted above belong to the committed 50,000-row dataset.
 * **Nothing validates the self-reported metrics, and this module does not add
   validation.** Question 3's supporting analysis measures the damage rather than
@@ -469,7 +469,7 @@ tooling, their output is committed, and nothing here needs them to run.
   catch up on recent submissions, not to re-scrape the archive; use
   `scrape.py --target N` for that.
 * **The LLM standardization quality is capped by a 1.1B-parameter model.** The
-  known failure modes are catalogued in `../module_2/README.md` and are unchanged
+  known failure modes are cataloged in `../module_2/README.md` and are unchanged
   here — most relevantly, it occasionally picks a confidently wrong campus, which
   is invisible to any of the queries above because the wrong answer is itself a
   valid university name.
