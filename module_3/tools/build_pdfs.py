@@ -90,11 +90,12 @@ def _styles() -> Dict[str, ParagraphStyle]:
             "caveat", parent=base["Normal"], fontSize=9, leading=13.2,
             textColor=colors.HexColor("#7c3a06"), alignment=TA_JUSTIFY,
         ),
-        # Sized so the two required paragraphs sit on a single page rather
-        # than spilling four lines onto a second one.
+        # Sized so the two required paragraphs sit on a single page rather than
+        # spilling a few lines onto a second one. Re-check this if the essay
+        # grows: it was retuned once when the GRE evidence was added to it.
         "essay": ParagraphStyle(
-            "essay", parent=base["Normal"], fontSize=10, leading=15.2,
-            textColor=INK, alignment=TA_JUSTIFY, spaceAfter=11,
+            "essay", parent=base["Normal"], fontSize=9.6, leading=14.1,
+            textColor=INK, alignment=TA_JUSTIFY, spaceAfter=10,
         ),
     }
 
@@ -181,6 +182,43 @@ def _footer(canvas: Any, doc: Any) -> None:
     canvas.drawString(1 * inch, 0.6 * inch, "{0} ({1})".format(AUTHOR, JHED))
     canvas.drawRightString(7.5 * inch, 0.6 * inch, "Page {0}".format(doc.page))
     canvas.restoreState()
+
+
+def _gre_diagnosis() -> dict:
+    """Live figures for the combined-total diagnosis quoted in limitations.pdf.
+
+    Queried rather than written down, so a Pull Data that changes the data
+    cannot leave the essay asserting a number that is no longer true.
+    """
+    import psycopg
+
+    with psycopg.connect(**db_config.connect_kwargs()) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(*) FILTER (WHERE gre IS NOT NULL
+                                          AND (gre < 130 OR gre > 170)),
+                       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340),
+                       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340
+                                          AND gre_v IS NOT NULL),
+                       ROUND(AVG(gre - gre_v) FILTER (
+                                 WHERE gre BETWEEN 260 AND 340
+                                   AND gre_v IS NOT NULL)::numeric, 2)
+                FROM applicants
+                """
+            )
+            impossible, in_total, with_verbal, implied = cursor.fetchone()
+
+    return {
+        "in_total": query_data.fmt_count(in_total),
+        # Not "share" -- the paragraph already uses that name for the share of
+        # reported values that are impossible, which is a different fraction.
+        "total_share": (
+            query_data.fmt_pct(100.0 * in_total / impossible) if impossible else "n/a"
+        ),
+        "with_verbal": query_data.fmt_count(with_verbal),
+        "implied": query_data.fmt_avg(implied),
+    }
 
 
 def _total_rows() -> str:
@@ -334,13 +372,18 @@ def build_limitations(results: Sequence[query_data.QuestionResult], path: Path) 
             "validates nothing an applicant types, and Question 11 counts the "
             "consequences: {out_of_range} of the {reported} reported GRE "
             "Quantitative values &mdash; {share} of them &mdash; are impossible on "
-            "a scale that runs 130 to 170. They are not random noise. They cluster "
-            "between 260 and 340, which is the range of a <i>combined</i> GRE "
-            "total, and many of those same rows fill in the verbal score "
-            "separately; a row reading gre = 323 alongside gre_v = 161 is an "
-            "applicant who answered a differently-worded question than the one the "
-            "field label implies. The effect on the headline number is not "
-            "marginal. Question 3 reports an average GRE Quantitative of "
+            "a scale that runs 130 to 170. They are not random noise. The GRE "
+            "reports Verbal and Quantitative on 130-170 each and a <i>combined</i> "
+            "total on 260-340, and {in_total} of these impossible values &mdash; "
+            "{total_share} of them &mdash; fall in exactly that second band. That reading "
+            "survives a second test: {with_verbal} of them also report a verbal "
+            "score separately, and subtracting it leaves a mean of {implied}, back "
+            "inside the legal range and within a point of the average of the "
+            "values that were never out of range at all. A row reading gre = 323 "
+            "beside gre_v = 161 is not a typo; it is an applicant answering a "
+            "differently-worded question than the one the field label implies. "
+            "The effect on the headline number is not marginal. Question 3 "
+            "reports an average GRE Quantitative of "
             "{avg_all}, which no human being has ever scored; restricted to values "
             "the scale permits, the same column averages {avg_in_range}. "
             "Analytical Writing behaves the same way, inflated from {aw_in_range} "
@@ -361,6 +404,7 @@ def build_limitations(results: Sequence[query_data.QuestionResult], path: Path) 
         ).format(
             out_of_range=gre_q[2],
             reported=gre_q[1],
+            **_gre_diagnosis(),
             share="{0:.0f} per cent".format(
                 100 * int(gre_q[2].replace(",", "")) / int(gre_q[1].replace(",", ""))
             ),
@@ -385,8 +429,8 @@ def build_limitations(results: Sequence[query_data.QuestionResult], path: Path) 
 
     document = SimpleDocTemplate(
         str(path), pagesize=LETTER,
-        leftMargin=1.0 * inch, rightMargin=1.0 * inch,
-        topMargin=0.85 * inch, bottomMargin=0.8 * inch,
+        leftMargin=0.92 * inch, rightMargin=0.92 * inch,
+        topMargin=0.8 * inch, bottomMargin=0.75 * inch,
         title="What This Data Can and Cannot Tell Us", author=AUTHOR,
     )
     document.build(story, onFirstPage=_footer, onLaterPages=_footer)

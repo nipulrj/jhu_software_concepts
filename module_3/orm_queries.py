@@ -476,6 +476,28 @@ def question_11(session: Session) -> QuestionResult:
 
     values = session.execute(statement).one()
 
+    # A second statement, mirroring the raw-SQL file: the impossible GRE
+    # Quantitative values are not random noise, and saying so needs evidence.
+    # Verbal and Quantitative are each reported on 130-170 and the combined total
+    # on 260-340, so a total typed into the Quantitative box should land in that
+    # second band -- and subtracting the verbal score the same row reports should
+    # leave a believable section score.
+    in_total_range = Applicant.gre.between(260, 340)
+    impossible_gre = and_(
+        Applicant.gre.is_not(None),
+        or_(Applicant.gre < 130, Applicant.gre > 170),
+    )
+    has_verbal = and_(in_total_range, Applicant.gre_v.is_not(None))
+
+    impossible, in_range_total, with_verbal, implied_quant = session.execute(
+        select(
+            _count_where(impossible_gre),
+            _count_where(in_total_range),
+            _count_where(has_verbal),
+            _avg2(case((has_verbal, Applicant.gre - Applicant.gre_v), else_=None)),
+        ).select_from(Applicant)
+    ).one()
+
     table_rows: List[List[str]] = []
     total_out_of_range = 0
     worst_metric: Optional[str] = None
@@ -515,6 +537,22 @@ def question_11(session: Session) -> QuestionResult:
                 worst_metric, fmt_avg(abs(worst_shift))
             )
         )
+    if impossible and in_range_total:
+        answer_lines.append(
+            "Of those, {0} of the {1} impossible GRE Quantitative values ({2}) fall in "
+            "260-340, the official combined Verbal+Quantitative range".format(
+                fmt_count(in_range_total),
+                fmt_count(impossible),
+                fmt_pct(100.0 * in_range_total / impossible),
+            )
+        )
+    if with_verbal and implied_quant is not None:
+        answer_lines.append(
+            "Subtracting the verbal score from the {0} of those that report one "
+            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
+                fmt_count(with_verbal), fmt_avg(implied_quant)
+            )
+        )
 
     return QuestionResult(
         number=11,
@@ -529,7 +567,9 @@ def question_11(session: Session) -> QuestionResult:
             "list of (column, valid-range) pairs and selected in one pass. Where "
             "the handwritten version repeats a near-identical SELECT four times "
             "in a UNION ALL, here the repetition is a loop -- adding a fifth "
-            "metric would be one more tuple."
+            "metric would be one more tuple. A second statement then tests what "
+            "the impossible values are rather than merely counting them, using "
+            "the same between() and case() expressions."
         ),
         table={
             "columns": [

@@ -177,7 +177,7 @@ and both it and these numbers move together.)
 | 8 | CS PhD acceptances at the four universities (original fields) | 30 |
 | 9 | Same, using the LLM fields | 30 (difference: +0) |
 | 10 | *(my own)* Highest acceptance rate among the ten busiest Fall 2026 universities | University of Toronto, 39.70% |
-| 11 | *(my own)* Impossible self-reported values | 2,715 |
+| 11 | *(my own)* Impossible self-reported values | 2,715 (97.75% of the GRE ones are mis-entered totals) |
 
 Two of these need a word of explanation, and both are in `query_results.pdf` and
 on the web page as well.
@@ -188,13 +188,30 @@ on the web page as well.
 nonetheless the correct answer to the question as asked — the mean of every value
 applicants supplied — and it is reported as such rather than quietly cleaned.
 
-The column is **bimodal**. Of 3,769 reported values, roughly 1,450 sit in the
-valid 130–170 band and **2,316 fall between 260 and 340**, because those
-applicants typed their *combined* GRE total into the box Grad Cafe labels only
-"GRE". The giveaway is that many of them also filled in the verbal field
-separately — `gre = 323` alongside `gre_v = 161` is a combined total, not a
-section score. Analytical Writing is distorted the same way by placeholder
-values of `99.99` on a scale that stops at 6.
+The GRE is scored on three scales: Verbal 130–170, Quantitative 130–170, and
+Analytical Writing 0–6, with a **combined Verbal+Quantitative total reported on
+260–340**. That last range is the whole explanation.
+
+The Quantitative column here is **bimodal**, and the second mode falls in exactly
+the combined-total band. Question 11 tests this rather than asserting it, and
+both predictions hold:
+
+| Check | Result |
+|---|---|
+| Impossible values (outside 130–170) | 2,316 of 3,769 reported |
+| ...that land inside the official 260–340 total range | **2,264 — 97.75%** |
+| ...of those, also reporting a separate verbal score | 1,675 |
+| Their mean once verbal is subtracted | **165.26** |
+
+If `gre` really held a section score, subtracting verbal from it would produce
+nonsense. Instead it reconstructs a plausible quantitative score — within a point
+of the 165.74 mean of the values that were never out of range at all. So
+`gre = 323` beside `gre_v = 161` is not a typo; it is an applicant answering a
+differently-worded question than the field label implies. Only **52 values
+(1.4%)** resist the explanation, and those are obvious junk — `4.0`, `999`, `370`.
+
+Analytical Writing is distorted the same way by placeholder values of `99.99` on
+a scale that stops at 6.
 
 Restricted to values each scale actually permits, the averages are **165.74** and
 **4.33** — both entirely ordinary. Question 11 computes exactly this comparison,

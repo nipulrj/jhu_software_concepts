@@ -97,14 +97,18 @@ def use_utf8_console() -> None:
 QUESTION_3_CAVEAT = (
     "These are the averages of exactly what applicants reported, which is "
     "what the question asks for -- but two of them are not usable as test "
-    "scores. The GRE Quantitative field is bimodal: most values sit in the "
-    "valid 130-170 band, while a large minority fall between 260 and 340, "
-    "because those applicants typed their combined GRE total into the box "
-    "the site labels only 'GRE'. The Analytical Writing average is inflated "
-    "the same way by placeholder values of 99.99 on a scale that stops at 6. "
-    "Question 11 counts these and gives the averages restricted to values "
-    "each scale actually permits; limitations.pdf discusses what follows "
-    "from it."
+    "scores. The GRE reports Verbal and Quantitative on 130-170 each, a "
+    "combined Verbal+Quantitative total on 260-340, and Analytical Writing "
+    "on 0-6. The Quantitative column here is bimodal, and the second mode "
+    "falls in exactly the 260-340 band: those applicants entered their "
+    "combined total into the box the site labels only 'GRE'. Two further "
+    "checks in Question 11 confirm that rather than assume it -- almost all "
+    "of the impossible values land inside the official total range, and "
+    "subtracting the verbal score the same rows report leaves a mean back "
+    "inside 130-170. Analytical Writing is inflated the same way by "
+    "placeholder values of 99.99 on a scale that stops at 6. Question 11 "
+    "also gives the averages restricted to values each scale permits; "
+    "limitations.pdf discusses what follows from it."
 )
 
 QUESTION_9_CAVEAT = (
@@ -546,7 +550,27 @@ SELECT 'GRE Analytical Writing (0-6)',
        ROUND(AVG(gre_aw) FILTER (WHERE gre_aw BETWEEN 0 AND 6)::numeric, 2)
 FROM applicants;
 """
+
+    # A second statement, because the impossible GRE Quantitative values are not
+    # random noise and saying so needs evidence rather than assertion. The GRE
+    # reports Verbal and Quantitative on 130-170 each and a *combined* total on
+    # 260-340; if these values are combined totals entered in the wrong box, they
+    # should sit in that second band, and subtracting the verbal score the same
+    # row reports should leave a plausible section score.
+    diagnosis_sql = """
+SELECT COUNT(*) FILTER (WHERE gre IS NOT NULL AND (gre < 130 OR gre > 170)) AS impossible,
+       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340)                      AS in_total_range,
+       COUNT(*) FILTER (WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL) AS with_verbal,
+       ROUND(AVG(gre - gre_v) FILTER (
+                 WHERE gre BETWEEN 260 AND 340 AND gre_v IS NOT NULL)::numeric, 2)
+                                                                            AS implied_quant
+FROM applicants;
+"""
+
     rows = _rows(connection, sql)
+    impossible, in_total_range, with_verbal, implied_quant = _row(
+        connection, diagnosis_sql
+    )
 
     table_rows = []
     worst_metric = None
@@ -581,6 +605,22 @@ FROM applicants;
                 worst_metric, fmt_avg(abs(worst_shift))
             )
         )
+    if impossible and in_total_range:
+        answer_lines.append(
+            "Of those, {0} of the {1} impossible GRE Quantitative values ({2}) fall in "
+            "260-340, the official combined Verbal+Quantitative range".format(
+                fmt_count(in_total_range),
+                fmt_count(impossible),
+                fmt_pct(100.0 * in_total_range / impossible),
+            )
+        )
+    if with_verbal and implied_quant is not None:
+        answer_lines.append(
+            "Subtracting the verbal score from the {0} of those that report one "
+            "leaves a mean of {1} -- back inside the valid 130-170 band".format(
+                fmt_count(with_verbal), fmt_avg(implied_quant)
+            )
+        )
 
     return QuestionResult(
         number=11,
@@ -589,7 +629,11 @@ FROM applicants;
             "and how far do they move the averages reported in Question 3?"
         ),
         answer_lines=answer_lines,
-        sql=sql.strip(),
+        sql=(
+            sql.strip()
+            + "\n\n-- and, to test what those impossible values actually are:\n"
+            + diagnosis_sql.strip()
+        ),
         explanation=(
             "Grad Cafe validates nothing an applicant types, so the table holds "
             "GRE Analytical Writing scores of 99.99 and GPAs on a 10-point scale. "
@@ -599,7 +643,15 @@ FROM applicants;
             "those two averages -- that is, the amount of Question 3's answer "
             "that is an artefact of unvalidated input rather than a fact about "
             "applicants. UNION ALL rather than UNION so that two metrics with "
-            "identical counts are not silently collapsed into one row."
+            "identical counts are not silently collapsed into one row. The "
+            "second statement then tests what the impossible values are rather "
+            "than merely counting them: the GRE reports Verbal and Quantitative "
+            "on 130-170 each and a combined total on 260-340, so if these are "
+            "totals typed into the wrong box they should land in that second "
+            "band -- and subtracting the verbal score the same row reports "
+            "should leave a believable section score. Both predictions hold, "
+            "which is why the caveat on Question 3 states this as a diagnosis "
+            "rather than a guess."
         ),
         table={
             "columns": [
