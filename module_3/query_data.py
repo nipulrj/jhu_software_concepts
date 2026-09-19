@@ -631,15 +631,47 @@ QUESTIONS = (
 )
 
 
-def run_all(connection: psycopg.Connection) -> List[QuestionResult]:
-    """Answer every question against an open connection."""
-    return [question(connection) for question in QUESTIONS]
+def parse_selection(spec: Optional[str], available: int = len(QUESTIONS)) -> List[int]:
+    """Turn ``"1-6"`` or ``"1,4,5"`` into a sorted list of question numbers.
+
+    Handy for re-running a single question while working on it, and for printing
+    the answers in screen-sized batches -- the full run is longer than a console
+    window, so the screenshots in ``screenshots/`` are taken in two halves.
+    """
+    if not spec:
+        return list(range(1, available + 1))
+
+    wanted: set = set()
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            start, _, end = part.partition("-")
+            wanted.update(range(int(start), int(end) + 1))
+        else:
+            wanted.add(int(part))
+
+    selected = sorted(number for number in wanted if 1 <= number <= available)
+    if not selected:
+        raise ValueError(
+            "No questions matched {0!r}; valid numbers are 1-{1}.".format(spec, available)
+        )
+    return selected
 
 
-def answer_all() -> List[QuestionResult]:
-    """Open a connection, answer every question, close it again."""
+def run_all(
+    connection: psycopg.Connection, numbers: Optional[Sequence[int]] = None
+) -> List[QuestionResult]:
+    """Answer every question against an open connection, or just ``numbers``."""
+    chosen = QUESTIONS if numbers is None else [QUESTIONS[n - 1] for n in numbers]
+    return [question(connection) for question in chosen]
+
+
+def answer_all(numbers: Optional[Sequence[int]] = None) -> List[QuestionResult]:
+    """Open a connection, answer the questions, close it again."""
     with psycopg.connect(**db_config.connect_kwargs()) as connection:
-        return run_all(connection)
+        return run_all(connection, numbers)
 
 
 # ----------------------------------------------------------------------
@@ -700,12 +732,23 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="print the SQL statement beneath each answer",
     )
+    parser.add_argument(
+        "--questions",
+        metavar="SPEC",
+        help="answer only these, e.g. 1-6 or 1,4,5 (default: all eleven)",
+    )
     args = parser.parse_args(argv)
 
     use_utf8_console()
 
     try:
-        results = answer_all()
+        numbers = parse_selection(args.questions)
+    except ValueError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+
+    try:
+        results = answer_all(numbers)
     except psycopg.OperationalError as exc:
         print(
             "Could not connect to PostgreSQL at {where}.\n  {exc}\n"

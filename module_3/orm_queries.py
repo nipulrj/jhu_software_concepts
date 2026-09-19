@@ -31,11 +31,13 @@ from query_data import (
     QUESTION_3_CAVEAT,
     QUESTION_9_CAVEAT,
     QuestionResult,
+    parse_selection,
     fmt_avg,
     fmt_count,
     fmt_pct,
     fmt_signed,
     print_results,
+    use_utf8_console,
 )
 
 # ----------------------------------------------------------------------
@@ -563,15 +565,18 @@ QUESTIONS = (
 REQUIRED_BY_PART_6 = (1, 4, 5, 8, 9, 10)
 
 
-def run_all(session: Session) -> List[QuestionResult]:
-    """Answer every question against an open Session."""
-    return [question(session) for question in QUESTIONS]
+def run_all(
+    session: Session, numbers: Optional[Sequence[int]] = None
+) -> List[QuestionResult]:
+    """Answer every question against an open Session, or just ``numbers``."""
+    chosen = QUESTIONS if numbers is None else [QUESTIONS[n - 1] for n in numbers]
+    return [question(session) for question in chosen]
 
 
-def answer_all() -> List[QuestionResult]:
-    """Open a Session, answer every question, close it again."""
+def answer_all(numbers: Optional[Sequence[int]] = None) -> List[QuestionResult]:
+    """Open a Session, answer the questions, close it again."""
     with SessionLocal() as session:
-        return run_all(session)
+        return run_all(session, numbers)
 
 
 def _compare_with_raw_sql() -> int:
@@ -616,12 +621,25 @@ def main(argv: Optional[List[str]] = None) -> int:
         action="store_true",
         help="check these answers against the raw SQL in query_data.py",
     )
+    parser.add_argument(
+        "--questions",
+        metavar="SPEC",
+        help="answer only these, e.g. 1-6 or 1,4,5 (default: all eleven)",
+    )
     args = parser.parse_args(argv)
+
+    use_utf8_console()
+
+    try:
+        numbers = parse_selection(args.questions, len(QUESTIONS))
+    except ValueError as exc:
+        print(exc, file=sys.stderr)
+        return 1
 
     try:
         if args.compare:
             return _compare_with_raw_sql()
-        results = answer_all()
+        results = answer_all(numbers)
     except SQLAlchemyError as exc:
         print(
             "Could not query {where}:\n  {exc}\n"
