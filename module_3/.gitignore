@@ -16,3 +16,9 @@ llm_hosting/standardization_cache.json
 
 # Marker file written while a Pull Data scrape is in flight.
 .pull_data.lock
+
+# Node modules, if the Word builder is ever run from inside this folder.
+# tools/build_query_results_docx.js needs `npm install docx`; keep it out of
+# the repo and the submission ZIP.
+node_modules/
+package-lock.json

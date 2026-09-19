@@ -22,7 +22,7 @@ with the SQLAlchemy ORM, and serve the results from a dynamic Flask page.
 | `query_results.pdf` | Every question with its result, its SQL and an explanation |
 | `limitations.pdf` | Two paragraphs on what self-reported data can and cannot support |
 | `screenshots/` | Raw SQL output, ORM output, and the running web page |
-| `tools/` | Scripts that generate `query_results.pdf` and capture the screenshots |
+| `tools/` | Scripts that build `query_results.pdf`/`.docx` and capture the screenshots |
 
 ---
 
@@ -417,7 +417,9 @@ module_3/
   clean.py                     Module 2 cleaner
   llm_hosting/                 Module 2 LLM standardizer
   tools/
-    build_pdfs.py              generates query_results.pdf
+    build_pdfs.py              generates query_results.pdf directly
+    export_results_json.py     dumps a live run, for the Word route
+    build_query_results_docx.js  turns that dump into query_results.docx
     capture_screenshots.ps1    captures the six screenshots
   applicant_data.json          Module 2 cleaned records
   llm_extend_applicant_data.json   the file load_data.py reads
@@ -446,6 +448,25 @@ follows the new data.
 Word and exported, so a generator would overwrite the authored version rather
 than help. Its figures are quoted from a run of `query_data.py`; if the data ever
 moves them, the essay wants re-reading rather than re-rendering.
+
+Both PDFs can also be produced through Word, which is how the submitted copies
+were made. `tools/` has a two-step route for the analysis document:
+
+```bash
+python tools/export_results_json.py --out results.json
+npm install docx
+node tools/build_query_results_docx.js results.json query_results.docx
+```
+
+The first step runs the real queries and dumps what they returned; the second
+turns that into a Word file. Open it, adjust anything, then export to PDF. The
+querying stays in Python where the queries live, and the document building goes
+to the library that writes `.docx` properly. `--` is promoted to an em dash on the
+way into Word, except inside SQL, where two hyphens start a comment and have to
+stay two hyphens.
+
+`node_modules/` is gitignored; the Word route is optional tooling and is not
+needed to run anything else in this module.
 
 The screenshots are real screen captures of real windows, not text rendered to
 look like a terminal. `tools/capture_screenshots.ps1` launches each window
