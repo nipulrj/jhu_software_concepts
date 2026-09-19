@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Grad Cafe Data Analysis{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="brand" href="{{ url_for('index') }}">Grad School Cafe Data Analysis</a>
+      <span class="brand-meta">{{ database }}</span>
+    </div>
+  </header>
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="page-footer">
+    <p>
+      Nipul Jayasekera &middot; JHU EN.605.256 Modern Software Concepts in Python
+      &middot; Module 3
+    </p>
+    <p class="footer-note">
+      Figures are read live from PostgreSQL through the SQLAlchemy
+      <code>Applicant</code> model each time this page loads.
+    </p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
