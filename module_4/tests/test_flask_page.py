@@ -96,6 +96,43 @@ def test_create_app_defaults_to_the_real_collaborators(monkeypatch):
     assert services.pulls == []
 
 
+def test_the_default_pull_runner_spawns_a_detached_pull(monkeypatch):
+    """Pressing Pull Data on the real application starts a child process.
+
+    The one collaborator the rest of the suite always replaces, so its default
+    is asserted here rather than left untested.
+    """
+    state = pull_data.MemoryState()
+    monkeypatch.setattr(pull_data, "default_state", lambda: state)
+    spawned = {}
+
+    def spawn(**kwargs):
+        spawned.update(kwargs)
+        return {"state": "running"}
+
+    monkeypatch.setattr(pull_data, "spawn_pull", spawn)
+    services = flask_app.get_services(flask_app.create_app())
+
+    assert services.pull_runner() == {"state": "running"}
+    assert spawned == {"state": state}
+
+
+def test_main_serves_the_application(monkeypatch):
+    """``python flask_app.py`` builds an app through the factory and serves it."""
+    monkeypatch.setattr(pull_data, "default_state", lambda: pull_data.MemoryState())
+    monkeypatch.setenv("PORT", "5099")
+    served = {}
+
+    def run(self, host, port, debug):
+        served.update(host=host, port=port, debug=debug)
+
+    monkeypatch.setattr(flask_app.Flask, "run", run)
+
+    flask_app.main()
+
+    assert served == {"host": "127.0.0.1", "port": 5099, "debug": False}
+
+
 # ----------------------------------------------------------------------
 # GET /
 # ----------------------------------------------------------------------
