@@ -102,7 +102,9 @@ class AnalysisCache:
     """
 
     def __init__(self, provider: Callable[[], List[QuestionResult]]) -> None:
-        self._provider = provider
+        #: The callable that answers the questions.  Public, so a test can
+        #: confirm which one an application was built with.
+        self.provider = provider
         self._snapshot: Optional[Dict[str, Any]] = None
         #: How many times the provider has actually been called. The busy-state
         #: tests assert on this: a refused update must not move it.
@@ -128,7 +130,7 @@ class AnalysisCache:
         """
         self.computations += 1
         try:
-            results = self._provider()
+            results = self.provider()
         except SQLAlchemyError as exc:
             snapshot: Dict[str, Any] = {
                 "results": [],
