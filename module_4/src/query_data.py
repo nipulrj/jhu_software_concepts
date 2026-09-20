@@ -18,11 +18,12 @@ import argparse
 import sys
 import textwrap
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import psycopg
 
 import db_config
+import load_data
 
 # Each question below carries its own complete, standalone statement rather than
 # assembling one from shared fragments, so that what appears in
@@ -172,6 +173,29 @@ class QuestionResult:
     def answer(self) -> str:
         return "\n".join(self.answer_lines)
 
+    def as_dict(self) -> Dict[str, Any]:
+        """This result as a plain dict, keyed by :data:`ANALYSIS_KEYS`.
+
+        The shape the analysis template reads, and the shape the formatting
+        tests assert against -- so a renamed field fails a test here rather
+        than silently rendering an empty block on the page.
+        """
+        return {key: getattr(self, key) for key in ANALYSIS_KEYS}
+
+
+#: The keys of one rendered analysis item.  ``answer`` is the joined string and
+#: ``answer_lines`` the individual "Answer:" rows; the template uses both.
+ANALYSIS_KEYS = (
+    "number",
+    "question",
+    "answer",
+    "answer_lines",
+    "table",
+    "supporting",
+    "caveat",
+    "original",
+)
+
 
 # ----------------------------------------------------------------------
 # Query execution
@@ -197,6 +221,77 @@ def _rows(connection: psycopg.Connection, sql: str) -> List[Sequence[Any]]:
     with connection.cursor() as cursor:
         cursor.execute(sql)
         return list(cursor.fetchall())
+
+
+# ----------------------------------------------------------------------
+# Reading whole rows back out
+#
+# The analyses above all reduce the table to a number.  These two read stored
+# records back as they were written, which is what lets a test assert that a
+# pull inserted rows carrying the required fields -- and what any later feature
+# ("show me this applicant") would build on.
+# ----------------------------------------------------------------------
+#: The stored fields, in schema order.  Taken from the loader rather than
+#: repeated, so the columns selected here cannot drift from the columns written.
+APPLICANT_FIELDS: Tuple[str, ...] = load_data.COLUMNS
+
+
+def fetch_applicants(
+    connection: psycopg.Connection,
+    limit: Optional[int] = None,
+    p_id: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """Read stored applicants as dicts keyed by :data:`APPLICANT_FIELDS`.
+
+    :param connection: an open psycopg connection.
+    :param limit: at most this many rows, newest result id first. ``None`` for
+        every row, which on the full dataset is fifty thousand of them -- pass a
+        limit unless you mean it.
+    :param p_id: only the row with this Grad Cafe result id.
+    :returns: one dict per row, with every required field present as a key even
+        where the applicant left the value blank (it is ``None`` then, not
+        missing). Callers can therefore index a field without guarding for it.
+    """
+    sql = "SELECT {columns} FROM {table}".format(
+        columns=", ".join(APPLICANT_FIELDS), table=load_data.TABLE_NAME
+    )
+    parameters: List[Any] = []
+    if p_id is not None:
+        sql += " WHERE p_id = %s"
+        parameters.append(p_id)
+    sql += " ORDER BY p_id DESC"
+    if limit is not None:
+        sql += " LIMIT %s"
+        parameters.append(limit)
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql, parameters or None)
+        return [dict(zip(APPLICANT_FIELDS, row)) for row in cursor.fetchall()]
+
+
+def fetch_applicant(
+    connection: psycopg.Connection, p_id: int
+) -> Optional[Dict[str, Any]]:
+    """One stored applicant as a dict, or ``None`` if that id is not stored.
+
+    :param connection: an open psycopg connection.
+    :param p_id: the Grad Cafe result id, which is the table's primary key.
+    """
+    matches = fetch_applicants(connection, p_id=p_id)
+    return matches[0] if matches else None
+
+
+def analysis_dict(results: Sequence[QuestionResult]) -> Dict[int, Dict[str, Any]]:
+    """Index answered questions by number, each as a plain dict.
+
+    :param results: the answers, from :func:`answer_all` or the ORM's.
+    :returns: ``{question_number: {...}}``, each inner dict keyed by
+        :data:`ANALYSIS_KEYS`.
+
+    A pure function over already-answered questions, so a test can check the
+    shape the template consumes without a database behind it.
+    """
+    return {result.number: result.as_dict() for result in results}
 
 
 # ----------------------------------------------------------------------

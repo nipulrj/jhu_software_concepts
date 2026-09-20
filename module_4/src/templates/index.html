@@ -1,31 +1,38 @@
 {% extends "base.html" %}
 
+{#
+  The two buttons carry data-testid attributes as well as ids. The ids are what
+  the page's own script uses; the data-testid values are the contract the UI
+  tests assert against, so restyling the page cannot break them.
+#}
+
 {% block content %}
 
 <div class="page-head">
   <div>
     <h1>Analysis</h1>
     <p class="subtitle">
-      Grad Cafe admissions results, queried live from PostgreSQL.
+      Grad Cafe admissions results, queried from PostgreSQL through the
+      <code>Applicant</code> model.
       {% if total_rows %}<strong>{{ total_rows }}</strong> entries for Fall 2026.{% endif %}
     </p>
   </div>
 
-  <form class="head-actions" method="post" action="{{ url_for('update_analysis') }}">
-    <button type="submit" class="button button-secondary">Update Analysis</button>
-  </form>
+  <div class="head-actions">
+    <button type="button"
+            class="button button-secondary"
+            id="update-analysis-btn"
+            data-testid="update-analysis-btn"
+            {% if running %}disabled{% endif %}>
+      Update Analysis
+    </button>
+  </div>
 </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="flash flash-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+<div id="action-message" class="flash" hidden></div>
 
 {% if error %}
-  <div class="flash flash-error">{{ error }}</div>
+  <div class="flash flash-error" data-testid="analysis-error">{{ error }}</div>
 {% endif %}
 
 <section class="panel pull-panel">
@@ -34,9 +41,10 @@
     <p>
       <strong>Pull Data</strong> checks Grad Cafe for newly submitted application
       results and adds any new records to the database. Depending on how much new
-      data is available this may take some time, so it runs in the background &mdash;
-      you can keep reading this page while it works, and the results below will
-      refresh once it finishes.
+      data is available this may take some time, so it runs in the background
+      &mdash; you can keep reading this page while it works. Press
+      <strong>Update Analysis</strong> once it finishes to recompute the figures
+      below.
     </p>
     <p class="muted">
       Only new entries are added. Anything already stored is recognized by its
@@ -46,18 +54,19 @@
   </div>
 
   <div class="pull-actions">
-    <form method="post" action="{{ url_for('pull_data_route') }}">
-      <button type="submit" class="button button-primary"
-              {% if running %}disabled{% endif %}
-              id="pull-button">
-        {% if running %}Pulling data&hellip;{% else %}Pull Data{% endif %}
-      </button>
-    </form>
+    <button type="button"
+            class="button button-primary"
+            id="pull-data-btn"
+            data-testid="pull-data-btn"
+            {% if running %}disabled{% endif %}>
+      {% if running %}Pulling data&hellip;{% else %}Pull Data{% endif %}
+    </button>
   </div>
 </section>
 
 <div id="pull-status"
      class="status status-{{ status.get('state', 'idle') }}"
+     data-testid="pull-status"
      data-running="{{ 'true' if running else 'false' }}">
   <span class="status-dot" aria-hidden="true"></span>
   <span id="pull-status-message">
@@ -65,16 +74,20 @@
   </span>
 </div>
 
+<p class="muted analysis-timestamp" data-testid="analysis-updated-at">
+  Analysis computed at {{ updated_at }} (UTC).
+</p>
+
 {% macro render_question(result) %}
-  <article class="question">
+  <article class="question" data-testid="question-{{ result.number }}">
     <h3>
       <span class="qnum">Question {{ result.number }}</span>
       {{ result.question }}
     </h3>
 
-    <div class="answer">
+    <div class="answer" data-testid="answer-{{ result.number }}">
       {% for line in result.answer_lines %}
-        <p class="answer-line">{{ line }}</p>
+        <p class="answer-line"><span class="answer-label">Answer:</span> {{ line }}</p>
       {% endfor %}
     </div>
 
@@ -113,14 +126,14 @@
 {% endmacro %}
 
 {% if groups.required %}
-  <section class="panel">
+  <section class="panel" data-testid="required-analysis">
     <h2 class="section-heading">Required analysis</h2>
     {% for result in groups.required %}{{ render_question(result) }}{% endfor %}
   </section>
 {% endif %}
 
 {% if groups.original %}
-  <section class="panel">
+  <section class="panel" data-testid="original-analysis">
     <h2 class="section-heading">My own questions</h2>
     <p class="section-intro">
       Two questions of my own. The first asks which of the most-applied-to
@@ -137,31 +150,108 @@
 
 {% block scripts %}
 <script>
-  // While a pull is running, poll for progress so the user sees the stage change
-  // rather than a frozen button, and reload once it finishes so the figures
-  // above are the new ones. Plain fetch on an interval -- no dependencies.
+  // Both buttons POST to a JSON endpoint and report what came back. Plain fetch
+  // on the standard endpoints -- no dependencies, and nothing here that the
+  // Flask test client cannot exercise directly: the tests POST to the same two
+  // URLs and assert on the same JSON, so this script has no logic of its own to
+  // get out of step with them.
   (function () {
-    var box = document.getElementById("pull-status");
-    if (!box || box.dataset.running !== "true") { return; }
+    var pullButton = document.getElementById("pull-data-btn");
+    var updateButton = document.getElementById("update-analysis-btn");
+    var statusBox = document.getElementById("pull-status");
+    var statusMessage = document.getElementById("pull-status-message");
+    var actionMessage = document.getElementById("action-message");
+    var poller = null;
 
-    var message = document.getElementById("pull-status-message");
-    var button = document.getElementById("pull-button");
-    if (button) { button.disabled = true; }
+    function show(text, kind) {
+      if (!actionMessage) { return; }
+      actionMessage.textContent = text;
+      actionMessage.className = "flash flash-" + (kind || "success");
+      actionMessage.hidden = false;
+    }
 
-    var timer = setInterval(function () {
-      fetch("{{ url_for('status') }}", { cache: "no-store" })
-        .then(function (response) { return response.json(); })
-        .then(function (state) {
-          if (message && state.message) { message.textContent = state.message; }
-          box.className = "status status-" + (state.state || "idle");
-          if (!state.running) {
-            clearInterval(timer);
-            // Reload so the analysis reflects the rows just inserted.
-            window.location.reload();
-          }
+    function setBusy(busy) {
+      if (pullButton) {
+        pullButton.disabled = busy;
+        pullButton.textContent = busy ? "Pulling data…" : "Pull Data";
+      }
+      if (updateButton) { updateButton.disabled = busy; }
+    }
+
+    function applyStatus(state) {
+      if (!state) { return; }
+      if (statusMessage && state.message) { statusMessage.textContent = state.message; }
+      if (statusBox) {
+        statusBox.className = "status status-" + (state.state || "idle");
+        statusBox.dataset.running = state.running ? "true" : "false";
+      }
+      setBusy(Boolean(state.running));
+    }
+
+    function poll() {
+      if (poller) { return; }
+      poller = setInterval(function () {
+        fetch("{{ url_for('status') }}", { cache: "no-store" })
+          .then(function (response) { return response.json(); })
+          .then(function (state) {
+            applyStatus(state);
+            if (!state.running) {
+              clearInterval(poller);
+              poller = null;
+            }
+          })
+          .catch(function () { /* transient; the next tick retries */ });
+      }, 3000);
+    }
+
+    function post(url, button) {
+      if (button) { button.disabled = true; }
+      return fetch(url, {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        cache: "no-store"
+      })
+        .then(function (response) {
+          return response.json().then(function (body) {
+            return { ok: response.ok, status: response.status, body: body };
+          });
         })
-        .catch(function () { /* transient; the next tick retries */ });
-    }, 3000);
+        .then(function (result) {
+          show(result.body.message || "Done.", result.ok ? "success" : "warning");
+          applyStatus(result.body.status);
+          return result;
+        })
+        .catch(function (error) {
+          show("Could not reach the server: " + error, "error");
+          return null;
+        });
+    }
+
+    if (pullButton) {
+      pullButton.addEventListener("click", function () {
+        post("{{ url_for('pull_data_route') }}", pullButton).then(function (result) {
+          // Started: leave both buttons disabled and watch it. Refused or
+          // failed: hand the button back so it can be pressed again.
+          if (result && result.ok) { setBusy(true); poll(); } else { setBusy(false); }
+        });
+      });
+    }
+
+    if (updateButton) {
+      updateButton.addEventListener("click", function () {
+        post("{{ url_for('update_analysis') }}", updateButton).then(function (result) {
+          // The page renders the held snapshot, so a successful refresh is only
+          // visible after a reload. Reload rather than patching the DOM here:
+          // the server-rendered page stays the single description of the data.
+          if (result && result.ok) { window.location.reload(); }
+          else { updateButton.disabled = false; }
+        });
+      });
+    }
+
+    // A pull already in flight when the page loaded -- after a Flask restart,
+    // say -- still needs watching.
+    if (statusBox && statusBox.dataset.running === "true") { setBusy(true); poll(); }
   })();
 </script>
 {% endblock %}

@@ -4,7 +4,7 @@ The assignment requires Questions 1, 4, 5, 8, 9 and one of my own to be repeated
 here.  All eleven are implemented instead, for one practical reason: the Flask
 page must read the database through the ``Applicant`` model, and answering only
 six here would have forced the other five to be written a second time inside the
-web app.  ``app.py`` therefore imports straight from this module.
+web app.  :mod:`flask_app` therefore imports straight from this module.
 
 No raw SQL appears anywhere in this file -- no ``text()``, no psycopg cursor.
 Every answer is built from ``select()``, ``func`` and the ``Applicant`` columns,
@@ -26,7 +26,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 import db_config
-from models import Applicant, SessionLocal
+from models import Applicant, get_session
 from query_data import (
     QUESTION_3_CAVEAT,
     QUESTION_9_CAVEAT,
@@ -724,8 +724,13 @@ def run_all(
 
 
 def answer_all(numbers: Optional[Sequence[int]] = None) -> List[QuestionResult]:
-    """Open a Session, answer the questions, close it again."""
-    with SessionLocal() as session:
+    """Open a Session, answer the questions, close it again.
+
+    The Session comes from :func:`models.get_session`, which builds its Engine
+    on first use -- so the database this reads is whatever the environment says
+    *now*, and a test fixture can redirect it without reloading any module.
+    """
+    with get_session() as session:
         return run_all(session, numbers)
 
 

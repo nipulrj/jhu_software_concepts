@@ -1,19 +1,22 @@
-"""Load the cleaned Grad Cafe data from Module 2 into PostgreSQL.
+"""Load cleaned Grad Cafe records into PostgreSQL.
 
-Reads ``llm_extend_applicant_data.json`` -- the Module 2 deliverable that already
-carries the LLM-standardized program and university -- and writes it into the
-single ``applicants`` table this assignment specifies.
+Writes the output of the ETL pipeline -- either a JSON file on disk or a list of
+records already in memory -- into the single ``applicants`` table this
+application specifies.
 
 Run it as often as you like.  Grad Cafe gives every result a permanent numeric
 id, which the scraper keeps as ``entry_id`` and this loader stores as the primary
 key ``p_id``.  Inserts therefore carry ``ON CONFLICT (p_id)``, so a second run
-refreshes the rows it already has instead of duplicating them.  That is also what
-makes the Flask "Pull Data" button safe: it re-runs this loader over a file
-holding both old and new records.
+refreshes the rows it already has instead of duplicating them.  That is the
+uniqueness policy the whole system rests on: it is what makes the "Pull Data"
+button safe to press twice, and it is what ``tests/test_db_insert.py`` checks.
 
-    python load_data.py                     # load the committed data file
-    python load_data.py --file other.json   # load some other cleaned file
-    python load_data.py --recreate          # drop and rebuild the table first
+:func:`load_into_database` takes ``records=`` as well as ``path=``, so a caller
+holding rows in memory -- the pull pipeline, or a test with a fake scraper --
+never has to write a temporary file just to load them.
+
+    python load_data.py --file cleaned.json   # load a cleaned file
+    python load_data.py --recreate            # drop and rebuild the table first
 """
 
 from __future__ import annotations
@@ -28,12 +31,13 @@ import psycopg
 
 import db_config
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+SRC_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SRC_DIR.parent
 
-# The Module 2 pipeline and its outputs live in module_2/, kept together so this
-# module's own files are not mixed in with the ones carried over from the last.
-MODULE_2_DIR = PROJECT_ROOT / "module_2"
-DEFAULT_DATA_PATH = MODULE_2_DIR / "llm_extend_applicant_data.json"
+# Where a "Pull Data" run leaves its output. Kept outside src/ -- it is generated
+# data, not source -- and out of version control; see .gitignore.
+DATA_DIR = PROJECT_ROOT / "data"
+DEFAULT_DATA_PATH = DATA_DIR / "pull" / "llm_extend_applicant_data.json"
 
 TABLE_NAME = "applicants"
 
@@ -193,16 +197,22 @@ def _row_from_record(record: Dict[str, Any]) -> Optional[Tuple[Any, ...]]:
     )
 
 
-def load_records(path: Path = DEFAULT_DATA_PATH) -> List[Dict[str, Any]]:
-    """Read the cleaned JSON file produced by the Module 2 pipeline."""
+def read_records(path: Path = DEFAULT_DATA_PATH) -> List[Dict[str, Any]]:
+    """Read a cleaned JSON file produced by the ETL pipeline.
+
+    :param path: the file to read. It may hold a bare JSON array or an object
+        with a ``"rows"`` key; anything in the array that is not an object is
+        dropped rather than crashing the load.
+    :raises LoaderError: if the file is missing or is not valid JSON, with a
+        message saying what to run instead of a traceback.
+    """
     path = Path(path)
     if not path.exists():
         raise LoaderError(
-            "{path} does not exist. Run the Module 2 pipeline first, from "
-            "module_2/:\n"
+            "{path} does not exist. Run the pipeline first, from src/:\n"
             "    python scrape.py --target 50000\n"
             "    python clean.py\n"
-            "    python llm_hosting/app.py --file applicant_data.json "
+            "    python ../llm_hosting/app.py --file applicant_data.json "
             "--out llm_extend_applicant_data.json --json-array".format(path=path)
         )
 
@@ -280,17 +290,32 @@ def load_into_database(
     path: Path = DEFAULT_DATA_PATH,
     recreate: bool = False,
     verbose: bool = True,
+    records: Optional[Iterable[Dict[str, Any]]] = None,
 ) -> Dict[str, int]:
-    """Load ``path`` into PostgreSQL and report what changed.
+    """Load records into PostgreSQL and report what changed.
 
-    Returns a small summary so the Flask "Pull Data" route can tell the user how
-    many records were actually added rather than just saying "done".
+    :param path: a cleaned JSON file to read. Ignored when ``records`` is given.
+    :param recreate: drop and rebuild the table before loading.
+    :param verbose: print a running commentary to stderr. The web app and the
+        tests both pass ``False``; the command line leaves it on.
+    :param records: records already in memory, loaded instead of reading
+        ``path``. This is the injection point the pull pipeline uses, and the
+        reason a test with a fake scraper needs no temporary file.
+    :returns: a summary -- ``read``, ``skipped``, ``written``, ``inserted``,
+        ``updated``, ``total`` -- so the "Pull Data" route can say how many
+        records were actually added rather than just "done".
+    :raises LoaderError: if the file is unusable, or the server unreachable.
     """
-    records = load_records(path)
+    if records is None:
+        source = Path(path).name
+        records = read_records(path)
+    else:
+        source = "memory"
+        records = list(records)
     rows, skipped = build_rows(records)
 
     if verbose:
-        print("Read {0:,} records from {1}".format(len(records), Path(path).name), file=sys.stderr)
+        print("Read {0:,} records from {1}".format(len(records), source), file=sys.stderr)
         if skipped:
             print("  skipped {0:,} without a usable entry id".format(skipped), file=sys.stderr)
         duplicates = len(records) - skipped - len(rows)
@@ -308,7 +333,7 @@ def load_into_database(
         raise LoaderError(
             "Could not connect to PostgreSQL at {where}.\n"
             "  {exc}\n"
-            "Check that the server is running and that module_3/.env holds the "
+            "Check that the server is running and that module_4/.env holds the "
             "right credentials (copy .env.example to start).".format(
                 where=db_config.describe(), exc=exc
             )

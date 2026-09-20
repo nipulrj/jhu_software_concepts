@@ -9,7 +9,7 @@
 <body>
   <header class="masthead">
     <div class="masthead-inner">
-      <a class="brand" href="{{ url_for('index') }}">Grad School Cafe Data Analysis</a>
+      <a class="brand" href="{{ url_for('analysis') }}">Grad School Cafe Data Analysis</a>
       <span class="brand-meta">{{ database }}</span>
     </div>
   </header>
@@ -21,11 +21,11 @@
   <footer class="page-footer">
     <p>
       Nipul Jayasekera &middot; JHU EN.605.256 Modern Software Concepts in Python
-      &middot; Module 3
+      &middot; Module 4
     </p>
     <p class="footer-note">
-      Figures are read live from PostgreSQL through the SQLAlchemy
-      <code>Applicant</code> model each time this page loads.
+      Figures are read from PostgreSQL through the SQLAlchemy
+      <code>Applicant</code> model, and recomputed when Update Analysis is pressed.
     </p>
   </footer>
 

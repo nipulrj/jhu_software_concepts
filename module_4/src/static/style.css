@@ -249,6 +249,20 @@ h1 {
 }
 .answer-line + .answer-line { margin-top: 3px; }
 
+/* Every rendered figure is labelled, so no number on the page is ambiguous
+   about what it is answering. The tests look for this label too. */
+.answer-label {
+  color: var(--ink-faint);
+  font-weight: 600;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.analysis-timestamp {
+  margin: 10px 0 0;
+  text-align: right;
+}
+
 /* Findings that support an answer without being part of it — Question 3 uses
    these to show what its own averages are worth. */
 .supporting {
