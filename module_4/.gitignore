@@ -1,0 +1,27 @@
+# Database credentials. `.env.example` is committed; the real `.env` never is.
+.env
+
+# Working files written by a Pull Data run: large, regenerable, not deliverables.
+data/
+
+# Downloaded GGUF model weights (~670 MB), fetched on first run of the LLM
+# stage from Hugging Face.
+llm_hosting/models/
+
+# Cached raw model answers. Regenerable, and only an optimization: it lets a
+# rerun skip the model for strings already standardized.
+llm_hosting/standardization_cache.json
+
+# Marker file written while a Pull Data scrape is in flight.
+.pull_data.lock
+
+# Test and coverage artifacts. coverage_summary.txt IS committed -- it is the
+# deliverable -- but the machine-readable data behind it is not.
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Sphinx scratch space. docs/_build/html IS committed as the deliverable copy of
+# the generated site; doctrees are an intermediate cache.
+docs/_build/doctrees/

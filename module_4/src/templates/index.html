@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-head">
+  <div>
+    <h1>Analysis</h1>
+    <p class="subtitle">
+      Grad Cafe admissions results, queried live from PostgreSQL.
+      {% if total_rows %}<strong>{{ total_rows }}</strong> entries for Fall 2026.{% endif %}
+    </p>
+  </div>
+
+  <form class="head-actions" method="post" action="{{ url_for('update_analysis') }}">
+    <button type="submit" class="button button-secondary">Update Analysis</button>
+  </form>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if error %}
+  <div class="flash flash-error">{{ error }}</div>
+{% endif %}
+
+<section class="panel pull-panel">
+  <div class="pull-copy">
+    <h2>Pull Data</h2>
+    <p>
+      <strong>Pull Data</strong> checks Grad Cafe for newly submitted application
+      results and adds any new records to the database. Depending on how much new
+      data is available this may take some time, so it runs in the background &mdash;
+      you can keep reading this page while it works, and the results below will
+      refresh once it finishes.
+    </p>
+    <p class="muted">
+      Only new entries are added. Anything already stored is recognized by its
+      Grad Cafe result id and refreshed rather than duplicated, and a second pull
+      cannot start while one is already running.
+    </p>
+  </div>
+
+  <div class="pull-actions">
+    <form method="post" action="{{ url_for('pull_data_route') }}">
+      <button type="submit" class="button button-primary"
+              {% if running %}disabled{% endif %}
+              id="pull-button">
+        {% if running %}Pulling data&hellip;{% else %}Pull Data{% endif %}
+      </button>
+    </form>
+  </div>
+</section>
+
+<div id="pull-status"
+     class="status status-{{ status.get('state', 'idle') }}"
+     data-running="{{ 'true' if running else 'false' }}">
+  <span class="status-dot" aria-hidden="true"></span>
+  <span id="pull-status-message">
+    {{ status.get('message', 'No data pull has been run yet.') }}
+  </span>
+</div>
+
+{% macro render_question(result) %}
+  <article class="question">
+    <h3>
+      <span class="qnum">Question {{ result.number }}</span>
+      {{ result.question }}
+    </h3>
+
+    <div class="answer">
+      {% for line in result.answer_lines %}
+        <p class="answer-line">{{ line }}</p>
+      {% endfor %}
+    </div>
+
+    {% if result.table %}
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              {% for column in result.table.columns %}<th>{{ column }}</th>{% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in result.table.rows %}
+              <tr>
+                {% for cell in row %}
+                  <td {% if not loop.first %}class="numeric"{% endif %}>{{ cell }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+    {% if result.supporting %}
+      <ul class="supporting">
+        {% for entry in result.supporting %}<li>{{ entry }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if result.caveat %}
+      <p class="caveat"><strong>Read this before quoting the number:</strong>
+        {{ result.caveat }}</p>
+    {% endif %}
+  </article>
+{% endmacro %}
+
+{% if groups.required %}
+  <section class="panel">
+    <h2 class="section-heading">Required analysis</h2>
+    {% for result in groups.required %}{{ render_question(result) }}{% endfor %}
+  </section>
+{% endif %}
+
+{% if groups.original %}
+  <section class="panel">
+    <h2 class="section-heading">My own questions</h2>
+    <p class="section-intro">
+      Two questions of my own. The first asks which of the most-applied-to
+      universities is hardest to get into, and whether that shows up in the GPA
+      of the people it accepts. The second asks whether international applicants
+      fare differently from American ones, and whether the two are equally
+      willing to say what their GPA was.
+    </p>
+    {% for result in groups.original %}{{ render_question(result) }}{% endfor %}
+  </section>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // While a pull is running, poll for progress so the user sees the stage change
+  // rather than a frozen button, and reload once it finishes so the figures
+  // above are the new ones. Plain fetch on an interval -- no dependencies.
+  (function () {
+    var box = document.getElementById("pull-status");
+    if (!box || box.dataset.running !== "true") { return; }
+
+    var message = document.getElementById("pull-status-message");
+    var button = document.getElementById("pull-button");
+    if (button) { button.disabled = true; }
+
+    var timer = setInterval(function () {
+      fetch("{{ url_for('status') }}", { cache: "no-store" })
+        .then(function (response) { return response.json(); })
+        .then(function (state) {
+          if (message && state.message) { message.textContent = state.message; }
+          box.className = "status status-" + (state.state || "idle");
+          if (!state.running) {
+            clearInterval(timer);
+            // Reload so the analysis reflects the rows just inserted.
+            window.location.reload();
+          }
+        })
+        .catch(function () { /* transient; the next tick retries */ });
+    }, 3000);
+  })();
+</script>
+{% endblock %}
