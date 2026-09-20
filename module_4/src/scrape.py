@@ -44,7 +44,8 @@ USER_AGENT = (
 DEFAULT_DELAY_SECONDS = 1.0
 DEFAULT_TARGET_ENTRIES = 30_000
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+# As above: generated files go to module_4/data/, never into src/.
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 RAW_DATA_PATH = DATA_DIR / "raw_applicant_data.json"
 CHECKPOINT_PATH = DATA_DIR / "checkpoint.json"
 

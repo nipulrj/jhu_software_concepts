@@ -29,8 +29,11 @@ from typing import Any, Dict, List, Optional
 
 from scrape import RAW_DATA_PATH, load_data, save_data
 
-MODULE_DIR = Path(__file__).resolve().parent
-CLEANED_DATA_PATH = MODULE_DIR / "applicant_data.json"
+# Generated data lives beside the source rather than inside it: src/ holds
+# code, and module_4/data/ is what .gitignore keeps out of version control.
+SRC_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SRC_DIR.parent
+CLEANED_DATA_PATH = PROJECT_ROOT / "data" / "applicant_data.json"
 
 # "Sep 11, 2026" as rendered in the "Added on" column.
 _DATE_ADDED_RE = re.compile(r"^([A-Za-z]{3,9})\s+(\d{1,2}),\s*(\d{4})$")
@@ -128,7 +131,12 @@ def _parse_status(
         return result
 
     match = _STATUS_RE.match(text)
-    if not match:
+    if not match:  # pragma: no cover - unreachable, kept as a guard
+        # _STATUS_RE is `^(.+?)(?: on <month> <day>)?$` and `text` is non-empty
+        # with its whitespace already collapsed to single spaces, so there is no
+        # input that reaches here and fails to match. The branch stays because
+        # loosening either the regex or _strip_markup would make it reachable
+        # again, and falling back to the raw label beats an AttributeError.
         result["status"] = text
         return result
 
@@ -288,7 +296,7 @@ def summarise(rows: List[Dict[str, Any]]) -> str:
         "gpa", "gre_quant", "gre_verbal", "gre_aw",
     ):
         populated = sum(1 for row in rows if row.get(field) is not None)
-        lines.append(f"{field:<20} {populated:>7,} ({populated / total:5.1%})")
+        lines.append(f"{field:<20} {populated:>7,} ({populated / total:7.2%})")
     return "\n".join(lines)
 
 
