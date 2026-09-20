@@ -407,5 +407,9 @@ def main() -> None:
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover - process entry point
+    # Excluded from coverage rather than exercised: running this line means
+    # re-executing the module under a second name, which would define a
+    # second copy of everything in it. The main() it dispatches to is
+    # called directly by the tests, which is where the behaviour lives.
     main()
