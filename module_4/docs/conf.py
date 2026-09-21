@@ -1,4 +1,4 @@
-"""Sphinx configuration for the Grad Cafe analytics documentation.
+r"""Sphinx configuration for the Grad Cafe analytics documentation.
 
 ``src/`` is a source root rather than a package -- the modules import each other
 by bare name, as ``clean.py`` does with ``from scrape import ...`` -- so it goes
@@ -96,7 +96,11 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 
 # -- Intersphinx -------------------------------------------------------------
-intersphinx_mapping = {
+intersphinx_timeout = 10
+
+#: The projects whose documentation this one links into.  Each is used only to
+#: turn a name such as :class:`flask.Flask` into a link.
+INTERSPHINX_CANDIDATES = {
     "python": ("https://docs.python.org/3", None),
     "flask": ("https://flask.palletsprojects.com/en/stable/", None),
     "sqlalchemy": ("https://docs.sqlalchemy.org/en/20/", None),
@@ -104,9 +108,47 @@ intersphinx_mapping = {
     "pytest": ("https://docs.pytest.org/en/stable/", None),
 }
 
-# Read the Docs builds without network access to some inventories; a missing one
-# should warn rather than fail the build.
-intersphinx_timeout = 10
+
+def _reachable_inventories(candidates: dict) -> dict:
+    """Drop any inventory that cannot be fetched right now.
+
+    CI and Read the Docs both build with warnings as errors, and Sphinx emits
+    an *untyped* warning when it cannot reach an inventory -- one that
+    ``suppress_warnings`` cannot target.  So an outage at docs.python.org would
+    fail a build whose own pages are perfectly correct.
+
+    Probing here instead means a build without network access still succeeds,
+    with the only consequence being that a few cross-references render as plain
+    text.  Every warning that says something about *this* project remains an
+    error, which is the point of ``-W``.
+    """
+    import urllib.error
+    import urllib.request
+
+    # A GET rather than a HEAD, and with a browser-ish User-Agent: several of
+    # these hosts answer 403 to a HEAD or to urllib's default agent, which would
+    # make the probe drop an inventory that is perfectly reachable. Only the
+    # first few bytes are read -- enough to know the response is real.
+    headers = {"User-Agent": "sphinx-intersphinx-probe/1.0 (+docs build)"}
+
+    reachable = {}
+    for name, (base_url, inventory) in candidates.items():
+        url = inventory or base_url.rstrip("/") + "/objects.inv"
+        try:
+            request = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(request, timeout=intersphinx_timeout) as response:
+                response.read(64)
+            reachable[name] = (base_url, inventory)
+        except (urllib.error.URLError, OSError, ValueError) as exc:
+            print(
+                "[conf] intersphinx: skipping {0} ({1}: {2})".format(
+                    name, type(exc).__name__, exc
+                )
+            )
+    return reachable
+
+
+intersphinx_mapping = _reachable_inventories(INTERSPHINX_CANDIDATES)
 
 # -- HTML output -------------------------------------------------------------
 html_theme = "sphinx_rtd_theme"
