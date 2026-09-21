@@ -7,9 +7,8 @@ from [The Grad Cafe](https://www.thegradcafe.com/survey/), loads them into
 PostgreSQL, and answers eleven analytical questions about them on one page.
 Module 4 is the same application made testable, tested, and documented.
 
-**Documentation:** built from [`docs/`](docs/) and committed under
-[`docs/_build/html/`](docs/_build/html/index.html); published from
-[`.readthedocs.yaml`](../.readthedocs.yaml) at the repository root.
+**Documentation:** <https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/>
+(also committed under [`docs/_build/html/`](docs/_build/html/index.html))
 
 | | |
 |---|---|
@@ -175,14 +174,14 @@ browser.** The scraper touches the network in exactly one place, and every test
 replaces it. Busy state is a flag a test sets. Every request goes through
 Flask's test client.
 
-The [testing guide](docs/testing.rst) has the fixtures, the test doubles and
-the stable selectors.
+The [testing guide](https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/en/latest/testing.html) has the fixtures, the
+test doubles and the stable selectors.
 
 ---
 
 ## View the documentation
 
-Built from `docs/`:
+Published at <https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/>, and built from `docs/`:
 
 ```bash
 make -C docs html          # Windows: docs\make.bat html
