@@ -12,9 +12,9 @@ Module 4 is the same application made testable, tested, and documented.
 
 | | |
 |---|---|
-| Tests | **487**, every one marked, in under 10 seconds |
+| Tests | **489**, every one marked, in under 10 seconds |
 | Coverage | **100%** of `module_4/src` — see [`coverage_summary.txt`](coverage_summary.txt) |
-| CI | [`.github/workflows/tests.yml`](../.github/workflows/tests.yml) — see [`actions_success.png`](actions_success.png) |
+| CI | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) — see [`actions_success.png`](actions_success.png) |
 | Repository | `git@github.com:nipulrj/jhu_software_concepts.git` |
 
 ---
@@ -226,6 +226,7 @@ module_4/
 │   └── test_{scrape,clean,pull_data,load_data,models,query_data,orm_queries,db_config}.py
 ├── docs/                    Sphinx source, and _build/html
 ├── llm_hosting/             the vendored standardizer (not application code)
+├── .github/workflows/     a copy of the CI workflow GitHub runs
 ├── pytest.ini
 ├── requirements.txt
 ├── coverage_summary.txt
@@ -241,8 +242,13 @@ standardizer, it imports `llama_cpp` and a 670 MB model file, and the pull
 invokes it as a subprocess — so it is a vendored tool rather than code this
 module owns, and it is not part of what the coverage requirement measures.
 
-`.github/workflows/tests.yml` is at the repository root because GitHub reads
-workflows only from there. Everything it runs is in `module_4`.
+The CI workflow exists twice, byte for byte: at the repository root, where
+GitHub reads it from, and at
+[`module_4/.github/workflows/tests.yml`](.github/workflows/tests.yml), so the
+module reads on its own. The copy is inert, and
+[`tests/test_workflow_copy.py`](tests/test_workflow_copy.py) fails if the two
+ever differ — an inert copy is exactly the kind of file that goes stale
+unnoticed.
 
 ---
 

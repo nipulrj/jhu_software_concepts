@@ -1,7 +1,7 @@
 Testing guide
 =============
 
-487 tests, every one marked, 100% statement coverage of ``module_4/src``, under
+489 tests, every one marked, 100% statement coverage of ``module_4/src``, under
 ten seconds.  Nothing in the suite reaches the network, waits on a clock, or
 needs a browser.
 
@@ -72,9 +72,10 @@ The markers
      - ``test_integration_end_to_end.py``,
        ``test_pull_data.py``,
        ``test_scrape.py``,
-       ``test_clean.py``
+       ``test_clean.py``,
+       ``test_workflow_copy.py``
      - The ETL flow: end to end through the web layer, and each stage on its
-       own.
+       own -- plus the CI workflow that runs the whole thing.
 
 Some files carry two markers -- ``test_query_data.py`` is both ``analysis`` and
 ``db``, because its subject is analytical output computed by the database.
@@ -259,3 +260,11 @@ Continuous integration
 request touching ``module_4``, against a PostgreSQL 18 service container, and
 then builds these pages with ``-W`` so a broken cross-reference fails the build.
 ``actions_success.png`` in ``module_4`` is a green run.
+
+The workflow exists twice, byte for byte: at the repository root, which is the
+only place GitHub reads workflows from, and under ``module_4/.github/workflows/``
+so the module reads on its own.  The copy is inert, which is exactly the kind of
+file that goes stale unnoticed, so ``tests/test_workflow_copy.py`` compares the
+two and fails if either is edited without the other.  It also checks that the
+workflow runs the command this page documents -- a green check means little if
+the job quietly ran something else.

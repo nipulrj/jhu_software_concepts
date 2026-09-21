@@ -255,7 +255,7 @@
              
   <section id="testing-guide">
 <h1>Testing guide<a class="headerlink" href="#testing-guide" title="Link to this heading"></a></h1>
-<p>487 tests, every one marked, 100% statement coverage of <code class="docutils literal notranslate"><span class="pre">module_4/src</span></code>, under
+<p>489 tests, every one marked, 100% statement coverage of <code class="docutils literal notranslate"><span class="pre">module_4/src</span></code>, under
 ten seconds.  Nothing in the suite reaches the network, waits on a clock, or
 needs a browser.</p>
 <section id="running-them">
@@ -327,9 +327,10 @@ as dicts, and the configuration that decides which database is used.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">test_integration_end_to_end.py</span></code>,
 <code class="docutils literal notranslate"><span class="pre">test_pull_data.py</span></code>,
 <code class="docutils literal notranslate"><span class="pre">test_scrape.py</span></code>,
-<code class="docutils literal notranslate"><span class="pre">test_clean.py</span></code></p></td>
+<code class="docutils literal notranslate"><span class="pre">test_clean.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_workflow_copy.py</span></code></p></td>
 <td><p>The ETL flow: end to end through the web layer, and each stage on its
-own.</p></td>
+own – plus the CI workflow that runs the whole thing.</p></td>
 </tr>
 </tbody>
 </table>
@@ -534,6 +535,13 @@ either the regex above it or <code class="docutils literal notranslate"><span cl
 request touching <code class="docutils literal notranslate"><span class="pre">module_4</span></code>, against a PostgreSQL 18 service container, and
 then builds these pages with <code class="docutils literal notranslate"><span class="pre">-W</span></code> so a broken cross-reference fails the build.
 <code class="docutils literal notranslate"><span class="pre">actions_success.png</span></code> in <code class="docutils literal notranslate"><span class="pre">module_4</span></code> is a green run.</p>
+<p>The workflow exists twice, byte for byte: at the repository root, which is the
+only place GitHub reads workflows from, and under <code class="docutils literal notranslate"><span class="pre">module_4/.github/workflows/</span></code>
+so the module reads on its own.  The copy is inert, which is exactly the kind of
+file that goes stale unnoticed, so <code class="docutils literal notranslate"><span class="pre">tests/test_workflow_copy.py</span></code> compares the
+two and fails if either is edited without the other.  It also checks that the
+workflow runs the command this page documents – a green check means little if
+the job quietly ran something else.</p>
 </section>
 </section>
 

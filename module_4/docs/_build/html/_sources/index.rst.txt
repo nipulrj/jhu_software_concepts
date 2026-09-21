@@ -56,7 +56,7 @@ Data access                 psycopg 3 for the loader and the raw-SQL analyses,
 Database                    PostgreSQL 18, one ``applicants`` table
 ETL                         ``scrape`` |rarr| ``clean`` |rarr| standardizer
                             |rarr| ``load_data``
-Tests                       487, all marked, 100% statement coverage of
+Tests                       489, all marked, 100% statement coverage of
                             ``src/``, under ten seconds
 CI                          GitHub Actions, PostgreSQL service container
 ==========================  ====================================================
