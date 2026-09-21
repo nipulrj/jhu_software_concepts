@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing guide &mdash; Grad Cafe Analytics</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f46eefca"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Operational notes" href="operations.html" />
+    <link rel="prev" title="db_config – where to connect" href="api/db_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Grad Cafe Analytics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview and setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-you-need">What you need</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#creating-the-databases">Creating the databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#loading-some-data">Loading some data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#running-the-application">Running the application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#the-optional-standardizer">The optional standardizer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#three-layers-and-the-seams-between-them">Three layers, and the seams between them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-web-layer">The web layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-etl-layer">The ETL layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-database-layer">The database layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#where-the-files-are">Where the files are</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/flask_app.html">flask_app – the web layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#routes">Routes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#what-the-tests-replace">What the tests replace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.EXTENSION_KEY"><code class="docutils literal notranslate"><span class="pre">EXTENSION_KEY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.NEVER_UPDATED"><code class="docutils literal notranslate"><span class="pre">NEVER_UPDATED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.default_analysis_provider"><code class="docutils literal notranslate"><span class="pre">default_analysis_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.AnalysisCache"><code class="docutils literal notranslate"><span class="pre">AnalysisCache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.Services"><code class="docutils literal notranslate"><span class="pre">Services</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.get_services"><code class="docutils literal notranslate"><span class="pre">get_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.split_results"><code class="docutils literal notranslate"><span class="pre">split_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.total_rows"><code class="docutils literal notranslate"><span class="pre">total_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/pull_data.html">pull_data – the pull pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#every-stage-is-a-parameter">Every stage is a parameter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#busy-state-is-an-object-not-a-sleep">Busy state is an object, not a sleep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.STAGES"><code class="docutils literal notranslate"><span class="pre">STAGES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.IDLE_STATUS"><code class="docutils literal notranslate"><span class="pre">IDLE_STATUS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.PullInProgress"><code class="docutils literal notranslate"><span class="pre">PullInProgress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.PullState"><code class="docutils literal notranslate"><span class="pre">PullState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.pid_is_alive"><code class="docutils literal notranslate"><span class="pre">pid_is_alive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.FileState"><code class="docutils literal notranslate"><span class="pre">FileState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.MemoryState"><code class="docutils literal notranslate"><span class="pre">MemoryState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_state"><code class="docutils literal notranslate"><span class="pre">default_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Scraper"><code class="docutils literal notranslate"><span class="pre">Scraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Cleaner"><code class="docutils literal notranslate"><span class="pre">Cleaner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Standardizer"><code class="docutils literal notranslate"><span class="pre">Standardizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Loader"><code class="docutils literal notranslate"><span class="pre">Loader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.make_scraper"><code class="docutils literal notranslate"><span class="pre">make_scraper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_cleaner"><code class="docutils literal notranslate"><span class="pre">default_cleaner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.make_standardizer"><code class="docutils literal notranslate"><span class="pre">make_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.passthrough_standardizer"><code class="docutils literal notranslate"><span class="pre">passthrough_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_loader"><code class="docutils literal notranslate"><span class="pre">default_loader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.run_pipeline"><code class="docutils literal notranslate"><span class="pre">run_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.describe_summary"><code class="docutils literal notranslate"><span class="pre">describe_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.spawn_pull"><code class="docutils literal notranslate"><span class="pre">spawn_pull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/scrape.html">scrape – stage 1, the scraper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.ScrapingBlocked"><code class="docutils literal notranslate"><span class="pre">ScrapingBlocked</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.GradCafeScraper"><code class="docutils literal notranslate"><span class="pre">GradCafeScraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.save_data"><code class="docutils literal notranslate"><span class="pre">save_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/clean.html">clean – stage 2, the cleaner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.clean_data"><code class="docutils literal notranslate"><span class="pre">clean_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.summarise"><code class="docutils literal notranslate"><span class="pre">summarise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.row_count"><code class="docutils literal notranslate"><span class="pre">row_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.load_into_database"><code class="docutils literal notranslate"><span class="pre">load_into_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/query_data.html">query_data – the analyses in raw SQL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_count"><code class="docutils literal notranslate"><span class="pre">fmt_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_pct"><code class="docutils literal notranslate"><span class="pre">fmt_pct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_avg"><code class="docutils literal notranslate"><span class="pre">fmt_avg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_signed"><code class="docutils literal notranslate"><span class="pre">fmt_signed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.use_utf8_console"><code class="docutils literal notranslate"><span class="pre">use_utf8_console()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.QuestionResult"><code class="docutils literal notranslate"><span class="pre">QuestionResult</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.ANALYSIS_KEYS"><code class="docutils literal notranslate"><span class="pre">ANALYSIS_KEYS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.APPLICANT_FIELDS"><code class="docutils literal notranslate"><span class="pre">APPLICANT_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fetch_applicants"><code class="docutils literal notranslate"><span class="pre">fetch_applicants()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fetch_applicant"><code class="docutils literal notranslate"><span class="pre">fetch_applicant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.analysis_dict"><code class="docutils literal notranslate"><span class="pre">analysis_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.parse_selection"><code class="docutils literal notranslate"><span class="pre">parse_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.print_results"><code class="docutils literal notranslate"><span class="pre">print_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/orm_queries.html">orm_queries – the analyses through the ORM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/models.html">models – the ORM mapping and the Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.REQUIRED_FIELDS"><code class="docutils literal notranslate"><span class="pre">REQUIRED_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.Applicant"><code class="docutils literal notranslate"><span class="pre">Applicant</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_engine"><code class="docutils literal notranslate"><span class="pre">get_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.reset_engine"><code class="docutils literal notranslate"><span class="pre">reset_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_sessionmaker"><code class="docutils literal notranslate"><span class="pre">get_sessionmaker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_session"><code class="docutils literal notranslate"><span class="pre">get_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.session_scope"><code class="docutils literal notranslate"><span class="pre">session_scope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/db_config.html">db_config – where to connect</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.URL_SCHEMES"><code class="docutils literal notranslate"><span class="pre">URL_SCHEMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.load_dotenv"><code class="docutils literal notranslate"><span class="pre">load_dotenv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.parse_url"><code class="docutils literal notranslate"><span class="pre">parse_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.connect_kwargs"><code class="docutils literal notranslate"><span class="pre">connect_kwargs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.describe"><code class="docutils literal notranslate"><span class="pre">describe()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Testing guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-them">Running them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-markers">The markers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stable-selectors">Stable selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fixtures">Fixtures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-doubles">Test doubles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#no-sleeps-and-no-network">No sleeps, and no network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coverage">Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-integration">Continuous integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">Operational notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#busy-state-policy">Busy-state policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#uniqueness-and-idempotency">Uniqueness and idempotency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#scraping-policy">Scraping policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#data-notes">Data notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#setting-up">Setting up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#in-ci">In CI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#running-the-application">Running the application</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Grad Cafe Analytics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Testing guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/testing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="testing-guide">
+<h1>Testing guide<a class="headerlink" href="#testing-guide" title="Link to this heading"></a></h1>
+<p>487 tests, every one marked, 100% statement coverage of <code class="docutils literal notranslate"><span class="pre">module_4/src</span></code>, under
+ten seconds.  Nothing in the suite reaches the network, waits on a clock, or
+needs a browser.</p>
+<section id="running-them">
+<h2>Running them<a class="headerlink" href="#running-them" title="Link to this heading"></a></h2>
+<p>From the <strong>repository root</strong>, because <code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code>’s <code class="docutils literal notranslate"><span class="pre">--cov</span></code> path is written
+relative to it:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m pytest module_4</span>
+</pre></div>
+</div>
+<p>Selecting all five markers runs the same set, because no test is unmarked:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m pytest module_4 -m &quot;web or buttons or analysis or db or integration&quot;</span>
+</pre></div>
+</div>
+<p>Useful subsets:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python -m pytest module_4 -m &quot;web or buttons&quot;          # no database needed</span>
+<span class="go">python -m pytest module_4 -m &quot;not db&quot; --no-cov          # fastest loop</span>
+<span class="go">python -m pytest module_4/tests/test_buttons.py -q      # one file</span>
+<span class="go">python -m pytest module_4 -k busy -v                    # by name</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--no-cov</span></code> is worth adding while iterating: <code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code> sets
+<code class="docutils literal notranslate"><span class="pre">--cov-fail-under=100</span></code>, so a partial run will otherwise “fail” for having
+covered only the part you ran.</p>
+</section>
+<section id="the-markers">
+<h2>The markers<a class="headerlink" href="#the-markers" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16.0%" />
+<col style="width: 22.0%" />
+<col style="width: 62.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Marker</p></th>
+<th class="head"><p>Files</p></th>
+<th class="head"><p>What it covers</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">web</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_flask_page.py</span></code></p></td>
+<td><p>The application factory and the rendered page: every required route,
+the status code, the heading, both buttons, the <code class="docutils literal notranslate"><span class="pre">Answer:</span></code> labels, and
+the page still rendering when the database is unreachable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">buttons</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_buttons.py</span></code></p></td>
+<td><p>Both <code class="docutils literal notranslate"><span class="pre">POST</span></code> endpoints, their JSON, the busy gating on each, and the
+error paths.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">analysis</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_analysis_format.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_query_data.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_orm_queries.py</span></code></p></td>
+<td><p>Labelling and rounding: every answer line labelled, every percentage to
+exactly two decimals, on the page and on the console.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">db</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_db_insert.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_db_config.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_models.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_load_data.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_query_data.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_orm_queries.py</span></code></p></td>
+<td><p>The schema, what a pull writes, the uniqueness policy, reading rows back
+as dicts, and the configuration that decides which database is used.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">integration</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">test_integration_end_to_end.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_pull_data.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_scrape.py</span></code>,
+<code class="docutils literal notranslate"><span class="pre">test_clean.py</span></code></p></td>
+<td><p>The ETL flow: end to end through the web layer, and each stage on its
+own.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Some files carry two markers – <code class="docutils literal notranslate"><span class="pre">test_query_data.py</span></code> is both <code class="docutils literal notranslate"><span class="pre">analysis</span></code> and
+<code class="docutils literal notranslate"><span class="pre">db</span></code>, because its subject is analytical output computed by the database.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The five markers are fixed by the assignment, and the ETL stages
+(<code class="docutils literal notranslate"><span class="pre">scrape</span></code>, <code class="docutils literal notranslate"><span class="pre">clean</span></code>, <code class="docutils literal notranslate"><span class="pre">pull_data</span></code>) do not map neatly onto any of them.
+They are marked <code class="docutils literal notranslate"><span class="pre">integration</span></code>: the pipeline they form is the flow the
+Pull Data button integrates, and they are tested a stage at a time.</p>
+</div>
+</section>
+<section id="stable-selectors">
+<h2>Stable selectors<a class="headerlink" href="#stable-selectors" title="Link to this heading"></a></h2>
+<p>The UI tests never match on text or CSS class.  Everything they assert against
+carries a <code class="docutils literal notranslate"><span class="pre">data-testid</span></code>, so the page can be restyled without breaking them.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34.0%" />
+<col style="width: 66.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Selector</p></th>
+<th class="head"><p>What it marks</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;pull-data-btn&quot;]</span></code></p></td>
+<td><p>The Pull Data button. <code class="docutils literal notranslate"><span class="pre">disabled</span></code> while a pull is in flight.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;update-analysis-btn&quot;]</span></code></p></td>
+<td><p>The Update Analysis button. Same.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;pull-status&quot;]</span></code></p></td>
+<td><p>The status line. Its <code class="docutils literal notranslate"><span class="pre">data-running</span></code> attribute is <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;analysis-updated-at&quot;]</span></code></p></td>
+<td><p>When the rendered snapshot was computed. Changes when, and only when,
+Update Analysis succeeds.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;question-N&quot;]</span></code></p></td>
+<td><p>One question’s whole block: heading, answer, table, caveat.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;answer-N&quot;]</span></code></p></td>
+<td><p>Just that question’s answers. Each line begins <code class="docutils literal notranslate"><span class="pre">Answer:</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;required-analysis&quot;]</span></code></p></td>
+<td><p>The section holding the assignment’s questions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;original-analysis&quot;]</span></code></p></td>
+<td><p>The section holding my own two.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[data-testid=&quot;analysis-error&quot;]</span></code></p></td>
+<td><p>The banner shown when the database could not be read.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="fixtures">
+<h2>Fixtures<a class="headerlink" href="#fixtures" title="Link to this heading"></a></h2>
+<p>All in <code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code>.</p>
+<p><strong>Application</strong> – no database, no network, no clock.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">app</span></code> / <code class="docutils literal notranslate"><span class="pre">client</span></code> / <code class="docutils literal notranslate"><span class="pre">services</span></code></dt><dd><p>An application built through <a class="reference internal" href="api/flask_app.html#flask_app.create_app" title="flask_app.create_app"><code class="xref py py-func docutils literal notranslate"><span class="pre">flask_app.create_app()</span></code></a> with an in-memory
+busy flag, a recording pull runner and a canned analysis provider.
+<code class="docutils literal notranslate"><span class="pre">services</span></code> is the <a class="reference internal" href="api/flask_app.html#flask_app.Services" title="flask_app.Services"><code class="xref py py-class docutils literal notranslate"><span class="pre">flask_app.Services</span></code></a> it was built with, so a test
+can read the state the routes act on rather than infer it from HTML.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">make_app</span></code></dt><dd><p>A callable returning a new application, for a test that needs to override
+one collaborator without restating the others:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="o">=</span> <span class="n">make_app</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">pull_data</span><span class="o">.</span><span class="n">MemoryState</span><span class="p">(</span><span class="n">busy</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">test_client</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">state</span></code></dt><dd><p>The <a class="reference internal" href="api/pull_data.html#pull_data.MemoryState" title="pull_data.MemoryState"><code class="xref py py-class docutils literal notranslate"><span class="pre">pull_data.MemoryState</span></code></a> behind <code class="docutils literal notranslate"><span class="pre">app</span></code>. Call <code class="docutils literal notranslate"><span class="pre">state.begin()</span></code> to
+make the application busy; that is the whole of it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">analysis_provider</span></code></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.CountingProvider</span></code> serving <code class="docutils literal notranslate"><span class="pre">conftest.CANNED_RESULTS</span></code> and
+counting its calls – which is how a refused update is proved to have
+recomputed nothing.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pull_runner</span></code></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.FakePullRunner</span></code> that records that it was called.</p>
+</dd>
+</dl>
+<p><strong>Database</strong> – these need a running PostgreSQL.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">test_database_url</span></code></dt><dd><p>Reads <code class="docutils literal notranslate"><span class="pre">TEST_DATABASE_URL</span></code>. Fails with an explanation if it is unset, and
+<strong>refuses to run if it names the same database as</strong> <code class="docutils literal notranslate"><span class="pre">DATABASE_URL</span></code>: these
+tests truncate and drop tables, and that guard is what stops a mistyped
+variable from doing it to real rows.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">database</span></code></dt><dd><p>Points the whole application at that database for one test, and drops the
+ORM’s cached Engines on the way in and out.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">db_connection</span></code></dt><dd><p>An open autocommitting connection to it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">empty_database</span></code></dt><dd><p>The schema in place, no rows. Built with
+<a class="reference internal" href="api/load_data.html#load_data.create_table" title="load_data.create_table"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_data.create_table()</span></code></a>, so what the tests assert against is the
+schema the application ships.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">seeded_database</span></code></dt><dd><p>The twelve sample records loaded.</p>
+</dd>
+</dl>
+<p><strong>Data</strong></p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sample_raw_rows</span></code></dt><dd><p>Twelve raw scraped rows, in the shape <a class="reference internal" href="api/scrape.html#module-scrape" title="scrape"><code class="xref py py-mod docutils literal notranslate"><span class="pre">scrape</span></code></a> produces.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">overlapping_raw_rows</span></code></dt><dd><p>A second batch repeating two of them – one with an edited decision – and
+adding two new ones.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">sample_records</span></code></dt><dd><p>The sample rows put through the <em>real</em> cleaner and a fake standardizer, so
+what the database tests insert is what the application would have inserted.</p>
+</dd>
+</dl>
+</section>
+<section id="test-doubles">
+<h2>Test doubles<a class="headerlink" href="#test-doubles" title="Link to this heading"></a></h2>
+<p>All in <code class="docutils literal notranslate"><span class="pre">tests/doubles.py</span></code>.  Each stands in for one injected collaborator.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.0%" />
+<col style="width: 72.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Double</p></th>
+<th class="head"><p>Stands in for</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.FakeScraper</span></code></p></td>
+<td><p>The scraper. Serves batches from a list, repeating the last once
+exhausted – which is the realistic case, since consecutive real pulls
+overlap heavily. Counts its calls.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-func docutils literal notranslate"><span class="pre">doubles.fake_standardizer()</span></code></p></td>
+<td><p>The local LLM. Fills the two <code class="docutils literal notranslate"><span class="pre">llm-generated-*</span></code> columns by splitting
+the combined program field, and returns a <strong>new</strong> list, because
+<a class="reference internal" href="api/pull_data.html#pull_data.run_pipeline" title="pull_data.run_pipeline"><code class="xref py py-func docutils literal notranslate"><span class="pre">pull_data.run_pipeline()</span></code></a> reads identity to tell a standardizer
+that ran from one that declined.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.RecordingLoader</span></code></p></td>
+<td><p>The loader. Records what it was handed and writes nothing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.FailingLoader</span></code></p></td>
+<td><p>The loader, raising <code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.LoaderFailure</span></code>. The error-path
+double.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.FakePullRunner</span></code></p></td>
+<td><p>What a click on Pull Data does. Runs the pipeline synchronously, so by
+the time the route has answered the rows are in the database and the
+test can look.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">doubles.CountingProvider</span></code></p></td>
+<td><p>The analysis provider. Returns canned answers and counts its calls.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Two regular expressions live there too.  The formatting tests pull every
+percentage-looking token out of the rendered page with the loose
+<code class="xref py py-data docutils literal notranslate"><span class="pre">doubles.PERCENT_PATTERN</span></code>, then require each to match the strict
+<code class="xref py py-data docutils literal notranslate"><span class="pre">doubles.TWO_DECIMAL_PERCENT</span></code>.  Matching loosely first is what makes the
+test able to fail – a pattern that only matched two-decimal percentages would
+pass happily on a page full of one-decimal ones – and a negative test feeds the
+page <code class="docutils literal notranslate"><span class="pre">39.3%</span></code> to prove it.</p>
+</section>
+<section id="no-sleeps-and-no-network">
+<h2>No sleeps, and no network<a class="headerlink" href="#no-sleeps-and-no-network" title="Link to this heading"></a></h2>
+<p><strong>Busy state is a flag, not a race.</strong>  “A pull is in progress” is
+<code class="docutils literal notranslate"><span class="pre">state.begin()</span></code>, and a test asserts against state it set rather than a scrape
+it hopes is still running.  No test in the suite calls <code class="docutils literal notranslate"><span class="pre">sleep</span></code>.</p>
+<p><strong>Nothing reaches the internet.</strong>  The scraper touches the network in exactly
+one place – <code class="xref py py-meth docutils literal notranslate"><span class="pre">scrape.GradCafeScraper._read_url()</span></code> – and every test replaces
+either that method or the <code class="docutils literal notranslate"><span class="pre">urlopen</span></code> inside it.  The delays the scraper takes
+between requests are patched out, which is the opposite of a test that sleeps:
+nothing waits for anything.</p>
+<p><strong>“Performs no update” is measured, not assumed.</strong>  A refused
+<code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/update-analysis</span></code> is proved by the provider’s call count not moving, not
+by the page looking unchanged.</p>
+</section>
+<section id="coverage">
+<h2>Coverage<a class="headerlink" href="#coverage" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code> sets <code class="docutils literal notranslate"><span class="pre">--cov=module_4/src</span> <span class="pre">--cov-report=term-missing</span>
+<span class="pre">--cov-fail-under=100</span></code>, so coverage is a test result rather than a number
+nobody reads.  <code class="docutils literal notranslate"><span class="pre">coverage_summary.txt</span></code> holds the committed output.</p>
+<p>Two things are marked <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">pragma:</span> <span class="pre">no</span> <span class="pre">cover</span></code>, both with a comment at the site
+saying why:</p>
+<ul class="simple">
+<li><p>Every <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> guard.  Executing one means re-importing
+its module under a second name, which defines a second copy of everything in
+it – SQLAlchemy rejects the duplicate mapping outright, and for <code class="docutils literal notranslate"><span class="pre">scrape.py</span></code>
+it would start a real scrape.  Each <code class="docutils literal notranslate"><span class="pre">main()</span></code> they dispatch to is called
+directly by the tests, which is where the behaviour is.</p></li>
+<li><p>One unreachable guard in <code class="xref py py-func docutils literal notranslate"><span class="pre">clean._parse_status()</span></code>, kept because loosening
+either the regex above it or <code class="docutils literal notranslate"><span class="pre">_strip_markup</span></code> would make it reachable again.</p></li>
+</ul>
+</section>
+<section id="continuous-integration">
+<h2>Continuous integration<a class="headerlink" href="#continuous-integration" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">.github/workflows/tests.yml</span></code> runs the same command on every push and pull
+request touching <code class="docutils literal notranslate"><span class="pre">module_4</span></code>, against a PostgreSQL 18 service container, and
+then builds these pages with <code class="docutils literal notranslate"><span class="pre">-W</span></code> so a broken cross-reference fails the build.
+<code class="docutils literal notranslate"><span class="pre">actions_success.png</span></code> in <code class="docutils literal notranslate"><span class="pre">module_4</span></code> is a green run.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/db_config.html" class="btn btn-neutral float-left" title="db_config – where to connect" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="operations.html" class="btn btn-neutral float-right" title="Operational notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Nipul Jayasekera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

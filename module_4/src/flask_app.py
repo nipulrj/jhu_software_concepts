@@ -14,13 +14,15 @@ Every number on the page is read through the SQLAlchemy ``Applicant`` model in
 
 Routes
 ------
-========================  ======================================================
-``GET  /``                redirect to ``/analysis``
-``GET  /analysis``        the page
-``POST /pull-data``       start a pull; ``200 {"ok": true}``, ``409`` if busy
+=========================  =====================================================
+Route                      What it answers
+=========================  =====================================================
+``GET  /``                 redirect to ``/analysis``
+``GET  /analysis``         the page
+``POST /pull-data``        start a pull; ``200 {"ok": true}``, ``409`` if busy
 ``POST /update-analysis``  recompute; ``200 {"ok": true}``, ``409`` if busy
-``GET  /status``          the pull's progress, polled by the page
-========================  ======================================================
+``GET  /status``           the pull's progress, polled by the page
+=========================  =====================================================
 
 The two ``POST`` routes answer with JSON rather than a redirect, so the buttons
 are ordinary ``fetch`` calls and the same endpoints are directly assertable from

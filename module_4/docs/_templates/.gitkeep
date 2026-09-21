@@ -1,0 +1,3 @@
+# Keeps this directory in git. conf.py names it in html_static_path /
+# templates_path, and Sphinx warns if it is missing -- which fails the
+# CI build, where warnings are errors.

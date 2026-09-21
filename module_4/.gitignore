@@ -22,6 +22,9 @@ llm_hosting/standardization_cache.json
 .coverage.*
 htmlcov/
 
-# Sphinx scratch space. docs/_build/html IS committed as the deliverable copy of
-# the generated site; doctrees are an intermediate cache.
+# Sphinx scratch space. docs/_build/html IS committed -- the generated site is
+# one of the deliverables -- but the doctree cache behind it is not. Build with
+# `make -C docs html`, or `python -m sphinx -b html -d docs/_build/doctrees
+# docs docs/_build/html`, so the cache lands outside the published tree.
 docs/_build/doctrees/
+docs/_build/html/.doctrees/

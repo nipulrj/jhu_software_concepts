@@ -1,0 +1,733 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>flask_app &mdash; Grad Cafe Analytics</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f46eefca"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Grad Cafe Analytics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview and setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#what-you-need">What you need</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#creating-the-databases">Creating the databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#loading-some-data">Loading some data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#running-the-application">Running the application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#the-optional-standardizer">The optional standardizer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#three-layers-and-the-seams-between-them">Three layers, and the seams between them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#the-web-layer">The web layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#the-etl-layer">The ETL layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#the-database-layer">The database layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture.html#where-the-files-are">Where the files are</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/flask_app.html">flask_app – the web layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#routes">Routes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#what-the-tests-replace">What the tests replace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.EXTENSION_KEY"><code class="docutils literal notranslate"><span class="pre">EXTENSION_KEY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.NEVER_UPDATED"><code class="docutils literal notranslate"><span class="pre">NEVER_UPDATED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.default_analysis_provider"><code class="docutils literal notranslate"><span class="pre">default_analysis_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.AnalysisCache"><code class="docutils literal notranslate"><span class="pre">AnalysisCache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.Services"><code class="docutils literal notranslate"><span class="pre">Services</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.get_services"><code class="docutils literal notranslate"><span class="pre">get_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.split_results"><code class="docutils literal notranslate"><span class="pre">split_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.total_rows"><code class="docutils literal notranslate"><span class="pre">total_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/flask_app.html#flask_app.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/pull_data.html">pull_data – the pull pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#every-stage-is-a-parameter">Every stage is a parameter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#busy-state-is-an-object-not-a-sleep">Busy state is an object, not a sleep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.STAGES"><code class="docutils literal notranslate"><span class="pre">STAGES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.IDLE_STATUS"><code class="docutils literal notranslate"><span class="pre">IDLE_STATUS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.PullInProgress"><code class="docutils literal notranslate"><span class="pre">PullInProgress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.PullState"><code class="docutils literal notranslate"><span class="pre">PullState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.pid_is_alive"><code class="docutils literal notranslate"><span class="pre">pid_is_alive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.FileState"><code class="docutils literal notranslate"><span class="pre">FileState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.MemoryState"><code class="docutils literal notranslate"><span class="pre">MemoryState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.default_state"><code class="docutils literal notranslate"><span class="pre">default_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.Scraper"><code class="docutils literal notranslate"><span class="pre">Scraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.Cleaner"><code class="docutils literal notranslate"><span class="pre">Cleaner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.Standardizer"><code class="docutils literal notranslate"><span class="pre">Standardizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.Loader"><code class="docutils literal notranslate"><span class="pre">Loader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.make_scraper"><code class="docutils literal notranslate"><span class="pre">make_scraper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.default_cleaner"><code class="docutils literal notranslate"><span class="pre">default_cleaner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.make_standardizer"><code class="docutils literal notranslate"><span class="pre">make_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.passthrough_standardizer"><code class="docutils literal notranslate"><span class="pre">passthrough_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.default_loader"><code class="docutils literal notranslate"><span class="pre">default_loader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.run_pipeline"><code class="docutils literal notranslate"><span class="pre">run_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.describe_summary"><code class="docutils literal notranslate"><span class="pre">describe_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.spawn_pull"><code class="docutils literal notranslate"><span class="pre">spawn_pull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/pull_data.html#pull_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/scrape.html">scrape – stage 1, the scraper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/scrape.html#scrape.ScrapingBlocked"><code class="docutils literal notranslate"><span class="pre">ScrapingBlocked</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/scrape.html#scrape.GradCafeScraper"><code class="docutils literal notranslate"><span class="pre">GradCafeScraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/scrape.html#scrape.save_data"><code class="docutils literal notranslate"><span class="pre">save_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/scrape.html#scrape.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/scrape.html#scrape.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/clean.html">clean – stage 2, the cleaner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/clean.html#clean.clean_data"><code class="docutils literal notranslate"><span class="pre">clean_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/clean.html#clean.summarise"><code class="docutils literal notranslate"><span class="pre">summarise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/clean.html#clean.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.row_count"><code class="docutils literal notranslate"><span class="pre">row_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.load_into_database"><code class="docutils literal notranslate"><span class="pre">load_into_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/query_data.html">query_data – the analyses in raw SQL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fmt_count"><code class="docutils literal notranslate"><span class="pre">fmt_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fmt_pct"><code class="docutils literal notranslate"><span class="pre">fmt_pct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fmt_avg"><code class="docutils literal notranslate"><span class="pre">fmt_avg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fmt_signed"><code class="docutils literal notranslate"><span class="pre">fmt_signed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.use_utf8_console"><code class="docutils literal notranslate"><span class="pre">use_utf8_console()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.QuestionResult"><code class="docutils literal notranslate"><span class="pre">QuestionResult</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.ANALYSIS_KEYS"><code class="docutils literal notranslate"><span class="pre">ANALYSIS_KEYS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.APPLICANT_FIELDS"><code class="docutils literal notranslate"><span class="pre">APPLICANT_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fetch_applicants"><code class="docutils literal notranslate"><span class="pre">fetch_applicants()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.fetch_applicant"><code class="docutils literal notranslate"><span class="pre">fetch_applicant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.analysis_dict"><code class="docutils literal notranslate"><span class="pre">analysis_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.parse_selection"><code class="docutils literal notranslate"><span class="pre">parse_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.print_results"><code class="docutils literal notranslate"><span class="pre">print_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/query_data.html#query_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/orm_queries.html">orm_queries – the analyses through the ORM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/orm_queries.html#orm_queries.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models.html">models – the ORM mapping and the Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.REQUIRED_FIELDS"><code class="docutils literal notranslate"><span class="pre">REQUIRED_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.Applicant"><code class="docutils literal notranslate"><span class="pre">Applicant</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.get_engine"><code class="docutils literal notranslate"><span class="pre">get_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.reset_engine"><code class="docutils literal notranslate"><span class="pre">reset_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.get_sessionmaker"><code class="docutils literal notranslate"><span class="pre">get_sessionmaker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.get_session"><code class="docutils literal notranslate"><span class="pre">get_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.session_scope"><code class="docutils literal notranslate"><span class="pre">session_scope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/models.html#models.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/db_config.html">db_config – where to connect</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.URL_SCHEMES"><code class="docutils literal notranslate"><span class="pre">URL_SCHEMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.load_dotenv"><code class="docutils literal notranslate"><span class="pre">load_dotenv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.parse_url"><code class="docutils literal notranslate"><span class="pre">parse_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.connect_kwargs"><code class="docutils literal notranslate"><span class="pre">connect_kwargs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/db_config.html#db_config.describe"><code class="docutils literal notranslate"><span class="pre">describe()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../testing.html">Testing guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#running-them">Running them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#the-markers">The markers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#stable-selectors">Stable selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#fixtures">Fixtures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#test-doubles">Test doubles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#no-sleeps-and-no-network">No sleeps, and no network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#coverage">Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../testing.html#continuous-integration">Continuous integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../operations.html">Operational notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../operations.html#busy-state-policy">Busy-state policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../operations.html#uniqueness-and-idempotency">Uniqueness and idempotency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../operations.html#scraping-policy">Scraping policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../operations.html#data-notes">Data notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html#setting-up">Setting up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html#in-ci">In CI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../troubleshooting.html#running-the-application">Running the application</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Grad Cafe Analytics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">flask_app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for flask_app</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Flask front end for the Grad Cafe analysis.</span>
+
+<span class="sd">One page with two buttons, and an application factory so that a test can build</span>
+<span class="sd">its own copy of it:</span>
+
+<span class="sd">* **Pull Data** checks Grad Cafe for newly submitted results and adds them to</span>
+<span class="sd">  PostgreSQL.  It refuses to start a second pull while the first is still going.</span>
+<span class="sd">* **Update Analysis** recomputes the figures from whatever PostgreSQL holds right</span>
+<span class="sd">  now.  It never starts a scrape, and while a pull is in flight it refuses --</span>
+<span class="sd">  reporting that rather than publishing half-loaded figures as final.</span>
+
+<span class="sd">Every number on the page is read through the SQLAlchemy ``Applicant`` model in</span>
+<span class="sd">:mod:`orm_queries`, not through a psycopg cursor.</span>
+
+<span class="sd">Routes</span>
+<span class="sd">------</span>
+<span class="sd">=========================  =====================================================</span>
+<span class="sd">Route                      What it answers</span>
+<span class="sd">=========================  =====================================================</span>
+<span class="sd">``GET  /``                 redirect to ``/analysis``</span>
+<span class="sd">``GET  /analysis``         the page</span>
+<span class="sd">``POST /pull-data``        start a pull; ``200 {&quot;ok&quot;: true}``, ``409`` if busy</span>
+<span class="sd">``POST /update-analysis``  recompute; ``200 {&quot;ok&quot;: true}``, ``409`` if busy</span>
+<span class="sd">``GET  /status``           the pull&#39;s progress, polled by the page</span>
+<span class="sd">=========================  =====================================================</span>
+
+<span class="sd">The two ``POST`` routes answer with JSON rather than a redirect, so the buttons</span>
+<span class="sd">are ordinary ``fetch`` calls and the same endpoints are directly assertable from</span>
+<span class="sd">Flask&#39;s test client.</span>
+
+<span class="sd">What the tests replace</span>
+<span class="sd">----------------------</span>
+<span class="sd">:func:`create_app` takes three collaborators, each defaulting to the real thing:</span>
+
+<span class="sd">``state``</span>
+<span class="sd">    the busy flag and progress -- a :class:`pull_data.MemoryState` in tests, so</span>
+<span class="sd">    &quot;a pull is in progress&quot; is a flag that is set, never a scrape waited on.</span>
+<span class="sd">``pull_runner``</span>
+<span class="sd">    what a click on Pull Data actually does. In production it spawns a detached</span>
+<span class="sd">    child process; in tests it runs the pipeline synchronously with a fake</span>
+<span class="sd">    scraper, which is how a test can assert the rows landed in the database.</span>
+<span class="sd">``analysis_provider``</span>
+<span class="sd">    what answers the questions. Injecting it lets the page-rendering tests run</span>
+<span class="sd">    with no database at all.</span>
+
+<span class="sd">    python flask_app.py            # http://127.0.0.1:5000</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">url_for</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.exc</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLAlchemyError</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">db_config</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">models</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">orm_queries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pull_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">query_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuestionResult</span>
+
+<span class="c1">#: Where :meth:`Flask.extensions` keeps this application&#39;s collaborators.</span>
+<span class="n">EXTENSION_KEY</span> <span class="o">=</span> <span class="s2">&quot;gradcafe&quot;</span>
+
+<span class="c1">#: What the page says before anything has been computed.</span>
+<span class="n">NEVER_UPDATED</span> <span class="o">=</span> <span class="s2">&quot;not yet computed&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_now</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The current UTC time, to the second, as an ISO 8601 string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">timespec</span><span class="o">=</span><span class="s2">&quot;seconds&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># ----------------------------------------------------------------------</span>
+<span class="c1"># The analysis the page renders</span>
+<span class="c1"># ----------------------------------------------------------------------</span>
+<div class="viewcode-block" id="default_analysis_provider">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.default_analysis_provider">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_analysis_provider</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Answer every question through the ORM.</span>
+
+<span class="sd">    The default collaborator behind :class:`AnalysisCache`.  Separated out so a</span>
+<span class="sd">    test can pass its own and render the page without a database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">orm_queries</span><span class="o">.</span><span class="n">answer_all</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisCache">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.AnalysisCache">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The answers the page shows, recomputed only when asked.</span>
+
+<span class="sd">    This is what gives **Update Analysis** something to do.  ``GET /analysis``</span>
+<span class="sd">    renders the held snapshot -- computing one on first use -- and only</span>
+<span class="sd">    ``POST /update-analysis`` replaces it.  Eleven analytical queries over fifty</span>
+<span class="sd">    thousand rows is real work, so not repeating it on every page load is worth</span>
+<span class="sd">    having anyway; but the reason it is a cache and not a live read is that</span>
+<span class="sd">    &quot;pull, then update, then look&quot; is the workflow the two buttons describe, and</span>
+<span class="sd">    a page that silently recomputed itself would make the second button a no-op.</span>
+
+<span class="sd">    :param provider: a callable returning answered questions. Anything it raises</span>
+<span class="sd">        that is a :class:`sqlalchemy.exc.SQLAlchemyError` becomes the snapshot&#39;s</span>
+<span class="sd">        ``error`` instead of a stack trace in the browser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#: The callable that answers the questions.  Public, so a test can</span>
+        <span class="c1">#: confirm which one an application was built with.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">provider</span> <span class="o">=</span> <span class="n">provider</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: How many times the provider has actually been called. The busy-state</span>
+        <span class="c1">#: tests assert on this: a refused update must not move it.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="AnalysisCache.is_empty">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.AnalysisCache.is_empty">[docs]</a>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Has anything been computed yet?&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot</span> <span class="ow">is</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AnalysisCache.snapshot">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.AnalysisCache.snapshot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The held answers, computing them if there are none yet.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot</span></div>
+
+
+<div class="viewcode-block" id="AnalysisCache.refresh">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.AnalysisCache.refresh">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recompute the answers and hold the result.</span>
+
+<span class="sd">        :returns: ``{&quot;results&quot;: [...], &quot;error&quot;: None | str, &quot;updated_at&quot;: str}``</span>
+<span class="sd">            -- an error message rather than an exception, so a database that is</span>
+<span class="sd">            down produces a page explaining what to do.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provider</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">SQLAlchemyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">snapshot</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Could not read the database at </span><span class="si">{where}</span><span class="s2">. Check that &quot;</span>
+                    <span class="s2">&quot;PostgreSQL is running and that load_data.py has been run. &quot;</span>
+                    <span class="s2">&quot;(</span><span class="si">{exc}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">where</span><span class="o">=</span><span class="n">db_config</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span> <span class="n">exc</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="n">_now</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="n">_now</span><span class="p">()}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_snapshot</span> <span class="o">=</span> <span class="n">snapshot</span>
+        <span class="k">return</span> <span class="n">snapshot</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Services">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.Services">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Services</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The collaborators one application instance was built with.</span>
+
+<span class="sd">    Reachable as ``app.extensions[&quot;gradcafe&quot;]`` -- see :func:`get_services` --</span>
+<span class="sd">    so a test can read the busy flag and the refresh count that the routes act</span>
+<span class="sd">    on, rather than inferring them from the rendered page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">pull_data</span><span class="o">.</span><span class="n">PullState</span>
+    <span class="n">pull_runner</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisCache</span>
+    <span class="c1">#: Summaries of the pulls this instance has run, newest last.</span>
+    <span class="n">pulls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_services">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.get_services">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_services</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Services</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The :class:`Services` an application was built with.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">extensions</span><span class="p">[</span><span class="n">EXTENSION_KEY</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="split_results">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.split_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_results</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Separate the assignment&#39;s questions from the two of my own.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">result</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">original</span><span class="p">],</span>
+        <span class="s2">&quot;original&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">result</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">original</span><span class="p">],</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="total_rows">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.total_rows">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">total_rows</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Fall 2026 count, shown in the page header for a sense of scale.</span>
+
+<span class="sd">    Read out of Question 1&#39;s own answer rather than queried again, so the header</span>
+<span class="sd">    and the answer below it can never disagree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">answer_lines</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">answer_lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<span class="c1"># ----------------------------------------------------------------------</span>
+<span class="c1"># The application factory</span>
+<span class="c1"># ----------------------------------------------------------------------</span>
+<div class="viewcode-block" id="create_app">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.create_app">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_app</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pull_data</span><span class="o">.</span><span class="n">PullState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pull_runner</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">analysis_provider</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">List</span><span class="p">[</span><span class="n">QuestionResult</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flask</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a configured application.</span>
+
+<span class="sd">    :param config: values to put into ``app.config``. ``DATABASE_URL`` is</span>
+<span class="sd">        special-cased: it is also exported to the environment and the ORM&#39;s</span>
+<span class="sd">        Engine cache is cleared, so passing it here redirects every connection</span>
+<span class="sd">        the application makes -- psycopg and SQLAlchemy alike. That is the one</span>
+<span class="sd">        knob a test needs to point the whole app at a scratch database.</span>
+<span class="sd">    :param state: the busy flag and progress store. Defaults to the file-backed</span>
+<span class="sd">        one, which is what lets the flag survive the detached pull process.</span>
+<span class="sd">    :param pull_runner: what Pull Data does, called with no arguments. Defaults</span>
+<span class="sd">        to spawning that detached process.</span>
+<span class="sd">    :param analysis_provider: what answers the questions. Defaults to the ORM.</span>
+<span class="sd">    :returns: the application, with its collaborators on</span>
+<span class="sd">        ``app.extensions[&quot;gradcafe&quot;]``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="c1"># Flask needs a signing key for its session cookie. Read it from the</span>
+    <span class="c1"># environment when one is set; otherwise generate a fresh random one at</span>
+    <span class="c1"># start-up rather than committing a constant to the repository.</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;SECRET_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLASK_SECRET_KEY&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_hex</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">models</span><span class="o">.</span><span class="n">reset_engine</span><span class="p">()</span>
+
+    <span class="n">state</span> <span class="o">=</span> <span class="n">state</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pull_data</span><span class="o">.</span><span class="n">default_state</span><span class="p">()</span>
+    <span class="n">services</span> <span class="o">=</span> <span class="n">Services</span><span class="p">(</span>
+        <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+        <span class="n">pull_runner</span><span class="o">=</span><span class="n">pull_runner</span> <span class="k">if</span> <span class="n">pull_runner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_default_pull_runner</span><span class="p">(</span><span class="n">state</span><span class="p">),</span>
+        <span class="n">analysis</span><span class="o">=</span><span class="n">AnalysisCache</span><span class="p">(</span>
+            <span class="n">analysis_provider</span> <span class="k">if</span> <span class="n">analysis_provider</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_analysis_provider</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">extensions</span><span class="p">[</span><span class="n">EXTENSION_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="n">services</span>
+
+    <span class="n">_register_routes</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">services</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_pull_runner</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">pull_data</span><span class="o">.</span><span class="n">PullState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The production runner: start a detached child process and return.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">pull_data</span><span class="o">.</span><span class="n">spawn_pull</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">run</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_register_routes</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Attach every route to ``app``.</span>
+
+<span class="sd">    A function rather than decorators at module level, because the routes close</span>
+<span class="sd">    over the ``services`` this particular application was built with -- which is</span>
+<span class="sd">    what makes two differently configured applications able to coexist in one</span>
+<span class="sd">    test session.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send visitors to the analysis page, which is the whole application.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s2">&quot;analysis&quot;</span><span class="p">))</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/analysis&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analysis</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The analysis page, rendered from the held snapshot.&quot;&quot;&quot;</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+            <span class="s2">&quot;index.html&quot;</span><span class="p">,</span>
+            <span class="n">groups</span><span class="o">=</span><span class="n">split_results</span><span class="p">(</span><span class="n">results</span><span class="p">),</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+            <span class="n">updated_at</span><span class="o">=</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;updated_at&quot;</span><span class="p">],</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+            <span class="n">running</span><span class="o">=</span><span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_busy</span><span class="p">(),</span>
+            <span class="n">database</span><span class="o">=</span><span class="n">db_config</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span>
+            <span class="n">total_rows</span><span class="o">=</span><span class="n">total_rows</span><span class="p">(</span><span class="n">results</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/pull-data&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pull_data_route</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start a pull, unless one is already running.</span>
+
+<span class="sd">        ``200 {&quot;ok&quot;: true}`` when the pull was started, ``409 {&quot;busy&quot;: true}``</span>
+<span class="sd">        when one was already in flight -- in which case nothing is started, so a</span>
+<span class="sd">        double click cannot scrape Grad Cafe twice for the same results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_busy</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_busy_response</span><span class="p">(</span><span class="n">services</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">pull_runner</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">pull_data</span><span class="o">.</span><span class="n">PullInProgress</span><span class="p">:</span>
+            <span class="c1"># The runner itself found the flag taken -- the narrow race between</span>
+            <span class="c1"># the check above and claiming it. Same answer, same reason.</span>
+            <span class="k">return</span> <span class="n">_busy_response</span><span class="p">(</span><span class="n">services</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># a stage failed; nothing was committed</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">jsonify</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">exc</span><span class="p">),</span>
+                        <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;The data pull failed: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span>
+                        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(),</span>
+                    <span class="p">}</span>
+                <span class="p">),</span>
+                <span class="mi">500</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">services</span><span class="o">.</span><span class="n">pulls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">jsonify</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span>
+                    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="mi">200</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/update-analysis&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_analysis</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recompute the analysis.  Never starts a scrape.</span>
+
+<span class="sd">        ``200 {&quot;ok&quot;: true}`` when it ran, ``409 {&quot;busy&quot;: true}`` while a pull is</span>
+<span class="sd">        in flight -- and in that case nothing is recomputed, because figures</span>
+<span class="sd">        drawn from a half-loaded table would be reported as final.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_busy</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">_busy_response</span><span class="p">(</span><span class="n">services</span><span class="p">)</span>
+
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">jsonify</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                        <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">),</span>
+                <span class="mi">503</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">jsonify</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;questions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]),</span>
+                    <span class="s2">&quot;updated_at&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;updated_at&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Analysis refreshed from the current contents of &quot;</span>
+                    <span class="s2">&quot;the database.&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="mi">200</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/status&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The pull&#39;s progress, polled by the page while a pull is running.&quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;analysis_updated_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">NEVER_UPDATED</span>
+            <span class="k">if</span> <span class="n">services</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">is_empty</span>
+            <span class="k">else</span> <span class="n">services</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()[</span><span class="s2">&quot;updated_at&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_busy_response</span><span class="p">(</span><span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The shared ``409`` for both buttons while a pull is in flight.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">jsonify</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;ok&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;busy&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;A data pull is already running. Wait for it to &quot;</span>
+                <span class="s2">&quot;finish -- the figures will change again once it does.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="p">),</span>
+        <span class="mi">409</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../api/flask_app.html#flask_app.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serve the application on the configured port.</span>
+
+<span class="sd">    There is no module-level ``app`` object: the served application comes out of</span>
+<span class="sd">    :func:`create_app` like every other one, so there is a single code path and</span>
+<span class="sd">    nothing is configured at import time.  ``flask --app flask_app run`` finds</span>
+<span class="sd">    the factory by name and works the same way.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># debug=False: the reloader would run two processes, and the second would</span>
+    <span class="c1"># re-check the pull lock on every file touch for no benefit here.</span>
+    <span class="n">create_app</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="n">host</span><span class="o">=</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="s2">&quot;5000&quot;</span><span class="p">)),</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover - process entry point</span>
+    <span class="c1"># Excluded from coverage rather than exercised: running this line means</span>
+    <span class="c1"># re-executing the module under a second name, which would define a</span>
+    <span class="c1"># second copy of everything in it. The main() it dispatches to is</span>
+    <span class="c1"># called directly by the tests, which is where the behaviour lives.</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Nipul Jayasekera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

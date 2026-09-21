@@ -347,7 +347,8 @@ def default_cleaner(raw_rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """The real cleaning stage: normalize raw scraped rows.
 
     :param raw_rows: rows as the scraper stored them, text exactly as rendered.
-    :returns: cleaned records, with typed fields and consistent ``None``s.
+    :returns: cleaned records: typed fields, and one consistent
+        representation of a missing value.
     """
     import clean
 

@@ -1,0 +1,912 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Index &mdash; Grad Cafe Analytics</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f46eefca"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Grad Cafe Analytics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview and setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-you-need">What you need</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#installing">Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#creating-the-databases">Creating the databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#loading-some-data">Loading some data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#running-the-application">Running the application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#the-optional-standardizer">The optional standardizer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#three-layers-and-the-seams-between-them">Three layers, and the seams between them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-web-layer">The web layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-etl-layer">The ETL layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-database-layer">The database layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#where-the-files-are">Where the files are</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/flask_app.html">flask_app – the web layer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#routes">Routes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#what-the-tests-replace">What the tests replace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.EXTENSION_KEY"><code class="docutils literal notranslate"><span class="pre">EXTENSION_KEY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.NEVER_UPDATED"><code class="docutils literal notranslate"><span class="pre">NEVER_UPDATED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.default_analysis_provider"><code class="docutils literal notranslate"><span class="pre">default_analysis_provider()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.AnalysisCache"><code class="docutils literal notranslate"><span class="pre">AnalysisCache</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.Services"><code class="docutils literal notranslate"><span class="pre">Services</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.get_services"><code class="docutils literal notranslate"><span class="pre">get_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.split_results"><code class="docutils literal notranslate"><span class="pre">split_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.total_rows"><code class="docutils literal notranslate"><span class="pre">total_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.create_app"><code class="docutils literal notranslate"><span class="pre">create_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/flask_app.html#flask_app.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/pull_data.html">pull_data – the pull pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#every-stage-is-a-parameter">Every stage is a parameter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#busy-state-is-an-object-not-a-sleep">Busy state is an object, not a sleep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.STAGES"><code class="docutils literal notranslate"><span class="pre">STAGES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.IDLE_STATUS"><code class="docutils literal notranslate"><span class="pre">IDLE_STATUS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.PullInProgress"><code class="docutils literal notranslate"><span class="pre">PullInProgress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.PullState"><code class="docutils literal notranslate"><span class="pre">PullState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.pid_is_alive"><code class="docutils literal notranslate"><span class="pre">pid_is_alive()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.FileState"><code class="docutils literal notranslate"><span class="pre">FileState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.MemoryState"><code class="docutils literal notranslate"><span class="pre">MemoryState</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_state"><code class="docutils literal notranslate"><span class="pre">default_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Scraper"><code class="docutils literal notranslate"><span class="pre">Scraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Cleaner"><code class="docutils literal notranslate"><span class="pre">Cleaner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Standardizer"><code class="docutils literal notranslate"><span class="pre">Standardizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.Loader"><code class="docutils literal notranslate"><span class="pre">Loader</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.make_scraper"><code class="docutils literal notranslate"><span class="pre">make_scraper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_cleaner"><code class="docutils literal notranslate"><span class="pre">default_cleaner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.make_standardizer"><code class="docutils literal notranslate"><span class="pre">make_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.passthrough_standardizer"><code class="docutils literal notranslate"><span class="pre">passthrough_standardizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.default_loader"><code class="docutils literal notranslate"><span class="pre">default_loader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.run_pipeline"><code class="docutils literal notranslate"><span class="pre">run_pipeline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.describe_summary"><code class="docutils literal notranslate"><span class="pre">describe_summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.spawn_pull"><code class="docutils literal notranslate"><span class="pre">spawn_pull()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/pull_data.html#pull_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/scrape.html">scrape – stage 1, the scraper</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.ScrapingBlocked"><code class="docutils literal notranslate"><span class="pre">ScrapingBlocked</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.GradCafeScraper"><code class="docutils literal notranslate"><span class="pre">GradCafeScraper</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.save_data"><code class="docutils literal notranslate"><span class="pre">save_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/scrape.html#scrape.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/clean.html">clean – stage 2, the cleaner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.clean_data"><code class="docutils literal notranslate"><span class="pre">clean_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.summarise"><code class="docutils literal notranslate"><span class="pre">summarise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/clean.html#clean.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.row_count"><code class="docutils literal notranslate"><span class="pre">row_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.load_into_database"><code class="docutils literal notranslate"><span class="pre">load_into_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/query_data.html">query_data – the analyses in raw SQL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_count"><code class="docutils literal notranslate"><span class="pre">fmt_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_pct"><code class="docutils literal notranslate"><span class="pre">fmt_pct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_avg"><code class="docutils literal notranslate"><span class="pre">fmt_avg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fmt_signed"><code class="docutils literal notranslate"><span class="pre">fmt_signed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.use_utf8_console"><code class="docutils literal notranslate"><span class="pre">use_utf8_console()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.QuestionResult"><code class="docutils literal notranslate"><span class="pre">QuestionResult</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.ANALYSIS_KEYS"><code class="docutils literal notranslate"><span class="pre">ANALYSIS_KEYS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.APPLICANT_FIELDS"><code class="docutils literal notranslate"><span class="pre">APPLICANT_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fetch_applicants"><code class="docutils literal notranslate"><span class="pre">fetch_applicants()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.fetch_applicant"><code class="docutils literal notranslate"><span class="pre">fetch_applicant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.analysis_dict"><code class="docutils literal notranslate"><span class="pre">analysis_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.parse_selection"><code class="docutils literal notranslate"><span class="pre">parse_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.print_results"><code class="docutils literal notranslate"><span class="pre">print_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/query_data.html#query_data.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/orm_queries.html">orm_queries – the analyses through the ORM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_1"><code class="docutils literal notranslate"><span class="pre">question_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_2"><code class="docutils literal notranslate"><span class="pre">question_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_3"><code class="docutils literal notranslate"><span class="pre">question_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_4"><code class="docutils literal notranslate"><span class="pre">question_4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_5"><code class="docutils literal notranslate"><span class="pre">question_5()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_6"><code class="docutils literal notranslate"><span class="pre">question_6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_7"><code class="docutils literal notranslate"><span class="pre">question_7()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_8"><code class="docutils literal notranslate"><span class="pre">question_8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_9"><code class="docutils literal notranslate"><span class="pre">question_9()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_10"><code class="docutils literal notranslate"><span class="pre">question_10()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.question_11"><code class="docutils literal notranslate"><span class="pre">question_11()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.run_all"><code class="docutils literal notranslate"><span class="pre">run_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.answer_all"><code class="docutils literal notranslate"><span class="pre">answer_all()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/orm_queries.html#orm_queries.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/models.html">models – the ORM mapping and the Engine</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.REQUIRED_FIELDS"><code class="docutils literal notranslate"><span class="pre">REQUIRED_FIELDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.Applicant"><code class="docutils literal notranslate"><span class="pre">Applicant</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_engine"><code class="docutils literal notranslate"><span class="pre">get_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.reset_engine"><code class="docutils literal notranslate"><span class="pre">reset_engine()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_sessionmaker"><code class="docutils literal notranslate"><span class="pre">get_sessionmaker()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.get_session"><code class="docutils literal notranslate"><span class="pre">get_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.session_scope"><code class="docutils literal notranslate"><span class="pre">session_scope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/models.html#models.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/db_config.html">db_config – where to connect</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.URL_SCHEMES"><code class="docutils literal notranslate"><span class="pre">URL_SCHEMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.load_dotenv"><code class="docutils literal notranslate"><span class="pre">load_dotenv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.parse_url"><code class="docutils literal notranslate"><span class="pre">parse_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.connect_kwargs"><code class="docutils literal notranslate"><span class="pre">connect_kwargs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.database_url"><code class="docutils literal notranslate"><span class="pre">database_url()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/db_config.html#db_config.describe"><code class="docutils literal notranslate"><span class="pre">describe()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-them">Running them</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#the-markers">The markers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#stable-selectors">Stable selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#fixtures">Fixtures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-doubles">Test doubles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#no-sleeps-and-no-network">No sleeps, and no network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#coverage">Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#continuous-integration">Continuous integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">Operational notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#busy-state-policy">Busy-state policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#uniqueness-and-idempotency">Uniqueness and idempotency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#scraping-policy">Scraping policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operations.html#data-notes">Data notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#setting-up">Setting up</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#in-ci">In CI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#running-the-application">Running the application</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Grad Cafe Analytics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/flask_app.html#flask_app.Services.analysis">analysis (flask_app.Services attribute)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.analysis_dict">analysis_dict() (in module query_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.ANALYSIS_KEYS">ANALYSIS_KEYS (in module query_data)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache">AnalysisCache (class in flask_app)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.QuestionResult.answer">answer (query_data.QuestionResult property)</a>
+</li>
+      <li><a href="api/orm_queries.html#orm_queries.answer_all">answer_all() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.answer_all">(in module query_data)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.answer_lines">answer_lines (query_data.QuestionResult attribute)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant">Applicant (class in models)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.APPLICANT_FIELDS">APPLICANT_FIELDS (in module query_data)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.as_dict">as_dict() (models.Applicant method)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.QuestionResult.as_dict">(query_data.QuestionResult method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Base">Base (class in models)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.FileState.begin">begin() (pull_data.FileState method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.begin">(pull_data.MemoryState method)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.PullState.begin">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/load_data.html#load_data.build_rows">build_rows() (in module load_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.caveat">caveat (query_data.QuestionResult attribute)</a>
+</li>
+      <li><a href="api/scrape.html#scrape.GradCafeScraper.check_robots">check_robots() (scrape.GradCafeScraper method)</a>
+</li>
+      <li>
+    clean
+
+      <ul>
+        <li><a href="api/clean.html#module-clean">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/clean.html#clean.clean_data">clean_data() (in module clean)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.Cleaner">Cleaner (in module pull_data)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.comments">comments (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache.computations">computations (flask_app.AnalysisCache attribute)</a>
+</li>
+      <li><a href="api/db_config.html#db_config.connect_kwargs">connect_kwargs() (in module db_config)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.create_app">create_app() (in module flask_app)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.create_table">create_table() (in module load_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/db_config.html#db_config.database_url">database_url() (in module db_config)</a>
+
+      <ul>
+        <li><a href="api/models.html#models.database_url">(in module models)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models.html#models.Applicant.date_added">date_added (models.Applicant attribute)</a>
+</li>
+      <li>
+    db_config
+
+      <ul>
+        <li><a href="api/db_config.html#module-db_config">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/flask_app.html#flask_app.default_analysis_provider">default_analysis_provider() (in module flask_app)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.default_cleaner">default_cleaner() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.default_loader">default_loader() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.default_state">default_state() (in module pull_data)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.degree">degree (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/db_config.html#db_config.describe">describe() (in module db_config)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.describe_summary">describe_summary() (in module pull_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.FileState.end">end() (pull_data.FileState method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.end">(pull_data.MemoryState method)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.PullState.end">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.explanation">explanation (query_data.QuestionResult attribute)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.EXTENSION_KEY">EXTENSION_KEY (in module flask_app)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.fetch_applicant">fetch_applicant() (in module query_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.fetch_applicants">fetch_applicants() (in module query_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.FileState">FileState (class in pull_data)</a>
+</li>
+      <li>
+    flask_app
+
+      <ul>
+        <li><a href="api/flask_app.html#module-flask_app">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.fmt_avg">fmt_avg() (in module query_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.fmt_count">fmt_count() (in module query_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.fmt_pct">fmt_pct() (in module query_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.fmt_signed">fmt_signed() (in module query_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.get_engine">get_engine() (in module models)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.get_services">get_services() (in module flask_app)</a>
+</li>
+      <li><a href="api/models.html#models.get_session">get_session() (in module models)</a>
+</li>
+      <li><a href="api/models.html#models.get_sessionmaker">get_sessionmaker() (in module models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.gpa">gpa (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/scrape.html#scrape.GradCafeScraper">GradCafeScraper (class in scrape)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.gre">gre (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.gre_aw">gre_aw (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.gre_v">gre_v (models.Applicant attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.IDLE_STATUS">IDLE_STATUS (in module pull_data)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.insert_rows">insert_rows() (in module load_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.FileState.is_busy">is_busy() (pull_data.FileState method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.is_busy">(pull_data.MemoryState method)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.PullState.is_busy">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache.is_empty">is_empty (flask_app.AnalysisCache property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.llm_generated_program">llm_generated_program (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.llm_generated_university">llm_generated_university (models.Applicant attribute)</a>
+</li>
+      <li>
+    load_data
+
+      <ul>
+        <li><a href="api/load_data.html#module-load_data">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/scrape.html#scrape.load_data">load_data() (in module scrape)</a>
+</li>
+      <li><a href="api/db_config.html#db_config.load_dotenv">load_dotenv() (in module db_config)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.load_into_database">load_into_database() (in module load_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.Loader">Loader (in module pull_data)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.LoaderError">LoaderError</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/clean.html#clean.main">main() (in module clean)</a>
+
+      <ul>
+        <li><a href="api/flask_app.html#flask_app.main">(in module flask_app)</a>
+</li>
+        <li><a href="api/load_data.html#load_data.main">(in module load_data)</a>
+</li>
+        <li><a href="api/models.html#models.main">(in module models)</a>
+</li>
+        <li><a href="api/orm_queries.html#orm_queries.main">(in module orm_queries)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.main">(in module pull_data)</a>
+</li>
+        <li><a href="api/query_data.html#query_data.main">(in module query_data)</a>
+</li>
+        <li><a href="api/scrape.html#scrape.main">(in module scrape)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pull_data.html#pull_data.make_scraper">make_scraper() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.make_standardizer">make_standardizer() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.MemoryState">MemoryState (class in pull_data)</a>
+</li>
+      <li><a href="api/models.html#models.Base.metadata">metadata (models.Base attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    models
+
+      <ul>
+        <li><a href="api/models.html#module-models">module</a>
+</li>
+      </ul></li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/clean.html#module-clean">clean</a>
+</li>
+        <li><a href="api/db_config.html#module-db_config">db_config</a>
+</li>
+        <li><a href="api/flask_app.html#module-flask_app">flask_app</a>
+</li>
+        <li><a href="api/load_data.html#module-load_data">load_data</a>
+</li>
+        <li><a href="api/models.html#module-models">models</a>
+</li>
+        <li><a href="api/orm_queries.html#module-orm_queries">orm_queries</a>
+</li>
+        <li><a href="api/pull_data.html#module-pull_data">pull_data</a>
+</li>
+        <li><a href="api/query_data.html#module-query_data">query_data</a>
+</li>
+        <li><a href="api/scrape.html#module-scrape">scrape</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/flask_app.html#flask_app.NEVER_UPDATED">NEVER_UPDATED (in module flask_app)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.number">number (query_data.QuestionResult attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.original">original (query_data.QuestionResult attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    orm_queries
+
+      <ul>
+        <li><a href="api/orm_queries.html#module-orm_queries">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.p_id">p_id (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.parse_selection">parse_selection() (in module query_data)</a>
+</li>
+      <li><a href="api/db_config.html#db_config.parse_url">parse_url() (in module db_config)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.passthrough_standardizer">passthrough_standardizer() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.pid_is_alive">pid_is_alive() (in module pull_data)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.print_results">print_results() (in module query_data)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.program">program (models.Applicant attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache.provider">provider (flask_app.AnalysisCache attribute)</a>
+</li>
+      <li>
+    pull_data
+
+      <ul>
+        <li><a href="api/pull_data.html#module-pull_data">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/flask_app.html#flask_app.Services.pull_runner">pull_runner (flask_app.Services attribute)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.PullInProgress">PullInProgress</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.Services.pulls">pulls (flask_app.Services attribute)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.PullState">PullState (class in pull_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    query_data
+
+      <ul>
+        <li><a href="api/query_data.html#module-query_data">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/query_data.html#query_data.QuestionResult.question">question (query_data.QuestionResult attribute)</a>
+</li>
+      <li><a href="api/orm_queries.html#orm_queries.question_1">question_1() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_1">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_10">question_10() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_10">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_11">question_11() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_11">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_2">question_2() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_2">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_3">question_3() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_3">(in module query_data)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/orm_queries.html#orm_queries.question_4">question_4() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_4">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_5">question_5() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_5">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_6">question_6() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_6">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_7">question_7() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_7">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_8">question_8() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_8">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/orm_queries.html#orm_queries.question_9">question_9() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.question_9">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/query_data.html#query_data.QuestionResult">QuestionResult (class in query_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.FileState.read">read() (pull_data.FileState method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.read">(pull_data.MemoryState method)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.PullState.read">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/load_data.html#load_data.read_records">read_records() (in module load_data)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache.refresh">refresh() (flask_app.AnalysisCache method)</a>
+</li>
+      <li><a href="api/models.html#models.Base.registry">registry (models.Base attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.REQUIRED_FIELDS">REQUIRED_FIELDS (in module models)</a>
+</li>
+      <li><a href="api/models.html#models.reset_engine">reset_engine() (in module models)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.row_count">row_count() (in module load_data)</a>
+</li>
+      <li><a href="api/orm_queries.html#orm_queries.run_all">run_all() (in module orm_queries)</a>
+
+      <ul>
+        <li><a href="api/query_data.html#query_data.run_all">(in module query_data)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pull_data.html#pull_data.run_pipeline">run_pipeline() (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.FileState.running_pid">running_pid() (pull_data.FileState method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/scrape.html#scrape.save_data">save_data() (in module scrape)</a>
+</li>
+      <li>
+    scrape
+
+      <ul>
+        <li><a href="api/scrape.html#module-scrape">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/scrape.html#scrape.GradCafeScraper.scrape_data">scrape_data() (scrape.GradCafeScraper method)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.Scraper">Scraper (in module pull_data)</a>
+</li>
+      <li><a href="api/scrape.html#scrape.ScrapingBlocked">ScrapingBlocked</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.Services">Services (class in flask_app)</a>
+</li>
+      <li><a href="api/models.html#models.session_scope">session_scope() (in module models)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.AnalysisCache.snapshot">snapshot() (flask_app.AnalysisCache method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.PullState.snapshot">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.spawn_pull">spawn_pull() (in module pull_data)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.split_results">split_results() (in module flask_app)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.QuestionResult.sql">sql (query_data.QuestionResult attribute)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.STAGES">STAGES (in module pull_data)</a>
+</li>
+      <li><a href="api/pull_data.html#pull_data.Standardizer">Standardizer (in module pull_data)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.Services.state">state (flask_app.Services attribute)</a>
+</li>
+      <li><a href="api/models.html#models.Applicant.status">status (models.Applicant attribute)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.status">(pull_data.MemoryState attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/clean.html#clean.summarise">summarise() (in module clean)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.QuestionResult.supporting">supporting (query_data.QuestionResult attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/query_data.html#query_data.QuestionResult.table">table (query_data.QuestionResult attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.term">term (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/flask_app.html#flask_app.total_rows">total_rows() (in module flask_app)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.url">url (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/db_config.html#db_config.URL_SCHEMES">URL_SCHEMES (in module db_config)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.us_or_international">us_or_international (models.Applicant attribute)</a>
+</li>
+      <li><a href="api/query_data.html#query_data.use_utf8_console">use_utf8_console() (in module query_data)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pull_data.html#pull_data.FileState.write">write() (pull_data.FileState method)</a>
+
+      <ul>
+        <li><a href="api/pull_data.html#pull_data.MemoryState.write">(pull_data.MemoryState method)</a>
+</li>
+        <li><a href="api/pull_data.html#pull_data.PullState.write">(pull_data.PullState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Nipul Jayasekera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
