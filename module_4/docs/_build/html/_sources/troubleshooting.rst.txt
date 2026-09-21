@@ -16,10 +16,14 @@ Setting up
 ``psycopg.OperationalError: connection to server ... failed``
     PostgreSQL is not running, or is not where the configuration says.  The
     error names the server it tried -- ``user@host:port/database`` -- so compare
-    that with your ``.env``.  On Windows the service is called
-    ``postgresql-x64-18``; start it from Services, or::
+    that with your ``.env``.  On Windows the service is usually called
+    ``postgresql-x64-<version>``; start it from the Services panel, or point
+    ``pg_ctl`` at wherever you installed it::
 
-        pg_ctl -D "D:\PostgreSQL\18\data" start
+        pg_ctl -D "<your PostgreSQL install>\data" start
+
+    On macOS or Linux: ``brew services start postgresql@18``, or
+    ``sudo systemctl start postgresql``.
 
 ``psycopg.errors.UndefinedTable: relation "applicants" does not exist``
     Nothing has been loaded yet.  The loader creates the table, so::
@@ -36,7 +40,7 @@ Setting up
     The PostgreSQL ``bin`` directory is not on your ``PATH`` -- the default on
     Windows.  Either add it, or call the executable by full path::
 
-        "D:\PostgreSQL\18\bin\psql.exe" -U postgres -c "CREATE DATABASE gradcafe"
+        "<your PostgreSQL install>\bin\psql.exe" -U postgres -c "CREATE DATABASE gradcafe"
 
 ``FATAL: password authentication failed for user "postgres"``
     ``.env`` does not hold the password you set when you installed PostgreSQL.

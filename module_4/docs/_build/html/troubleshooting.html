@@ -266,11 +266,14 @@ from somewhere else.  The tests and Sphinx each add <code class="docutils litera
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">psycopg.OperationalError:</span> <span class="pre">connection</span> <span class="pre">to</span> <span class="pre">server</span> <span class="pre">...</span> <span class="pre">failed</span></code></dt><dd><p>PostgreSQL is not running, or is not where the configuration says.  The
 error names the server it tried – <code class="docutils literal notranslate"><span class="pre">user&#64;host:port/database</span></code> – so compare
-that with your <code class="docutils literal notranslate"><span class="pre">.env</span></code>.  On Windows the service is called
-<code class="docutils literal notranslate"><span class="pre">postgresql-x64-18</span></code>; start it from Services, or:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pg_ctl</span> <span class="o">-</span><span class="n">D</span> <span class="s2">&quot;D:\PostgreSQL</span><span class="se">\1</span><span class="s2">8\data&quot;</span> <span class="n">start</span>
+that with your <code class="docutils literal notranslate"><span class="pre">.env</span></code>.  On Windows the service is usually called
+<code class="docutils literal notranslate"><span class="pre">postgresql-x64-&lt;version&gt;</span></code>; start it from the Services panel, or point
+<code class="docutils literal notranslate"><span class="pre">pg_ctl</span></code> at wherever you installed it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pg_ctl</span> <span class="o">-</span><span class="n">D</span> <span class="s2">&quot;&lt;your PostgreSQL install&gt;\data&quot;</span> <span class="n">start</span>
 </pre></div>
 </div>
+<p>On macOS or Linux: <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">services</span> <span class="pre">start</span> <span class="pre">postgresql&#64;18</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">start</span> <span class="pre">postgresql</span></code>.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">psycopg.errors.UndefinedTable:</span> <span class="pre">relation</span> <span class="pre">&quot;applicants&quot;</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">exist</span></code></dt><dd><p>Nothing has been loaded yet.  The loader creates the table, so:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">src</span><span class="o">/</span><span class="n">load_data</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">file</span> <span class="o">../</span><span class="n">module_3</span><span class="o">/</span><span class="n">module_2</span><span class="o">/</span><span class="n">llm_extend_applicant_data</span><span class="o">.</span><span class="n">json</span>
@@ -283,7 +286,7 @@ that with your <code class="docutils literal notranslate"><span class="pre">.env
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">psql</span></code> or <code class="docutils literal notranslate"><span class="pre">createdb</span></code> is not recognized</dt><dd><p>The PostgreSQL <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory is not on your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> – the default on
 Windows.  Either add it, or call the executable by full path:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;D:\PostgreSQL</span><span class="se">\1</span><span class="s2">8</span><span class="se">\b</span><span class="s2">in\psql.exe&quot;</span> <span class="o">-</span><span class="n">U</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE DATABASE gradcafe&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;&lt;your PostgreSQL install&gt;</span><span class="se">\b</span><span class="s2">in\psql.exe&quot;</span> <span class="o">-</span><span class="n">U</span> <span class="n">postgres</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;CREATE DATABASE gradcafe&quot;</span>
 </pre></div>
 </div>
 </dd>
