@@ -14,10 +14,11 @@ build:
 
 sphinx:
   configuration: module_4/docs/conf.py
-  # Warnings are errors, the same as in CI: a broken cross-reference or a
-  # module autodoc can no longer import should fail the build rather than
-  # publish a page with a hole in it.
-  fail_on_warning: true
+  # Deliberately NOT fail_on_warning here. .github/workflows/tests.yml builds
+  # these same pages with -W on every push, so a broken cross-reference is
+  # already caught where the cost is a red check. Repeating the strictness on
+  # Read the Docs would only add a way for the published site to disappear.
+  fail_on_warning: false
 
 python:
   install:
