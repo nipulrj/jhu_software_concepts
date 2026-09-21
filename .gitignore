@@ -4,3 +4,14 @@ __pycache__/
 
 # Claude Code local dev server config
 .claude/
+
+# Coverage data, written to the working directory pytest runs in -- which for
+# module_4 is the repository root, because that is where its --cov path
+# resolves. coverage_summary.txt IS committed; this is the machine-readable
+# data behind it.
+.coverage
+.coverage.*
+htmlcov/
+
+# pytest's own cache, likewise written where pytest runs.
+.pytest_cache/
