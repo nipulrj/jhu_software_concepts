@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
@@ -217,10 +218,36 @@ def load_records(path: Path = DEFAULT_DATA_PATH) -> List[Dict[str, Any]]:
     if not isinstance(data, list):
         raise LoaderError("{path} should hold a JSON array of records.".format(path=path))
 
-    return [record for record in data if isinstance(record, dict)]
+    # Returned exactly as read, including anything in it that is not an object.
+    # Discarding those here would hide them from the only place that counts
+    # losses -- build_rows -- and a file that quietly loads fewer rows than it
+    # contains is the kind of thing nobody notices until the numbers are wrong.
+    return list(data)
 
 
-def build_rows(records: Iterable[Dict[str, Any]]) -> Tuple[List[Tuple[Any, ...]], int]:
+#: Why an input entry could not become a row.
+NOT_AN_OBJECT = "not a JSON object"
+NO_USABLE_ID = "no usable entry id"
+
+
+@dataclass(frozen=True)
+class SkippedRecord:
+    """One input entry that could not become a row, and why.
+
+    Carries the entry's position in the source array, so a malformed record in
+    a fifty-thousand-line file can be found rather than merely counted.
+    """
+
+    position: int
+    reason: str
+
+    def __str__(self) -> str:
+        return "entry {0}: {1}".format(self.position, self.reason)
+
+
+def build_rows(
+    records: Iterable[Any],
+) -> Tuple[List[Tuple[Any, ...]], List[SkippedRecord]]:
     """Convert records to insertable rows, de-duplicating on ``p_id``.
 
     One file can legitimately contain the same entry twice if it was stitched
@@ -229,12 +256,15 @@ def build_rows(records: Iterable[Dict[str, Any]]) -> Tuple[List[Tuple[Any, ...]]
     collapsed here, keeping the last occurrence.
     """
     by_id: Dict[int, Tuple[Any, ...]] = {}
-    skipped = 0
+    skipped: List[SkippedRecord] = []
 
-    for record in records:
+    for position, record in enumerate(records):
+        if not isinstance(record, dict):
+            skipped.append(SkippedRecord(position, NOT_AN_OBJECT))
+            continue
         row = _row_from_record(record)
         if row is None:
-            skipped += 1
+            skipped.append(SkippedRecord(position, NO_USABLE_ID))
             continue
         by_id[row[0]] = row
 
@@ -291,9 +321,12 @@ def load_into_database(
 
     if verbose:
         print("Read {0:,} records from {1}".format(len(records), Path(path).name), file=sys.stderr)
-        if skipped:
-            print("  skipped {0:,} without a usable entry id".format(skipped), file=sys.stderr)
-        duplicates = len(records) - skipped - len(rows)
+        for entry in skipped:
+            # Every skip is named individually, with its position, so a
+            # malformed record in a large file can be found and not merely
+            # counted. This is the whole point of tracking positions.
+            print("  skipped {0}".format(entry), file=sys.stderr)
+        duplicates = len(records) - len(skipped) - len(rows)
         if duplicates:
             print("  collapsed {0:,} repeated entry ids".format(duplicates), file=sys.stderr)
 
@@ -316,7 +349,10 @@ def load_into_database(
 
     summary = {
         "read": len(records),
-        "skipped": skipped,
+        "skipped": len(skipped),
+        # The skips in full, so a caller that is not a console can report
+        # which entries were lost and where.
+        "skipped_records": [str(entry) for entry in skipped],
         "written": len(rows),
         "inserted": after - before,
         "updated": len(rows) - (after - before),
