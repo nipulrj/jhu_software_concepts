@@ -120,6 +120,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.NOT_AN_OBJECT"><code class="docutils literal notranslate"><span class="pre">NOT_AN_OBJECT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.SkippedRecord"><code class="docutils literal notranslate"><span class="pre">SkippedRecord</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
@@ -277,6 +279,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
 
@@ -459,8 +462,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a cleaned JSON file produced by the ETL pipeline.</span>
 
 <span class="sd">    :param path: the file to read. It may hold a bare JSON array or an object</span>
-<span class="sd">        with a ``&quot;rows&quot;`` key; anything in the array that is not an object is</span>
-<span class="sd">        dropped rather than crashing the load.</span>
+<span class="sd">        with a ``&quot;rows&quot;`` key.</span>
+<span class="sd">    :returns: the array&#39;s entries exactly as read -- including any that are not</span>
+<span class="sd">        objects. Filtering those out here would hide them from</span>
+<span class="sd">        :func:`build_rows`, which is the one place losses are counted.</span>
 <span class="sd">    :raises LoaderError: if the file is missing or is not valid JSON, with a</span>
 <span class="sd">        message saying what to run instead of a traceback.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -485,14 +490,49 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">LoaderError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{path}</span><span class="s2"> should hold a JSON array of records.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">record</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)]</span></div>
+    <span class="c1"># Returned exactly as read, including anything in it that is not an object.</span>
+    <span class="c1"># Discarding those here would hide them from the only place that counts</span>
+    <span class="c1"># losses -- build_rows -- and a file that quietly loads fewer rows than it</span>
+    <span class="c1"># contains is the kind of thing nobody notices until the numbers are wrong.</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<span class="c1">#: Why an input entry could not become a row.</span>
+<span class="n">NOT_AN_OBJECT</span> <span class="o">=</span> <span class="s2">&quot;not a JSON object&quot;</span>
+<span class="n">NO_USABLE_ID</span> <span class="o">=</span> <span class="s2">&quot;no usable entry id&quot;</span>
+
+
+<div class="viewcode-block" id="SkippedRecord">
+<a class="viewcode-back" href="../api/load_data.html#load_data.SkippedRecord">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SkippedRecord</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One input entry that could not become a row, and why.</span>
+
+<span class="sd">    Carries the entry&#39;s position in the source array, so a malformed record in</span>
+<span class="sd">    a fifty-thousand-line file can be found rather than merely counted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">position</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;entry </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="build_rows">
 <a class="viewcode-back" href="../api/load_data.html#load_data.build_rows">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">build_rows</span><span class="p">(</span><span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_rows</span><span class="p">(</span>
+    <span class="n">records</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">SkippedRecord</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert records to insertable rows, de-duplicating on ``p_id``.</span>
+
+<span class="sd">    :param records: entries as read, which may include values that are not</span>
+<span class="sd">        objects at all -- a stray ``null`` in a hand-edited file, say.</span>
+<span class="sd">    :returns: the insertable rows, and one :class:`SkippedRecord` per entry that</span>
+<span class="sd">        could not become one. Every input is therefore accounted for: it is a</span>
+<span class="sd">        row, a duplicate collapsed into an earlier row, or a reported skip.</span>
 
 <span class="sd">    One file can legitimately contain the same entry twice if it was stitched</span>
 <span class="sd">    together from two scrapes.  ``ON CONFLICT`` cannot help there -- PostgreSQL</span>
@@ -500,12 +540,15 @@
 <span class="sd">    collapsed here, keeping the last occurrence.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">by_id</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">skipped</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">skipped</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">SkippedRecord</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SkippedRecord</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">NOT_AN_OBJECT</span><span class="p">))</span>
+            <span class="k">continue</span>
         <span class="n">row</span> <span class="o">=</span> <span class="n">_row_from_record</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">skipped</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SkippedRecord</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">NO_USABLE_ID</span><span class="p">))</span>
             <span class="k">continue</span>
         <span class="n">by_id</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span>
 
@@ -589,9 +632,12 @@
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Read </span><span class="si">{0:,}</span><span class="s2"> records from </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span> <span class="n">source</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">skipped</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  skipped </span><span class="si">{0:,}</span><span class="s2"> without a usable entry id&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">skipped</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-        <span class="n">duplicates</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">-</span> <span class="n">skipped</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">skipped</span><span class="p">:</span>
+            <span class="c1"># Every skip is named individually, with its position, so a</span>
+            <span class="c1"># malformed record in a large file can be found and not merely</span>
+            <span class="c1"># counted. This is the whole point of tracking positions.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  skipped </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">duplicates</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">skipped</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">duplicates</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  collapsed </span><span class="si">{0:,}</span><span class="s2"> repeated entry ids&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">duplicates</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
 
@@ -614,7 +660,10 @@
 
     <span class="n">summary</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;read&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
-        <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="n">skipped</span><span class="p">,</span>
+        <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">skipped</span><span class="p">),</span>
+        <span class="c1"># The skips in full, so a caller that is not a console -- the web</span>
+        <span class="c1"># layer, a test -- can report which entries were lost and where.</span>
+        <span class="s2">&quot;skipped_records&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">skipped</span><span class="p">],</span>
         <span class="s2">&quot;written&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span>
         <span class="s2">&quot;inserted&quot;</span><span class="p">:</span> <span class="n">after</span> <span class="o">-</span> <span class="n">before</span><span class="p">,</span>
         <span class="s2">&quot;updated&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">after</span> <span class="o">-</span> <span class="n">before</span><span class="p">),</span>

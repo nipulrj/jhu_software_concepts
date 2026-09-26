@@ -123,6 +123,8 @@
 <li class="toctree-l2"><a class="reference internal" href="api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.NOT_AN_OBJECT"><code class="docutils literal notranslate"><span class="pre">NOT_AN_OBJECT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.SkippedRecord"><code class="docutils literal notranslate"><span class="pre">SkippedRecord</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
@@ -321,6 +323,18 @@ keeping the last occurrence.</p>
 <p><strong>A record with no result id is dropped.</strong>  Not stored under a generated key:
 an entry that cannot be recognized on a later run would be inserted again by
 every subsequent pull.</p>
+<p><strong>Nothing is dropped silently.</strong>  Every entry the loader reads ends up as one of
+three things – an inserted row, a duplicate collapsed into an earlier row, or a
+reported skip – and the three counts add back up to the number read.  A skip
+carries its reason (<em>not a JSON object</em>, <em>no usable entry id</em>) <strong>and its
+position in the source array</strong>, because a malformed record in a
+fifty-thousand-line file needs to be findable, not merely counted.  Those skips
+appear in the loader’s console output and in the <code class="docutils literal notranslate"><span class="pre">skipped</span></code> and
+<code class="docutils literal notranslate"><span class="pre">skipped_records</span></code> keys of the summary the pull returns.</p>
+<p>This matters more than it looks.  Reading a file used to filter out anything
+that was not an object <em>before</em> the counter saw it, so a file holding three
+entries of which one was <code class="docutils literal notranslate"><span class="pre">null</span></code> would load two rows and report zero skipped –
+a silent loss.  <code class="docutils literal notranslate"><span class="pre">tests/test_load_data.py</span></code> now pins exactly that case.</p>
 </section>
 <section id="scraping-policy">
 <h2>Scraping policy<a class="headerlink" href="#scraping-policy" title="Link to this heading"></a></h2>

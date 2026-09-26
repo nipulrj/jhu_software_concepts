@@ -78,6 +78,20 @@ keeping the last occurrence.
 an entry that cannot be recognized on a later run would be inserted again by
 every subsequent pull.
 
+**Nothing is dropped silently.**  Every entry the loader reads ends up as one of
+three things -- an inserted row, a duplicate collapsed into an earlier row, or a
+reported skip -- and the three counts add back up to the number read.  A skip
+carries its reason (*not a JSON object*, *no usable entry id*) **and its
+position in the source array**, because a malformed record in a
+fifty-thousand-line file needs to be findable, not merely counted.  Those skips
+appear in the loader's console output and in the ``skipped`` and
+``skipped_records`` keys of the summary the pull returns.
+
+This matters more than it looks.  Reading a file used to filter out anything
+that was not an object *before* the counter saw it, so a file holding three
+entries of which one was ``null`` would load two rows and report zero skipped --
+a silent loss.  ``tests/test_load_data.py`` now pins exactly that case.
+
 Scraping policy
 ---------------
 

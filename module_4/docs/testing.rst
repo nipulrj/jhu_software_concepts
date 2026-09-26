@@ -1,7 +1,7 @@
 Testing guide
 =============
 
-489 tests, every one marked, 100% statement coverage of ``module_4/src``, under
+496 tests, every one marked, 100% statement coverage of ``module_4/src``, under
 ten seconds.  Nothing in the suite reaches the network, waits on a clock, or
 needs a browser.
 

@@ -12,7 +12,7 @@ Each module in this repository holds a self-contained assignment for the course.
 | [`module_1`](module_1/) | A personal site in Flask: blueprints, templates, static assets. |
 | [`module_2`](module_2/) | Scraping The Grad Cafe, cleaning the results, and standardizing program names with a local LLM. |
 | [`module_3`](module_3/) | Loading that data into PostgreSQL, answering eleven analytical questions in raw SQL and through the SQLAlchemy ORM, and serving them from a Flask page. |
-| [`module_4`](module_4/) | The Module 3 application made testable, tested and documented: 489 pytest tests at 100% coverage, GitHub Actions CI, and [Sphinx documentation](https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/). |
+| [`module_4`](module_4/) | The Module 3 application made testable, tested and documented: 496 pytest tests at 100% coverage, GitHub Actions CI, and [Sphinx documentation](https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/). |
 
 Continuous integration for `module_4` runs from
 [`.github/workflows/tests.yml`](.github/workflows/tests.yml): it starts a PostgreSQL

@@ -97,12 +97,59 @@ def test_a_string_id_is_accepted():
     assert row[0] == 900001
 
 
-def test_build_rows_counts_what_it_skipped(sample_records):
+def test_build_rows_reports_what_it_skipped(sample_records):
     """The summary distinguishes "unusable" from "already seen"."""
     rows, skipped = load_data.build_rows(sample_records + [{"no": "id"}])
 
     assert len(rows) == len(sample_records)
-    assert skipped == 1
+    assert [(s.position, s.reason) for s in skipped] == [
+        (len(sample_records), load_data.NO_USABLE_ID)
+    ]
+
+
+def test_a_null_among_valid_records_is_reported_not_swallowed():
+    """Two valid records and a ``null`` yield two rows and **one** reported skip.
+
+    The regression this file exists to prevent. Non-object entries used to be
+    filtered out while the file was read, before anything counted them, so a
+    file could load fewer rows than it contained and say nothing about it.
+    """
+    rows, skipped = load_data.build_rows([{"entry_id": 1}, {"entry_id": 2}, None])
+
+    assert len(rows) == 2
+    assert len(skipped) == 1
+    assert skipped[0].position == 2, "the position locates it in the source file"
+    assert skipped[0].reason == load_data.NOT_AN_OBJECT
+    assert str(skipped[0]) == "entry 2: not a JSON object"
+
+
+@pytest.mark.parametrize("junk", ["a string", 42, None, [1, 2], True])
+def test_every_kind_of_non_object_is_reported(junk):
+    """Whatever a hand-edited file puts in the array, the loss is visible."""
+    rows, skipped = load_data.build_rows([{"entry_id": 1}, junk])
+
+    assert len(rows) == 1
+    assert [(s.position, s.reason) for s in skipped] == [(1, load_data.NOT_AN_OBJECT)]
+
+
+def test_every_input_is_accounted_for():
+    """Row, collapsed duplicate, or reported skip -- nothing else.
+
+    The property the fix is really about: the three counts must add back up to
+    the number of entries read.
+    """
+    records = [
+        {"entry_id": 1},
+        {"entry_id": 1},   # duplicate, collapsed
+        {"entry_id": 2},
+        {"no": "id"},      # skipped: no usable id
+        None,              # skipped: not an object
+    ]
+
+    rows, skipped = load_data.build_rows(records)
+    duplicates = len(records) - len(skipped) - len(rows)
+
+    assert (len(rows), len(skipped), duplicates) == (2, 2, 1)
 
 
 def test_build_rows_keeps_the_last_of_a_repeated_id():
@@ -119,7 +166,7 @@ def test_build_rows_keeps_the_last_of_a_repeated_id():
 
 
 def test_build_rows_of_nothing_is_empty():
-    assert load_data.build_rows([]) == ([], 0)
+    assert load_data.build_rows([]) == ([], [])
 
 
 def test_rows_are_inserted_in_batches(monkeypatch):
@@ -148,12 +195,16 @@ def test_read_records_tolerates_a_rows_wrapper(tmp_path):
     assert load_data.read_records(path) == [{"entry_id": 1}]
 
 
-def test_read_records_drops_non_objects(tmp_path):
-    """A stray string in the array is skipped, not fatal."""
+def test_read_records_hands_back_non_objects_rather_than_hiding_them(tmp_path):
+    """A stray entry survives the read so that the loader can report it.
+
+    Dropping it here -- which is what this used to do -- put it out of reach of
+    the only place that counts losses.
+    """
     path = tmp_path / "mixed.json"
     path.write_text(json.dumps([{"entry_id": 1}, "junk", None]), encoding="utf-8")
 
-    assert load_data.read_records(path) == [{"entry_id": 1}]
+    assert load_data.read_records(path) == [{"entry_id": 1}, "junk", None]
 
 
 def test_read_records_explains_a_missing_file(tmp_path):
@@ -202,17 +253,27 @@ def test_a_verbose_load_reports_what_it_did(
     assert "applicants now holds 12 rows" in printed
 
 
-def test_a_verbose_load_reports_skipped_and_collapsed_records(
+def test_a_verbose_load_names_every_skip_and_its_position(
     empty_database, sample_records, capsys
 ):
-    """Records dropped and records collapsed are counted separately."""
-    records = sample_records + sample_records[:2] + [{"no": "id"}]
+    """Each loss is printed individually, with where in the file it was.
 
-    load_data.load_into_database(records=records, verbose=True)
+    A count alone makes a malformed record in a fifty-thousand-line file
+    impossible to find; the position is the part that makes it actionable.
+    """
+    records = sample_records + sample_records[:2] + [{"no": "id"}, None]
+
+    summary = load_data.load_into_database(records=records, verbose=True)
 
     printed = capsys.readouterr().err
-    assert "skipped 1 without a usable entry id" in printed
+    assert "skipped entry 14: no usable entry id" in printed
+    assert "skipped entry 15: not a JSON object" in printed
     assert "collapsed 2 repeated entry ids" in printed
+    assert summary["skipped"] == 2
+    assert summary["skipped_records"] == [
+        "entry 14: no usable entry id",
+        "entry 15: not a JSON object",
+    ]
 
 
 def test_loading_from_a_file_names_the_file(

@@ -12,7 +12,7 @@ Module 4 is the same application made testable, tested, and documented.
 
 | | |
 |---|---|
-| Tests | **489**, every one marked, in under 10 seconds |
+| Tests | **496**, every one marked, in under 10 seconds |
 | Coverage | **100%** of `module_4/src` — see [`coverage_summary.txt`](coverage_summary.txt) |
 | CI | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) — see [`actions_success.png`](actions_success.png) |
 | Repository | `git@github.com:nipulrj/jhu_software_concepts.git` |

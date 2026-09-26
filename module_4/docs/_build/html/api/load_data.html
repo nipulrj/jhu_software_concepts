@@ -123,6 +123,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">load_data – stage 4, the loader and the schema</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load_data.NOT_AN_OBJECT"><code class="docutils literal notranslate"><span class="pre">NOT_AN_OBJECT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#load_data.SkippedRecord"><code class="docutils literal notranslate"><span class="pre">SkippedRecord</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
@@ -290,35 +292,78 @@ python load_data.py –recreate            # drop and rebuild the table first</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>) – the file to read. It may hold a bare JSON array or an object
-with a <code class="docutils literal notranslate"><span class="pre">&quot;rows&quot;</span></code> key; anything in the array that is not an object is
-dropped rather than crashing the load.</p>
+with a <code class="docutils literal notranslate"><span class="pre">&quot;rows&quot;</span></code> key.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#load_data.LoaderError" title="load_data.LoaderError"><strong>LoaderError</strong></a> – if the file is missing or is not valid JSON, with a
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the array’s entries exactly as read – including any that are not
+objects. Filtering those out here would hide them from
+<a class="reference internal" href="#load_data.build_rows" title="load_data.build_rows"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_rows()</span></code></a>, which is the one place losses are counted.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#load_data.LoaderError" title="load_data.LoaderError"><strong>LoaderError</strong></a> – if the file is missing or is not valid JSON, with a
 message saying what to run instead of a traceback.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>]]</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="load_data.NOT_AN_OBJECT">
+<span class="sig-prename descclassname"><span class="pre">load_data.</span></span><span class="sig-name descname"><span class="pre">NOT_AN_OBJECT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">a</span> <span class="pre">JSON</span> <span class="pre">object'</span></span><a class="headerlink" href="#load_data.NOT_AN_OBJECT" title="Link to this definition"></a></dt>
+<dd><p>Why an input entry could not become a row.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="load_data.SkippedRecord">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">load_data.</span></span><span class="sig-name descname"><span class="pre">SkippedRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/load_data.html#SkippedRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#load_data.SkippedRecord" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One input entry that could not become a row, and why.</p>
+<p>Carries the entry’s position in the source array, so a malformed record in
+a fifty-thousand-line file can be found rather than merely counted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>reason</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="load_data.SkippedRecord.position">
+<span class="sig-name descname"><span class="pre">position</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#load_data.SkippedRecord.position" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="load_data.SkippedRecord.reason">
+<span class="sig-name descname"><span class="pre">reason</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#load_data.SkippedRecord.reason" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="load_data.build_rows">
 <span class="sig-prename descclassname"><span class="pre">load_data.</span></span><span class="sig-name descname"><span class="pre">build_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/load_data.html#build_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#load_data.build_rows" title="Link to this definition"></a></dt>
 <dd><p>Convert records to insertable rows, de-duplicating on <code class="docutils literal notranslate"><span class="pre">p_id</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>) – entries as read, which may include values that are not
+objects at all – a stray <code class="docutils literal notranslate"><span class="pre">null</span></code> in a hand-edited file, say.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the insertable rows, and one <a class="reference internal" href="#load_data.SkippedRecord" title="load_data.SkippedRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">SkippedRecord</span></code></a> per entry that
+could not become one. Every input is therefore accounted for: it is a
+row, a duplicate collapsed into an earlier row, or a reported skip.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>, …]], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference internal" href="#load_data.SkippedRecord" title="load_data.SkippedRecord"><em>SkippedRecord</em></a>]]</p>
+</dd>
+</dl>
 <p>One file can legitimately contain the same entry twice if it was stitched
 together from two scrapes.  <code class="docutils literal notranslate"><span class="pre">ON</span> <span class="pre">CONFLICT</span></code> cannot help there – PostgreSQL
 refuses a statement that touches the same row twice – so duplicates are
 collapsed here, keeping the last occurrence.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>records</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em><em>]</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>, …]], <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)">int</a>]</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py function">

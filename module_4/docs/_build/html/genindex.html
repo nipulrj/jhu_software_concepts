@@ -120,6 +120,8 @@
 <li class="toctree-l2"><a class="reference internal" href="api/load_data.html">load_data – stage 4, the loader and the schema</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.LoaderError"><code class="docutils literal notranslate"><span class="pre">LoaderError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.read_records"><code class="docutils literal notranslate"><span class="pre">read_records()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.NOT_AN_OBJECT"><code class="docutils literal notranslate"><span class="pre">NOT_AN_OBJECT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.SkippedRecord"><code class="docutils literal notranslate"><span class="pre">SkippedRecord</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.build_rows"><code class="docutils literal notranslate"><span class="pre">build_rows()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.create_table"><code class="docutils literal notranslate"><span class="pre">create_table()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/load_data.html#load_data.insert_rows"><code class="docutils literal notranslate"><span class="pre">insert_rows()</span></code></a></li>
@@ -597,6 +599,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/load_data.html#load_data.NOT_AN_OBJECT">NOT_AN_OBJECT (in module load_data)</a>
+</li>
       <li><a href="api/query_data.html#query_data.QuestionResult.number">number (query_data.QuestionResult attribute)</a>
 </li>
   </ul></td>
@@ -632,12 +636,14 @@
 </li>
       <li><a href="api/pull_data.html#pull_data.pid_is_alive">pid_is_alive() (in module pull_data)</a>
 </li>
-      <li><a href="api/query_data.html#query_data.print_results">print_results() (in module query_data)</a>
+      <li><a href="api/load_data.html#load_data.SkippedRecord.position">position (load_data.SkippedRecord attribute)</a>
 </li>
-      <li><a href="api/models.html#models.Applicant.program">program (models.Applicant attribute)</a>
+      <li><a href="api/query_data.html#query_data.print_results">print_results() (in module query_data)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models.html#models.Applicant.program">program (models.Applicant attribute)</a>
+</li>
       <li><a href="api/flask_app.html#flask_app.AnalysisCache.provider">provider (flask_app.AnalysisCache attribute)</a>
 </li>
       <li>
@@ -756,6 +762,8 @@
       </ul></li>
       <li><a href="api/load_data.html#load_data.read_records">read_records() (in module load_data)</a>
 </li>
+      <li><a href="api/load_data.html#load_data.SkippedRecord.reason">reason (load_data.SkippedRecord attribute)</a>
+</li>
       <li><a href="api/flask_app.html#flask_app.AnalysisCache.refresh">refresh() (flask_app.AnalysisCache method)</a>
 </li>
       <li><a href="api/models.html#models.Base.registry">registry (models.Base attribute)</a>
@@ -802,6 +810,8 @@
       <li><a href="api/flask_app.html#flask_app.Services">Services (class in flask_app)</a>
 </li>
       <li><a href="api/models.html#models.session_scope">session_scope() (in module models)</a>
+</li>
+      <li><a href="api/load_data.html#load_data.SkippedRecord">SkippedRecord (class in load_data)</a>
 </li>
       <li><a href="api/flask_app.html#flask_app.AnalysisCache.snapshot">snapshot() (flask_app.AnalysisCache method)</a>
 
