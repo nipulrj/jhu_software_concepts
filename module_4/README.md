@@ -8,7 +8,7 @@ PostgreSQL, and answers eleven analytical questions about them on one page.
 Module 4 is the same application made testable, tested, and documented.
 
 **Documentation:** <https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/>
-— the URL alone is in [`readtodoc-link.txt`](readtodoc-link.txt), and the
+— the URL alone is in [`readthedocs.txt`](readthedocs.txt), and the
 site is also committed under [`docs/_build/html/`](docs/_build/html/index.html).
 
 | | |
