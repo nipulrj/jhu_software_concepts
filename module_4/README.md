@@ -8,14 +8,15 @@ PostgreSQL, and answers eleven analytical questions about them on one page.
 Module 4 is the same application made testable, tested, and documented.
 
 **Documentation:** <https://jhu-software-concepts-gradcafe-analytics-nipulrj.readthedocs.io/>
-(also committed under [`docs/_build/html/`](docs/_build/html/index.html))
+— the URL alone is in [`readtodoc-link.txt`](readtodoc-link.txt), and the
+site is also committed under [`docs/_build/html/`](docs/_build/html/index.html).
 
 | | |
 |---|---|
 | Tests | **496**, every one marked, in under 10 seconds |
 | Coverage | **100%** of `module_4/src` — see [`coverage_summary.txt`](coverage_summary.txt) |
 | CI | [`.github/workflows/tests.yml`](.github/workflows/tests.yml) — see [`actions_success.png`](actions_success.png) |
-| Repository | `git@github.com:nipulrj/jhu_software_concepts.git` |
+| Repository | `git@github.com:nipulrj/jhu_software_concepts.git` — also in [`github.txt`](github.txt) |
 
 ---
 
